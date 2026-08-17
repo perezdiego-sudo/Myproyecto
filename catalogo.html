@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quimicos de la sabana - Catálogo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <a href="index.html" class="logo">Quimicos de la sabana</a>
+  </header>
+
+  <section id="catalogo" class="catalogo">
+    <h2>Nuestro Catálogo</h2>
+
+    <div class="filtros">
+      <button class="btn-filtro activo" data-categoria="todos">Todos</button>
+      <button class="btn-filtro" data-categoria="envases">Envases Plásticos</button>
+      <button class="btn-filtro" data-categoria="liquidos">Líquidos</button>
+      <button class="btn-filtro" data-categoria="perfumeria">Perfumería</button>
+    </div>
+
+    <div class="productos">
+
+      <div class="producto" data-categoria="liquidos" data-nombre="Desinfectante Multiusos" data-precio="8000">
+        <h3>Desinfectante Multiusos</h3>
+        <p>Elimina el 99.9% de gérmenes y bacterias.</p>
+        <span class="precio">$8.000</span>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+      <div class="producto" data-categoria="liquidos" data-nombre="Detergente Industrial" data-precio="25000">
+        <h3>Detergente Industrial</h3>
+        <p>Alto poder de limpieza para grandes superficies.</p>
+        <span class="precio">$25.000</span>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+      <div class="producto" data-categoria="envases" data-nombre="Envase Plástico">
+        <h3>Envase Plástico</h3>
+        <p>Envase resistente con tapa dosificadora, varias presentaciones.</p>
+        <select class="talla">
+          <option value="1/4 Litro" data-precio="1500">1/4 Litro - $1.500</option>
+          <option value="Medio Litro" data-precio="2500">Medio Litro - $2.500</option>
+          <option value="1 Litro" data-precio="3000">1 Litro - $3.000</option>
+          <option value="2 Litros" data-precio="5000">2 Litros - $5.000</option>
+          <option value="5 Litros" data-precio="10000">5 Litros - $10.000</option>
+          <option value="10 Litros" data-precio="18000">10 Litros - $18.000</option>
+          <option value="20 Litros" data-precio="32000">20 Litros - $32.000</option>
+        </select>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+      <!-- NUEVO PRODUCTO AGREGADO AQUÍ -->
+      <div class="producto" data-categoria="envases" data-nombre="NOMBRE DEL PRODUCTO">
+        <h3>NOMBRE DEL PRODUCTO</h3>
+        <p>Descripción breve del producto.</p>
+        <select class="talla">
+          <option value="1/4 Litro" data-precio="1500">1/4 Litro - $1.500</option>
+          <option value="Medio Litro" data-precio="2500">Medio Litro - $2.500</option>
+          <option value="1 Litro" data-precio="3000">1 Litro - $3.000</option>
+          <option value="2 Litros" data-precio="5000">2 Litros - $5.000</option>
+          <option value="5 Litros" data-precio="10000">5 Litros - $10.000</option>
+          <option value="10 Litros" data-precio="18000">10 Litros - $18.000</option>
+          <option value="20 Litros" data-precio="32000">20 Litros - $32.000</option>
+        </select>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+      <!-- FIN NUEVO PRODUCTO -->
+
+      <!-- NUEVO PRODUCTO AGREGADO AQUÍ -->
+      <div class="producto" data-categoria="envases" data-nombre="NOMBRE DEL PRODUCTO">
+        <h3>NOMBRE DEL PRODUCTO</h3>
+        <p>Descripción breve del producto.</p>
+        <select class="talla">
+          <option value="1/4 Litro" data-precio="1500">1/4 Litro - $1.500</option>
+          <option value="Medio Litro" data-precio="2500">Medio Litro - $2.500</option>
+          <option value="1 Litro" data-precio="3000">1 Litro - $3.000</option>
+          <option value="2 Litros" data-precio="5000">2 Litros - $5.000</option>
+          <option value="5 Litros" data-precio="10000">5 Litros - $10.000</option>
+          <option value="10 Litros" data-precio="18000">10 Litros - $18.000</option>
+          <option value="20 Litros" data-precio="32000">20 Litros - $32.000</option>
+        </select>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+      <div class="producto" data-categoria="perfumeria" data-nombre="Esencia Lavanda" data-precio="12000">
+        <h3>Esencia Lavanda</h3>
+        <p>Fragancia concentrada para productos de limpieza.</p>
+        <span class="precio">$12.000</span>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+      <div class="producto" data-categoria="perfumeria" data-nombre="Esencia Cítrica" data-precio="12000">
+        <h3>Esencia Cítrica</h3>
+        <p>Aroma fresco y duradero.</p>
+        <span class="precio">$12.000</span>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="carrito" class="carrito">
+    <h2>Tu Carrito</h2>
+    <ul id="lista-carrito"></ul>
+    <p id="total-carrito">Total: $0</p>
+    <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 2026 QuimiLimpio. Todos los derechos reservados.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
