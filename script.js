@@ -32,20 +32,28 @@ const btnEnviarPedido = document.getElementById('btn-enviar-pedido');
 botonesAgregar.forEach(boton => {
   boton.addEventListener('click', () => {
     const productoDiv = boton.closest('.producto');
-    const selectTalla = productoDiv.querySelector('.talla');
+    
+    // CORRECCIÓN AQUÍ: Busca selectores con la clase 'presentacion' O 'talla'
+    const selectPresentacion = productoDiv.querySelector('.presentacion, .talla');
     const cantidadInput = productoDiv.querySelector('.cantidad');
-    const cantidad = parseInt(cantidadInput.value);
+    const cantidad = parseInt(cantidadInput.value) || 1;
 
     let nombre;
     let precio;
 
-    if (selectTalla) {
-      const opcionSeleccionada = selectTalla.options[selectTalla.selectedIndex];
+    if (selectPresentacion) {
+      const opcionSeleccionada = selectPresentacion.options[selectPresentacion.selectedIndex];
       nombre = `${productoDiv.dataset.nombre} (${opcionSeleccionada.value})`;
       precio = parseInt(opcionSeleccionada.dataset.precio);
     } else {
       nombre = productoDiv.dataset.nombre;
       precio = parseInt(productoDiv.dataset.precio);
+    }
+
+    // Validación por si falta algún precio
+    if (isNaN(precio)) {
+      console.error(`No se pudo obtener el precio para: ${nombre}`);
+      return;
     }
 
     const productoExistente = carrito.find(item => item.nombre === nombre);

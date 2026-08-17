@@ -369,3 +369,48 @@ section h2 {
     font-size: 14px;
   }
 }
+
+/* Estilo para los desplegables de presentación */
+.producto select.presentacion,
+.producto select.talla {
+  width: 100%;
+  padding: 10px 38px 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #f1f1f1;
+  background-color: #2b2b2b;
+  border: 1px solid #444444;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  margin: 10px 0;
+  transition: all 0.2s ease-in-out;
+
+  /* Personalización de la flecha del select */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+/* Efecto hover y focus */
+.producto select.presentacion:hover,
+.producto select.talla:hover {
+  border-color: #ff6600; /* Color verde o primario de tu marca */
+}
+
+.producto select.presentacion:focus,
+.producto select.talla:focus {
+  border-color: #ff6600;
+  box-shadow: 0 0 0 3px rgb(248, 125, 10);
+}
+
+/* Estilo para las opciones del menú desplegable */
+.producto select.presentacion option,
+.producto select.talla option {
+  background-color: #1f1f1f;
+  color: #ffffff;
+  padding: 10px;
+}

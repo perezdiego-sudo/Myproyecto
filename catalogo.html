@@ -24,87 +24,100 @@
 
     <div class="productos">
 
-      <div class="producto" data-categoria="liquidos" data-nombre="Desinfectante Multiusos" data-precio="8000">
-        <h3>Desinfectante Multiusos</h3>
-        <p>Elimina el 99.9% de gérmenes y bacterias.</p>
-        <span class="precio">$8.000</span>
-        <div class="control-cantidad">
-          <input type="number" class="cantidad" value="1" min="1">
-          <button class="btn-agregar-carrito">Agregar al carrito</button>
-        </div>
-      </div>
-
-      <div class="producto" data-categoria="liquidos" data-nombre="Detergente Industrial" data-precio="25000">
-        <h3>Detergente Industrial</h3>
-        <p>Alto poder de limpieza para grandes superficies.</p>
-        <span class="precio">$25.000</span>
-        <div class="control-cantidad">
-          <input type="number" class="cantidad" value="1" min="1">
-          <button class="btn-agregar-carrito">Agregar al carrito</button>
-        </div>
-      </div>
-
-      <div class="producto" data-categoria="envases" data-nombre="Envase Plástico">
-        <h3>Envase Plástico</h3>
-        <p>Envase resistente con tapa dosificadora, varias presentaciones.</p>
-        <select class="talla">
-          <option value="1/4 Litro" data-precio="1500">1/4 Litro - $1.500</option>
-          <option value="Medio Litro" data-precio="2500">Medio Litro - $2.500</option>
-          <option value="1 Litro" data-precio="3000">1 Litro - $3.000</option>
-          <option value="2 Litros" data-precio="5000">2 Litros - $5.000</option>
-          <option value="5 Litros" data-precio="10000">5 Litros - $10.000</option>
-          <option value="10 Litros" data-precio="18000">10 Litros - $18.000</option>
-          <option value="20 Litros" data-precio="32000">20 Litros - $32.000</option>
+      <!-- PRODUCTO CORREGIDO: ALCOHOL AL 90% CON SELECTOR DE PRESENTACIONES -->
+      <div class="producto" data-categoria="liquidos" data-nombre="Alcohol al 90%">
+        <h3>Alcohol al 90%</h3>
+        <p>Alcohol al 96% de alta pureza. Limpieza profunda y evaporación rápida.</p>
+        
+        <select class="presentacion">
+          <option value="1/4 Litro" data-precio="3000">1/4 Litro - $3.000</option>
+          <option value="Medio Litro" data-precio="5500">Medio Litro - $5.500</option>
+          <option value="Litro" data-precio="10000" selected>1 Litro - $10.000</option>
+          <option value="20 Litros" data-precio="180000">20 Litros - $180.000</option>
+    
         </select>
+
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
           <button class="btn-agregar-carrito">Agregar al carrito</button>
         </div>
       </div>
 
-      <!-- NUEVO PRODUCTO AGREGADO AQUÍ -->
-      <div class="producto" data-categoria="envases" data-nombre="NOMBRE DEL PRODUCTO">
-        <h3>NOMBRE DEL PRODUCTO</h3>
-        <p>Descripción breve del producto.</p>
-        <select class="talla">
-          <option value="1/4 Litro" data-precio="1500">1/4 Litro - $1.500</option>
-          <option value="Medio Litro" data-precio="2500">Medio Litro - $2.500</option>
-          <option value="1 Litro" data-precio="3000">1 Litro - $3.000</option>
-          <option value="2 Litros" data-precio="5000">2 Litros - $5.000</option>
-          <option value="5 Litros" data-precio="10000">5 Litros - $10.000</option>
-          <option value="10 Litros" data-precio="18000">10 Litros - $18.000</option>
-          <option value="20 Litros" data-precio="32000">20 Litros - $32.000</option>
+    
+      <div class="producto" data-categoria="liquidos" data-nombre="Jabón Liquido Industrial">
+        <h3>Jabón Liquido Industrial</h3>
+        <p>Poderoso desengrasante industrial para limpieza profunda y eliminación de residuos difíciles.</p>
+        
+        <select class="presentacion">
+          <option value="Litro" data-precio="3000" selected>1 Litro - $3.000</option>
+          <option value="20 Litros" data-precio="60000">20 Litros - $60.000</option>
+    
         </select>
+
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
           <button class="btn-agregar-carrito">Agregar al carrito</button>
         </div>
       </div>
-      <!-- FIN NUEVO PRODUCTO -->
-
-      <!-- NUEVO PRODUCTO AGREGADO AQUÍ -->
-      <div class="producto" data-categoria="envases" data-nombre="NOMBRE DEL PRODUCTO">
-        <h3>NOMBRE DEL PRODUCTO</h3>
-        <p>Descripción breve del producto.</p>
-        <select class="talla">
-          <option value="1/4 Litro" data-precio="1500">1/4 Litro - $1.500</option>
-          <option value="Medio Litro" data-precio="2500">Medio Litro - $2.500</option>
-          <option value="1 Litro" data-precio="3000">1 Litro - $3.000</option>
-          <option value="2 Litros" data-precio="5000">2 Litros - $5.000</option>
-          <option value="5 Litros" data-precio="10000">5 Litros - $10.000</option>
-          <option value="10 Litros" data-precio="18000">10 Litros - $18.000</option>
-          <option value="20 Litros" data-precio="32000">20 Litros - $32.000</option>
+      
+      <div class="producto" data-categoria="liquidos" data-nombre="Acido Nitrico">
+        <h3>Acido Nitrico</h3>
+        <p>Limpiador químico de alta potencia. Elimina óxido, sarro y suciedad pesada</p>
+        
+        <select class="presentacion">
+          <option value="Medio Litro" data-precio="5500">Medio Litro - $5.000</option>
+          <option value="Litro" data-precio="10000" selected>1 Litro - $10.000</option>
+          <option value="20 Litros" data-precio="180000">20 Litros - $200.000</option>
+    
         </select>
+
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
           <button class="btn-agregar-carrito">Agregar al carrito</button>
         </div>
       </div>
 
-      <div class="producto" data-categoria="perfumeria" data-nombre="Esencia Lavanda" data-precio="12000">
-        <h3>Esencia Lavanda</h3>
-        <p>Fragancia concentrada para productos de limpieza.</p>
-        <span class="precio">$12.000</span>
+      <div class="producto" data-categoria="liquidos" data-nombre="Formol">
+        <h3>Formol</h3>
+        <p>Solución desinfectante e industrial. Potente eliminador de hongos, bacterias y malos olores</p>
+        
+        <select class="presentacion">
+          <option value="Medio Litro" data-precio="5500">Medio Litro - $5.000</option>
+          <option value="Litro" data-precio="10000" selected>1 Litro - $10.000</option>
+          <option value="20 Litros" data-precio="180000">20 Litros - $200.000</option>
+    
+        </select>
+
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+      <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero" data-precio="600">
+        <h3>Envase Mantequero x 1/4</h3>
+        <p>Envase resistente con tapa de seguridad.</p>
+        <span class="precio">$600</span>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+       <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero" data-precio="700">
+        <h3>Envase Mantequero x Medio litro</h3>
+        <p>Envase resistente con tapa de seguridad.</p>
+        <span class="precio">$700</span>
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
+      </div>
+
+       <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero" data-precio="800">
+        <h3>Envase Mantequero x 1 litro</h3>
+        <p>Envase resistente con tapa de seguridad.</p>
+        <span class="precio">$600</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
           <button class="btn-agregar-carrito">Agregar al carrito</button>
