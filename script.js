@@ -103,7 +103,7 @@ btnEnviarPedido.addEventListener('click', () => {
     return;
   }
 
-  let mensaje = 'Hola, quiero hacer el siguiente pedido:%0A%0A';
+  let mensaje = 'Hola Quimicos de la sabana, quiero realizar el siguiente pedido:%0A%0A';
 
   carrito.forEach(item => {
     mensaje += `- ${item.cantidad}x ${item.nombre}%0A`;

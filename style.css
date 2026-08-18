@@ -234,6 +234,36 @@ section h2 {
   color: #f0f0f0;
 }
 
+/* Item del carrito (nombre, detalle cantidad/precio unitario, subtotal) */
+.item-carrito {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-nombre {
+  font-weight: bold;
+  color: #fff;
+}
+
+.item-detalle {
+  font-size: 0.85em;
+  color: #aaa;
+}
+
+.item-subtotal {
+  font-weight: bold;
+  color: #ff9933;
+  margin: 0 15px;
+}
+
 .btn-eliminar {
   background-color: #e53935;
   color: white;
@@ -282,7 +312,54 @@ section h2 {
   color: #ff6600;
 }
 
-/* RESPONSIVE - TABLETS (hasta 768px) */
+/* Estilo para los desplegables de presentación */
+.producto select.presentacion,
+.producto select.talla {
+  width: 100%;
+  padding: 10px 38px 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #f1f1f1;
+  background-color: #2b2b2b;
+  border: 1px solid #444444;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  margin: 10px 0;
+  transition: all 0.2s ease-in-out;
+
+  /* Personalización de la flecha del select */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+/* Efecto hover y focus */
+.producto select.presentacion:hover,
+.producto select.talla:hover {
+  border-color: #ff6600;
+}
+
+.producto select.presentacion:focus,
+.producto select.talla:focus {
+  border-color: #ff6600;
+  box-shadow: 0 0 0 3px rgb(248, 125, 10);
+}
+
+/* Estilo para las opciones del menú desplegable */
+.producto select.presentacion option,
+.producto select.talla option {
+  background-color: #1f1f1f;
+  color: #ffffff;
+  padding: 10px;
+}
+
+/* ============================================= */
+/* RESPONSIVE - TABLETS (hasta 768px)             */
+/* ============================================= */
 @media (max-width: 768px) {
   section {
     padding: 40px 20px;
@@ -315,7 +392,9 @@ section h2 {
   }
 }
 
-/* RESPONSIVE - CELULARES (hasta 480px) */
+/* ============================================= */
+/* RESPONSIVE - CELULARES (hasta 480px)           */
+/* ============================================= */
 @media (max-width: 480px) {
   .logo-circulo {
     width: 70px;
@@ -359,6 +438,7 @@ section h2 {
 
   .control-cantidad {
     flex-direction: column;
+    width: 100%;
   }
 
   .control-cantidad .cantidad {
@@ -368,49 +448,44 @@ section h2 {
   #lista-carrito li {
     font-size: 14px;
   }
-}
 
-/* Estilo para los desplegables de presentación */
-.producto select.presentacion,
-.producto select.talla {
-  width: 100%;
-  padding: 10px 38px 10px 12px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #f1f1f1;
-  background-color: #2b2b2b;
-  border: 1px solid #444444;
-  border-radius: 8px;
-  cursor: pointer;
-  outline: none;
-  margin: 10px 0;
-  transition: all 0.2s ease-in-out;
+  /* Evita que iOS haga zoom automático al tocar inputs/selects */
+  .control-cantidad .cantidad,
+  .producto select.presentacion,
+  .producto select.talla {
+    font-size: 16px;
+  }
 
-  /* Personalización de la flecha del select */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-}
+  /* Tamaño táctil mínimo en botones */
+  .btn-agregar-carrito {
+    padding: 12px 16px;
+    font-size: 14px;
+    min-height: 44px;
+    width: 100%;
+  }
 
-/* Efecto hover y focus */
-.producto select.presentacion:hover,
-.producto select.talla:hover {
-  border-color: #ff6600; /* Color verde o primario de tu marca */
-}
+  /* Header en columna si crece con más elementos */
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-.producto select.presentacion:focus,
-.producto select.talla:focus {
-  border-color: #ff6600;
-  box-shadow: 0 0 0 3px rgb(248, 125, 10);
-}
+  /* Items del carrito: evitar que el texto se apriete */
+  .item-carrito {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
 
-/* Estilo para las opciones del menú desplegable */
-.producto select.presentacion option,
-.producto select.talla option {
-  background-color: #1f1f1f;
-  color: #ffffff;
-  padding: 10px;
+  .item-subtotal {
+    margin: 0;
+  }
+
+  /* Carrito pegado abajo mientras se hace scroll por el catálogo */
+  .carrito {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.5);
+  }
 }
