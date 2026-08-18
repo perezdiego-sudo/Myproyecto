@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quimicos de la sabana - Catálogo</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quimicos de la sabana - Catálogo</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- Botón flotante del carrito para celular -->
-<button id="btn-abrir-carrito" class="btn-carrito-flotante">
-  🛒 <span id="contador-carrito">0</span>
-</button>
+  <button id="btn-abrir-carrito" class="btn-carrito-flotante">
+    🛒 <span id="contador-carrito">0</span>
+  </button>
 
   <header class="header">
     <a href="index.html" class="logo">Quimicos de la sabana</a>
@@ -146,41 +146,38 @@
 
 
 <!-- Modal del Carrito -->
- 
 <div id="modal-carrito" class="modal-carrito oculto-modal">
   <div class="modal-contenido">
+    
     <div class="modal-header">
       <h2>Tu Carrito</h2>
-      
-      <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
-      
-      
+      <div class="modal-header-acciones">
+        <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
+      </div>
     </div>
-    
-  
+
     <div class="modal-body">
-      
       <ul id="lista-carrito"></ul>
 
-      <div class="opcion-domicilio">
-        
-        <p class="titulo-domicilio">¿Requiere domicilio?</p>
-        <div class="radio-group">
-          <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
-          <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
-          <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
-        </div>
-      </div>
+       <div class="opcion-domicilio">
+  <!-- Fila alineada con el texto a la izquierda y el botón a la derecha -->
+  <div class="domicilio-header">
+    <p class="titulo-domicilio">¿Requiere domicilio?</p>
+    <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
+  </div>
+
+  <div class="radio-group">
+    <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
+    <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+  </div>
+</div>
 
       <p id="total-carrito">Total: $0</p>
       <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
     </div>
+
   </div>
 </div>
-
-
- 
-
   <footer class="footer">
     <p>&copy; 2026 Quimicos de la Sabana. Todos los derechos reservados.</p>
   </footer>

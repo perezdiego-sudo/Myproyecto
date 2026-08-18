@@ -653,15 +653,38 @@ section h2 {
   gap: 12px;
 }
 
+/* Agrupa y alinea los botones en la esquina superior derecha */
+.modal-header-acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Contenedor flexible para empujar el botón al extremo derecho */
+.domicilio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+/* Elimina márgenes sobrantes que puedan empujar el botón hacia abajo */
+.domicilio-header .titulo-domicilio {
+  margin: 0;
+}
+
+/* Botón compacto alineado a la derecha */
 .btn-vaciar {
-  background: transparent;
+  background-color: transparent;
   color: #ff4d4d;
   border: 1px solid #ff4d4d;
   padding: 4px 10px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  white-space: nowrap; /* Evita que el texto del botón se parta */
 }
 
 .btn-vaciar:hover {
