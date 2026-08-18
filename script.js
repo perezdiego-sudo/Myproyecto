@@ -68,6 +68,9 @@ botonesAgregar.forEach(boton => {
   });
 });
 
+// Actualizar carrito //
+
+
 function actualizarCarrito() {
   listaCarrito.innerHTML = '';
   let total = 0;
@@ -77,24 +80,27 @@ function actualizarCarrito() {
     total += subtotal;
 
     const li = document.createElement('li');
+    li.classList.add('item-carrito'); // Importante para que tome los estilos CSS de la grilla
 
-    const textoSpan = document.createElement('span');
-    textoSpan.textContent = `${item.cantidad}x ${item.nombre} - $${subtotal.toLocaleString('es-CO')}`;
+    // Separamos la cantidad, el nombre y el subtotal en spans independientes
+    li.innerHTML = `
+      <span class="item-cantidad">${item.cantidad}x</span>
+      <span class="item-nombre">${item.nombre}</span>
+      <span class="item-subtotal">$${subtotal.toLocaleString('es-CO')}</span>
+      <button class="btn-eliminar">✕</button>
+    `;
 
-    const btnEliminar = document.createElement('button');
-    btnEliminar.textContent = '✕';
-    btnEliminar.classList.add('btn-eliminar');
-    btnEliminar.addEventListener('click', () => {
+    // Evento para eliminar el producto
+    li.querySelector('.btn-eliminar').addEventListener('click', () => {
       carrito.splice(index, 1);
       actualizarCarrito();
     });
 
-    li.appendChild(textoSpan);
-    li.appendChild(btnEliminar);
     listaCarrito.appendChild(li);
   });
 
   totalCarrito.textContent = `Total: $${total.toLocaleString('es-CO')}`;
+  localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
 btnEnviarPedido.addEventListener('click', () => {

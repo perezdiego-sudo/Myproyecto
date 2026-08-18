@@ -220,48 +220,45 @@ section h2 {
   padding: 20px;
 }
 
-#lista-carrito {
-  list-style: none;
-  margin-bottom: 15px;
-}
 
-#lista-carrito li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #333;
-  color: #f0f0f0;
-}
 
-/* Item del carrito (nombre, detalle cantidad/precio unitario, subtotal) */
 .item-carrito {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  /* 
+     Columna 1: Cantidad (35px)
+     Columna 2: Nombre (Toma todo el espacio restante 1fr)
+     Columna 3: Subtotal (Ancho fijo de 90px para que NUNCA se mueva)
+     Columna 4: Botón eliminar (30px)
+  */
+  grid-template-columns: 35px 1fr 90px 30px;
   align-items: center;
+  gap: 8px;
   padding: 10px 0;
   border-bottom: 1px solid #333;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.item-info {
-  display: flex;
-  flex-direction: column;
+.item-cantidad {
+  font-weight: bold;
+  color: #ff6600;
+  text-align: left;
 }
 
 .item-nombre {
-  font-weight: bold;
   color: #fff;
-}
-
-.item-detalle {
-  font-size: 0.85em;
-  color: #aaa;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0; /* Clave: impide que textos largos deformen la columna de precios */
 }
 
 .item-subtotal {
   font-weight: bold;
   color: #ff9933;
-  margin: 0 15px;
+  text-align: right; /* Clave: alinea todos los valores numéricos a la derecha */
+  white-space: nowrap;
 }
 
 .btn-eliminar {
@@ -274,9 +271,8 @@ section h2 {
   cursor: pointer;
   font-size: 12px;
   line-height: 1;
-  flex-shrink: 0;
+  justify-self: end;
 }
-
 .btn-eliminar:hover {
   background-color: #c62828;
 }
