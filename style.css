@@ -699,3 +699,145 @@ section h2 {
 
 
 
+
+
+/* ==========================================================
+   INICIO MINIMALISTA Y PROFESIONAL (index.html)
+   ========================================================== */
+
+.body-inicio {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: #0d0d0d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.contenedor-inicio {
+  text-align: center;
+  padding: 30px 20px;
+  max-width: 500px;
+  width: 90%;
+}
+
+/* Logo "Qs" estilizado */
+.logo-circulo-inicio {
+  width: 110px;
+  height: 110px;
+  background: linear-gradient(135deg, #ff6600 0%, #e65c00 100%);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px auto;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  box-shadow: 0 0 25px rgba(255, 102, 0, 0.5);
+  animation: pulsoLogo 3s infinite ease-in-out;
+}
+
+/* Título */
+.titulo-inicio {
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+/* Subtítulo */
+.subtitulo-inicio {
+  color: #a0a0a0;
+  font-size: 16px;
+  margin-bottom: 35px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Botón principal con brillo */
+.btn-inicio-glow {
+  display: inline-block;
+  background-color: #ff6600;
+  color: #000000;
+  padding: 14px 38px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: 0 0 15px #ff6600, 0 0 30px rgba(255, 102, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-inicio-glow:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 0 22px #ff6600, 0 0 45px rgba(255, 102, 0, 0.7);
+  background-color: #ff751a;
+}
+
+.btn-inicio-glow:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Animación sutil para el logo */
+@keyframes pulsoLogo {
+  0% {
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(255, 102, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.4);
+  }
+}
+
+
+/* Header superior del catálogo */
+.header {
+  background-color: #121212;
+  border-bottom: 1px solid #222;
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+/* Enlace del logo */
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  width: fit-content;
+  transition: opacity 0.2s;
+}
+
+.header .logo:hover {
+  opacity: 0.9;
+}
+
+/* Círculo miniatura del logo Qs */
+.logo-circulo-header {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #ff6600 0%, #e65c00 100%);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+}
+
+
