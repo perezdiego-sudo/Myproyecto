@@ -20,6 +20,8 @@ botonesFiltro.forEach(boton => {
 });
 
 // CONTROL DEL MODAL Y ELEMENTOS DEL CARRITO
+
+
 const modalCarrito = document.getElementById('modal-carrito');
 const btnAbrirCarrito = document.getElementById('btn-abrir-carrito');
 const btnCerrarCarrito = document.getElementById('btn-cerrar-carrito');
