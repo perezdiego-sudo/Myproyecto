@@ -103,25 +103,44 @@ function actualizarCarrito() {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
+
+
+
+
+
+
+
+
+
+
 btnEnviarPedido.addEventListener('click', () => {
   if (carrito.length === 0) {
     alert('Tu carrito está vacío. Agrega productos antes de enviar.');
     return;
   }
 
-  // Encabezado y saludo personalizado
-  let mensaje = 'Hola, Químicos de la Sabana, quiero realizar el siguiente pedido:%0A%0A';
+  // Obtiene la opción seleccionada por el cliente
+  const requiereDomicilio = document.querySelector('input[name="tipoEnvio"]:checked').value;
 
+  // Encabezado y saludo
+  let mensaje = '🛒 *NUEVO PEDIDO*%0A%0A';
+  mensaje += 'Hola, Químicos de la Sabana, quiero realizar el siguiente pedido:%0A%0A';
 
-  // Productos con precio al lado del nombre
+  // Productos
   carrito.forEach(item => {
     const subtotal = item.precio * item.cantidad;
-    mensaje += `*${item.cantidad}x* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
+    const esEnvase = item.nombre.toLowerCase().includes('envase') || item.categoria === 'Envases Plásticos';
+    const prefijoCantidad = esEnvase ? `${item.cantidad} und x` : `${item.cantidad}x`;
+
+    mensaje += `*${prefijoCantidad}* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
   });
 
   // Total acumulado
   const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-  mensaje += `%0A💰 *Total: $${total.toLocaleString('es-CO')}*`;
+  
+  mensaje += `%0A🚚 *¿Requiere domicilio?:* ${requiereDomicilio}`;
+  mensaje += `%0A💰 *Total productos: $${total.toLocaleString('es-CO')}*`;
+  mensaje += '%0A%0A_(El valor final con domicilio será confirmado por el vendedor)_';
 
   // Enviar a WhatsApp
   const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;

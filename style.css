@@ -388,6 +388,41 @@ section h2 {
   }
 }
 
+/* Estilos para el bloque de domicilio dentro del carrito */
+.opcion-domicilio {
+  margin: 15px 0;
+  padding: 10px 0;
+  border-top: 1px solid #333;
+  text-align: left;
+}
+
+.titulo-domicilio {
+  color: #ff6600;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.radio-group label {
+  color: #ffffff;
+  font-size: 0.9em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.radio-group input[type="radio"] {
+  accent-color: #ff6600; /* Aplica el color naranja al botón radio */
+  cursor: pointer;
+}
+
 /* ============================================= */
 /* RESPONSIVE - CELULARES (hasta 480px)           */
 /* ============================================= */

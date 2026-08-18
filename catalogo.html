@@ -137,12 +137,32 @@
     </div>
   </section>
 
-  <section id="carrito" class="carrito">
-    <h2>Tu Carrito</h2>
-    <ul id="lista-carrito"></ul>
-    <p id="total-carrito">Total: $0</p>
-    <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
+  <section>
+
+    <div class="carrito-container">
+  <h2>Tu Carrito</h2>
+  
+  <ul id="lista-carrito"></ul>
+
+  <!-- Coloca aquí dentro las opciones de domicilio -->
+  <div class="opcion-domicilio">
+    <p class="titulo-domicilio">¿Requiere domicilio?</p>
+    <div class="radio-group">
+      <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
+      <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+    </div>
+  </div>
+
+  <p id="total-carrito">Total: $0</p>
+  
+  <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
+</div>
+    
   </section>
+  
+
+
+ 
 
   <footer class="footer">
     <p>&copy; 2026 Quimicos de la Sabana. Todos los derechos reservados.</p>
