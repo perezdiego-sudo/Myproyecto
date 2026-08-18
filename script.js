@@ -105,28 +105,25 @@ function actualizarCarrito() {
 
 btnEnviarPedido.addEventListener('click', () => {
   if (carrito.length === 0) {
-    alert('Tu carrito está vacío. Agrega productos antes de hacer el pedido.');
+    alert('Tu carrito está vacío. Agrega productos antes de enviar.');
     return;
   }
 
-  // Encabezado del pedido
-  let mensaje = '🛒 *NUEVO PEDIDO DE COMPRA*%0A';
-  mensaje += '-----------------------------------%0A%0A';
+  // Encabezado y saludo personalizado
+  let mensaje = 'Qs';
+  mensaje += 'Hola, Químicos de la Sabana, quiero realizar el siguiente pedido:%0A%0A';
 
-  // Detalle de cada producto con saltos de línea y formato negrita
+  // Productos con precio al lado del nombre
   carrito.forEach(item => {
     const subtotal = item.precio * item.cantidad;
-    mensaje += `*${item.cantidad}x* ${item.nombre}%0A`;
-    mensaje += `    └ *Subtotal:* $${subtotal.toLocaleString('es-CO')}%0A%0A`;
+    mensaje += `*${item.cantidad}x* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
   });
 
-  // Cálculo del total acumulado
+  // Total acumulado
   const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+  mensaje += `%0A💰 *Total: $${total.toLocaleString('es-CO')}*`;
 
-  mensaje += '-----------------------------------%0A';
-  mensaje += `💰 *TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}`;
-
-  // Abre el enlace directo hacia WhatsApp
+  // Enviar a WhatsApp
   const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
   window.open(url, '_blank');
 });
