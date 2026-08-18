@@ -109,15 +109,24 @@ btnEnviarPedido.addEventListener('click', () => {
     return;
   }
 
-  let mensaje = 'Hola Quimicos de la sabana, quiero realizar el siguiente pedido:%0A%0A';
+  // Encabezado del pedido
+  let mensaje = '🛒 *NUEVO PEDIDO DE COMPRA*%0A';
+  mensaje += '-----------------------------------%0A%0A';
 
+  // Detalle de cada producto con saltos de línea y formato negrita
   carrito.forEach(item => {
-    mensaje += `- ${item.cantidad}x ${item.nombre}%0A`;
+    const subtotal = item.precio * item.cantidad;
+    mensaje += `*${item.cantidad}x* ${item.nombre}%0A`;
+    mensaje += `    └ *Subtotal:* $${subtotal.toLocaleString('es-CO')}%0A%0A`;
   });
 
+  // Cálculo del total acumulado
   const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-  mensaje += `%0ATotal: $${total.toLocaleString('es-CO')}`;
 
+  mensaje += '-----------------------------------%0A';
+  mensaje += `💰 *TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}`;
+
+  // Abre el enlace directo hacia WhatsApp
   const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
   window.open(url, '_blank');
 });
