@@ -110,8 +110,8 @@ btnEnviarPedido.addEventListener('click', () => {
   }
 
   // Encabezado y saludo personalizado
-  let mensaje = 'Qs';
-  mensaje += 'Hola, Químicos de la Sabana, quiero realizar el siguiente pedido:%0A%0A';
+  let mensaje = 'Hola, Químicos de la Sabana, quiero realizar el siguiente pedido:%0A%0A';
+
 
   // Productos con precio al lado del nombre
   carrito.forEach(item => {
