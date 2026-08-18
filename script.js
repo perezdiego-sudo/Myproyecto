@@ -22,18 +22,21 @@ botonesFiltro.forEach(boton => {
 // CARRITO Y WHATSAPP
 const NUMERO_WHATSAPP = "573136375152";
 
-let carrito = [];
+// Cargar carrito previo desde localStorage
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
 const botonesAgregar = document.querySelectorAll('.btn-agregar-carrito');
 const listaCarrito = document.getElementById('lista-carrito');
 const totalCarrito = document.getElementById('total-carrito');
 const btnEnviarPedido = document.getElementById('btn-enviar-pedido');
 
+// Renderizar carrito si ya tenía items al abrir la página
+document.addEventListener('DOMContentLoaded', actualizarCarrito);
+
 botonesAgregar.forEach(boton => {
   boton.addEventListener('click', () => {
     const productoDiv = boton.closest('.producto');
     
-    // CORRECCIÓN AQUÍ: Busca selectores con la clase 'presentacion' O 'talla'
     const selectPresentacion = productoDiv.querySelector('.presentacion, .talla');
     const cantidadInput = productoDiv.querySelector('.cantidad');
     const cantidad = parseInt(cantidadInput.value) || 1;
@@ -50,7 +53,6 @@ botonesAgregar.forEach(boton => {
       precio = parseInt(productoDiv.dataset.precio);
     }
 
-    // Validación por si falta algún precio
     if (isNaN(precio)) {
       console.error(`No se pudo obtener el precio para: ${nombre}`);
       return;
@@ -68,9 +70,7 @@ botonesAgregar.forEach(boton => {
   });
 });
 
-// Actualizar carrito //
-
-
+// Actualizar vista del carrito y guardar en localStorage
 function actualizarCarrito() {
   listaCarrito.innerHTML = '';
   let total = 0;
@@ -80,17 +80,15 @@ function actualizarCarrito() {
     total += subtotal;
 
     const li = document.createElement('li');
-    li.classList.add('item-carrito'); // Importante para que tome los estilos CSS de la grilla
+    li.classList.add('item-carrito');
 
-    // Separamos la cantidad, el nombre y el subtotal en spans independientes
     li.innerHTML = `
       <span class="item-cantidad">${item.cantidad}x</span>
       <span class="item-nombre">${item.nombre}</span>
       <span class="item-subtotal">$${subtotal.toLocaleString('es-CO')}</span>
-      <button class="btn-eliminar">✕</button>
+      <button class="btn-eliminar" aria-label="Eliminar producto">✕</button>
     `;
 
-    // Evento para eliminar el producto
     li.querySelector('.btn-eliminar').addEventListener('click', () => {
       carrito.splice(index, 1);
       actualizarCarrito();
@@ -103,46 +101,41 @@ function actualizarCarrito() {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-
-
-
-
-
-
-
-
-
-
+// ENVIAR A WHATSAPP
 btnEnviarPedido.addEventListener('click', () => {
   if (carrito.length === 0) {
     alert('Tu carrito está vacío. Agrega productos antes de enviar.');
     return;
   }
 
-  // Obtiene la opción seleccionada por el cliente
   const requiereDomicilio = document.querySelector('input[name="tipoEnvio"]:checked').value;
+  
+  const fecha = new Date().toLocaleDateString('es-CO');
+  const hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
-  // Encabezado y saludo
-  let mensaje = '🛒 *NUEVO PEDIDO*%0A%0A';
-  mensaje += 'Hola, Químicos de la Sabana, quiero realizar el siguiente pedido:%0A%0A';
+  let mensaje = '```==============================```%0A';
+  mensaje += '*QUÍMICOS DE LA SABANA*%0A';
+  mensaje += '```    COMPROBANTE DE PEDIDO     ```%0A';
+  mensaje += `\`\`\`Fecha: ${fecha} | ${hora}\`\`\`%0A`;
+  mensaje += '```==============================```%0A%0A';
+  mensaje += 'Hola, quiero realizar el siguiente pedido:%0A%0A';
 
-  // Productos
   carrito.forEach(item => {
     const subtotal = item.precio * item.cantidad;
-    const esEnvase = item.nombre.toLowerCase().includes('envase') || item.categoria === 'Envases Plásticos';
+    const esEnvase = item.nombre.toLowerCase().includes('envase');
     const prefijoCantidad = esEnvase ? `${item.cantidad} und x` : `${item.cantidad}x`;
 
     mensaje += `*${prefijoCantidad}* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
   });
 
-  // Total acumulado
   const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-  
-  mensaje += `%0A🚚 *¿Requiere domicilio?:* ${requiereDomicilio}`;
-  mensaje += `%0A💰 *Total productos: $${total.toLocaleString('es-CO')}*`;
-  mensaje += '%0A%0A_(El valor final con domicilio será confirmado por el vendedor)_';
 
-  // Enviar a WhatsApp
+  mensaje += '%0A```==============================```%0A';
+  mensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}%0A`;
+  mensaje += `*TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}%0A`;
+  mensaje += '```==============================```%0A';
+  mensaje += '_(El valor final con domicilio será confirmado por el vendedor)_';
+
   const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
   window.open(url, '_blank');
 });

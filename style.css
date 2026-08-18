@@ -76,6 +76,8 @@ body {
   padding: 20px 40px;
   background-color: #000;
   color: #ff6600;
+  border-radius: 8px;
+  box-shadow: #000;
 }
 
 .header .logo {
@@ -83,7 +85,11 @@ body {
   text-decoration: none;
   font-size: 22px;
   font-weight: bold;
+  
+  
 }
+
+
 
 /* SECCIONES */
 section {
@@ -277,6 +283,16 @@ section h2 {
   background-color: #c62828;
 }
 
+/* Contenedor o tarjeta del carrito estática al hacer scroll */
+/* CARRITO (Contenedor principal) */
+.carrito-container {
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  max-width: 500px;
+  border: 1px solid #333;
+  padding: 20px;
+  margin: 30px auto;
+}
 #total-carrito {
   font-weight: bold;
   font-size: 18px;
@@ -479,6 +495,14 @@ section h2 {
   #lista-carrito li {
     font-size: 14px;
   }
+
+  /* Carrito adaptado a celulares */
+  .carrito-container {
+    width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+
 
   /* Evita que iOS haga zoom automático al tocar inputs/selects */
   .control-cantidad .cantidad,
