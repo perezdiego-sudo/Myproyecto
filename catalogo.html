@@ -8,6 +8,11 @@
 </head>
 <body>
 
+  <!-- Botón flotante del carrito para celular -->
+<button id="btn-abrir-carrito" class="btn-carrito-flotante">
+  🛒 <span id="contador-carrito">0</span>
+</button>
+
   <header class="header">
     <a href="index.html" class="logo">Quimicos de la sabana</a>
   </header>
@@ -135,31 +140,43 @@
       </div>
 
     </div>
+
+
   </section>
 
-  <section>
 
-    <div class="carrito-container">
-  <h2>Tu Carrito</h2>
+<!-- Modal del Carrito -->
+ 
+<div id="modal-carrito" class="modal-carrito oculto-modal">
+  <div class="modal-contenido">
+    <div class="modal-header">
+      <h2>Tu Carrito</h2>
+      
+      <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
+      
+      
+    </div>
+    
   
-  <ul id="lista-carrito"></ul>
+    <div class="modal-body">
+      
+      <ul id="lista-carrito"></ul>
 
-  <!-- Coloca aquí dentro las opciones de domicilio -->
-  <div class="opcion-domicilio">
-    <p class="titulo-domicilio">¿Requiere domicilio?</p>
-    <div class="radio-group">
-      <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
-      <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+      <div class="opcion-domicilio">
+        
+        <p class="titulo-domicilio">¿Requiere domicilio?</p>
+        <div class="radio-group">
+          <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
+          <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+          <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
+        </div>
+      </div>
+
+      <p id="total-carrito">Total: $0</p>
+      <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
     </div>
   </div>
-
-  <p id="total-carrito">Total: $0</p>
-  
-  <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
 </div>
-    
-  </section>
-  
 
 
  

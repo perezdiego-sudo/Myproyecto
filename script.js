@@ -19,7 +19,13 @@ botonesFiltro.forEach(boton => {
   });
 });
 
-// CARRITO Y WHATSAPP
+// CONTROL DEL MODAL Y ELEMENTOS DEL CARRITO
+const modalCarrito = document.getElementById('modal-carrito');
+const btnAbrirCarrito = document.getElementById('btn-abrir-carrito');
+const btnCerrarCarrito = document.getElementById('btn-cerrar-carrito');
+const btnVaciarCarrito = document.getElementById('btn-vaciar-carrito');
+const contadorCarrito = document.getElementById('contador-carrito');
+
 const NUMERO_WHATSAPP = "573136375152";
 
 // Cargar carrito previo desde localStorage
@@ -29,6 +35,40 @@ const botonesAgregar = document.querySelectorAll('.btn-agregar-carrito');
 const listaCarrito = document.getElementById('lista-carrito');
 const totalCarrito = document.getElementById('total-carrito');
 const btnEnviarPedido = document.getElementById('btn-enviar-pedido');
+
+// Eventos para abrir/cerrar la ventana modal
+if (btnAbrirCarrito) {
+  btnAbrirCarrito.addEventListener('click', () => {
+    modalCarrito.classList.remove('oculto-modal');
+  });
+}
+
+if (btnCerrarCarrito) {
+  btnCerrarCarrito.addEventListener('click', () => {
+    modalCarrito.classList.add('oculto-modal');
+  });
+}
+
+// Evento para vaciar/borrar todo el carrito
+if (btnVaciarCarrito) {
+  btnVaciarCarrito.addEventListener('click', () => {
+    if (carrito.length === 0) return;
+
+    if (confirm('¿Estás seguro de que deseas vaciar todo el carrito?')) {
+      carrito = [];
+      actualizarCarrito();
+    }
+  });
+}
+
+// Cerrar el modal si el cliente toca fuera de la ventana
+if (modalCarrito) {
+  modalCarrito.addEventListener('click', (e) => {
+    if (e.target === modalCarrito) {
+      modalCarrito.classList.add('oculto-modal');
+    }
+  });
+}
 
 // Renderizar carrito si ya tenía items al abrir la página
 document.addEventListener('DOMContentLoaded', actualizarCarrito);
@@ -70,7 +110,7 @@ botonesAgregar.forEach(boton => {
   });
 });
 
-// Actualizar vista del carrito y guardar en localStorage
+// Actualizar vista del carrito, contador flotante y guardar en localStorage
 function actualizarCarrito() {
   listaCarrito.innerHTML = '';
   let total = 0;
@@ -97,7 +137,14 @@ function actualizarCarrito() {
     listaCarrito.appendChild(li);
   });
 
+  // Actualiza el texto del total y la burbuja del botón flotante
   totalCarrito.textContent = `Total: $${total.toLocaleString('es-CO')}`;
+  
+  if (contadorCarrito) {
+    const totalUnidades = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+    contadorCarrito.textContent = totalUnidades;
+  }
+
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
