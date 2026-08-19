@@ -840,4 +840,16 @@ section h2 {
   box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
 }
 
+html, body {
+  height: 100%;
+}
 
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.catalogo {
+  flex: 1;
+}
