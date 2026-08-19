@@ -32,17 +32,22 @@
 
     <div class="productos">
 
-      <!-- PRODUCTO CORREGIDO: ALCOHOL AL 90% CON SELECTOR DE PRESENTACIONES -->
+      <!-- ALCOHOL AL 96% -->
       <div class="producto" data-categoria="liquidos" data-nombre="Alcohol al 96%">
         <h3>Alcohol al 96%</h3>
         <p>Alcohol al 96% de alta pureza. Limpieza profunda y evaporación rápida.</p>
-        
+
+        <button class="btn-ver-mas"
+          data-descripcion="El alcohol al 96% es ideal para desinfección de superficies, herramientas y uso industrial. Su alta concentración garantiza evaporación rápida sin dejar residuos."
+          data-imagenes="imagenes/alcohol.webp">
+          Ver más
+        </button>
+
         <select class="presentacion">
           <option value="1/4 Litro" data-precio="3000">1/4 Litro - $3.000</option>
           <option value="Medio Litro" data-precio="5500">Medio Litro - $5.500</option>
           <option value="Litro" data-precio="10000" selected>1 Litro - $10.000</option>
           <option value="20 Litros" data-precio="180000">20 Litros - $180.000</option>
-    
         </select>
 
         <div class="control-cantidad">
@@ -51,15 +56,20 @@
         </div>
       </div>
 
-    
+      <!-- JABÓN LIQUIDO INDUSTRIAL -->
       <div class="producto" data-categoria="liquidos" data-nombre="Jabón Liquido Industrial">
         <h3>Jabón Liquido Industrial</h3>
         <p>Poderoso desengrasante industrial para limpieza profunda y eliminación de residuos difíciles.</p>
-        
+
+        <button class="btn-ver-mas"
+          data-descripcion="Jabón líquido de alto rendimiento formulado para desengrasar superficies industriales y domésticas. Elimina grasa acumulada y residuos difíciles sin dañar el material."
+          data-imagenes="imagenes/jabon-industrial.jpg,imagenes/jabon-industrial-b.jpg">
+          Ver más
+        </button>
+
         <select class="presentacion">
           <option value="Litro" data-precio="3000" selected>1 Litro - $3.000</option>
           <option value="20 Litros" data-precio="60000">20 Litros - $60.000</option>
-    
         </select>
 
         <div class="control-cantidad">
@@ -67,16 +77,22 @@
           <button class="btn-agregar-carrito">Agregar al carrito</button>
         </div>
       </div>
-      
+
+      <!-- ACIDO NITRICO -->
       <div class="producto" data-categoria="liquidos" data-nombre="Acido Nitrico">
         <h3>Acido Nitrico</h3>
         <p>Limpiador químico de alta potencia. Elimina óxido, sarro y suciedad pesada</p>
-        
+
+        <button class="btn-ver-mas"
+          data-descripcion="Limpiador de alta potencia recomendado para remover óxido, sarro y suciedad pesada en superficies metálicas e industriales. Uso exclusivo con protección adecuada."
+          data-imagenes="imagenes/acido-nitrico.jpg,imagenes/acido-nitrico-b.jpg">
+          Ver más
+        </button>
+
         <select class="presentacion">
           <option value="Medio Litro" data-precio="5500">Medio Litro - $5.000</option>
           <option value="Litro" data-precio="10000" selected>1 Litro - $10.000</option>
           <option value="20 Litros" data-precio="180000">20 Litros - $200.000</option>
-    
         </select>
 
         <div class="control-cantidad">
@@ -85,15 +101,21 @@
         </div>
       </div>
 
+      <!-- FORMOL -->
       <div class="producto" data-categoria="liquidos" data-nombre="Formol">
         <h3>Formol</h3>
         <p>Solución desinfectante e industrial. Potente eliminador de hongos, bacterias y malos olores</p>
-        
+
+        <button class="btn-ver-mas"
+          data-descripcion="Solución desinfectante de uso industrial, eficaz contra hongos, bacterias y malos olores. Ideal para desinfección profunda de espacios y superficies."
+          data-imagenes="imagenes/formol.jpg,imagenes/formol-b.jpg">
+          Ver más
+        </button>
+
         <select class="presentacion">
           <option value="Medio Litro" data-precio="5500">Medio Litro - $5.000</option>
           <option value="Litro" data-precio="10000" selected>1 Litro - $10.000</option>
           <option value="20 Litros" data-precio="180000">20 Litros - $200.000</option>
-    
         </select>
 
         <div class="control-cantidad">
@@ -102,9 +124,17 @@
         </div>
       </div>
 
+      <!-- ENVASE MANTEQUERO x 1/4 -->
       <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero x 1/4" data-precio="600">
         <h3>Envase Mantequero x 1/4</h3>
         <p>Envase resistente con tapa de seguridad.</p>
+
+        <button class="btn-ver-mas"
+          data-descripcion="Envase mantequero resistente, con tapa de seguridad hermética. Ideal para reenvasar productos líquidos de forma segura y práctica."
+          data-imagenes="imagenes/envase-1-4.jpg,imagenes/envase-1-4-b.jpg">
+          Ver más
+        </button>
+
         <span class="precio">$600</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
@@ -112,9 +142,17 @@
         </div>
       </div>
 
-       <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero x medio litro" data-precio="700">
+      <!-- ENVASE MANTEQUERO MEDIO LITRO -->
+      <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero x medio litro" data-precio="700">
         <h3>Envase Mantequero x Medio litro</h3>
         <p>Envase resistente con tapa de seguridad.</p>
+
+        <button class="btn-ver-mas"
+          data-descripcion="Envase mantequero resistente, con tapa de seguridad hermética. Capacidad de medio litro, ideal para uso doméstico o comercial."
+          data-imagenes="imagenes/envase-medio-litro.jpg,imagenes/envase-medio-litro-b.jpg">
+          Ver más
+        </button>
+
         <span class="precio">$700</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
@@ -122,9 +160,17 @@
         </div>
       </div>
 
-       <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero x 1 litro" data-precio="800">
+      <!-- ENVASE MANTEQUERO 1 LITRO -->
+      <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero x 1 litro" data-precio="800">
         <h3>Envase Mantequero x 1 litro</h3>
         <p>Envase resistente con tapa de seguridad.</p>
+
+        <button class="btn-ver-mas"
+          data-descripcion="Envase mantequero resistente, con tapa de seguridad hermética. Capacidad de 1 litro, perfecto para almacenamiento y transporte seguro."
+          data-imagenes="imagenes/envase-1-litro.jpg,imagenes/envase-1-litro-b.jpg">
+          Ver más
+        </button>
+
         <span class="precio">$800</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
@@ -132,9 +178,17 @@
         </div>
       </div>
 
+      <!-- ESENCIA CÍTRICA -->
       <div class="producto" data-categoria="perfumeria" data-nombre="Esencia Cítrica" data-precio="12000">
         <h3>Esencia Cítrica</h3>
         <p>Aroma fresco y duradero.</p>
+
+        <button class="btn-ver-mas"
+          data-descripcion="Esencia concentrada de aroma cítrico, fresco y duradero. Ideal para perfumar productos de limpieza, ambientes y textiles."
+          data-imagenes="imagenes/esencia-citrica.jpg,imagenes/esencia-citrica-b.jpg">
+          Ver más
+        </button>
+
         <span class="precio">$12.000</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
@@ -144,14 +198,29 @@
 
     </div>
 
-
   </section>
 
+<!-- Modal Ver Más (detalle de producto) -->
+<div id="modal-detalle" class="modal-carrito oculto-modal">
+  <div class="modal-contenido">
+    <div class="modal-header">
+      <h2 id="detalle-titulo">Nombre del producto</h2>
+      <button id="btn-cerrar-detalle" class="btn-cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detalle-imagen-principal">
+        <img id="detalle-imagen-actual" src="" alt="">
+      </div>
+      <div class="detalle-miniaturas" id="detalle-miniaturas"></div>
+      <p id="detalle-descripcion"></p>
+    </div>
+  </div>
+</div>
 
 <!-- Modal del Carrito -->
 <div id="modal-carrito" class="modal-carrito oculto-modal">
   <div class="modal-contenido">
-    
+
     <div class="modal-header">
       <h2>Tu Carrito</h2>
       <div class="modal-header-acciones">
@@ -163,7 +232,6 @@
       <ul id="lista-carrito"></ul>
 
        <div class="opcion-domicilio">
-  <!-- Fila alineada con el texto a la izquierda y el botón a la derecha -->
   <div class="domicilio-header">
     <p class="titulo-domicilio">¿Requiere domicilio?</p>
     <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>

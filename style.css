@@ -548,7 +548,7 @@ section h2 {
 /* Botón Flotante del Carrito */
 .btn-carrito-flotante {
   position: fixed;
-  bottom: 20px;
+  top: 20px;
   right: 20px;
   background-color: #ff6600;
   color: #000;
@@ -853,3 +853,140 @@ body {
 .catalogo {
   flex: 1;
 }
+
+
+
+
+
+
+
+/* ==========================================================
+   IMÁGENES DE PRODUCTO Y BOTÓN "VER MÁS"
+   ========================================================== */
+
+.producto-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background-color: #2a2a2a; /* se ve mientras carga o si falta la imagen */
+}
+
+.btn-ver-mas {
+  background: none;
+  border: 1px solid #ff6600;
+  color: #ff6600;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  width: 100%;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-ver-mas:hover {
+  background-color: #ff6600;
+  color: #000;
+}
+
+/* ==========================================================
+   MODAL DE DETALLE DE PRODUCTO ("Ver más")
+   ========================================================== */
+
+.detalle-imagen-principal img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  border-radius: 20px;
+  background-color: #2a2a2a;
+}
+
+.detalle-miniaturas {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.miniatura {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.7;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+
+.miniatura:hover,
+.miniatura.activa {
+  opacity: 1;
+  border-color: #ff6600;
+}
+
+#detalle-descripcion {
+  color: #ccc;
+  margin-top: 10px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+/* En celular, la imagen principal un poco más baja para no ocupar toda la pantalla */
+@media (max-width: 480px) {
+  .detalle-imagen-principal img {
+    height: 180px;
+  }
+}
+
+.detalle-imagen-principal img {
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+
+.detalle-imagen-principal img:hover {
+  transform: scale(1.03);
+}
+
+.modal-zoom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  cursor: zoom-out;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.modal-zoom.activo {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-zoom.oculto-modal {
+  display: flex; /* cambia de none a flex para permitir la animación */
+}
+
+.modal-zoom img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 8px;
+  transform: scale(0.7);
+  transition: transform 0.3s ease;
+}
+
+.modal-zoom.activo img {
+  transform: scale(1);
+}
+
+
