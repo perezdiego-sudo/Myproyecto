@@ -1,97 +1,159 @@
+/* ==========================================================
+   1. VARIABLES DE DISEÑO & RESET
+   ========================================================== */
+:root {
+  --color-bg-dark: #0d0d0d;
+  --color-bg-card: #1a1a1a;
+  --color-bg-input: #2a2a2a;
+  --color-primary: #ff6600;
+  --color-primary-hover: #e65c00;
+  --color-primary-light: #ff9933;
+  --color-danger: #e53935;
+  --color-danger-hover: #c62828;
+  --color-text-main: #ffffff;
+  --color-text-muted: #ccc;
+  --border-dark: #333333;
+  --border-input: #444444;
+  --glow-primary: 0 0 15px var(--color-primary), 0 0 30px rgba(255, 102, 0, 0.4);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
   color: #333;
   line-height: 1.6;
-  background-color: #0d0d0d;
+  background-color: var(--color-bg-dark);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* PÁGINA DE INICIO */
+/* ==========================================================
+   2. PÁGINA DE INICIO / HERO
+   ========================================================== */
+.body-inicio {
+  justify-content: center;
+  align-items: center;
+}
+
+.inicio, .contenedor-inicio {
+  text-align: center;
+  padding: 30px 20px;
+  max-width: 500px;
+  width: 90%;
+  margin: 0 auto;
+}
+
 .inicio {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 20px;
-  background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('fondo-inicio.jpg');
-  background-size: cover;
-  background-position: center;
+  background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('fondo-inicio.jpg') center/cover;
 }
 
-.inicio-contenido {
-  max-width: 500px;
-}
-
-.logo-circulo {
-  width: 90px;
-  height: 90px;
-  border-radius: 70%;
-  background-color: #ff6600;
+.logo-circulo, .logo-circulo-inicio {
+  width: 110px;
+  height: 110px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
   color: #000;
-  font-size: 80px;
-  font-weight: bold;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 50px;
+  margin: 0 auto 30px;
+  font-size: 42px;
+  font-weight: 900;
+  box-shadow: 0 0 25px rgba(255, 102, 0, 0.5);
+  animation: pulsoLogo 3s infinite ease-in-out;
 }
 
-.inicio h1 {
-  font-size: 100px;
-  color: #ff6600;
-  margin-bottom: 10px;
-  letter-spacing: 1px;
+.titulo-inicio, .inicio h1 {
+  color: var(--color-text-main);
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
 }
 
-.inicio p {
+.subtitulo-inicio, .inicio p {
+  color: #a0a0a0;
   font-size: 16px;
-  color: #f0f0f0;
-  margin-bottom: 30px;
+  margin-bottom: 35px;
 }
 
-.btn-hero {
+.btn-hero, .btn-inicio-glow {
   display: inline-block;
-  background-color: #ff6600;
+  background-color: var(--color-primary);
   color: #000;
-  padding: 14px 32px;
-  border-radius: 6px;
+  padding: 14px 38px;
+  border-radius: 50px;
   text-decoration: none;
-  font-weight: bold;
-  font-size: 16px;
-  transition: background-color 0.2s;
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: var(--glow-primary);
+  transition: all 0.3s ease;
 }
 
-.btn-hero:hover {
-  background-color: #e65c00;
+.btn-hero:hover, .btn-inicio-glow:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 0 22px var(--color-primary), 0 0 45px rgba(255, 102, 0, 0.7);
+  background-color: #ff751a;
 }
 
-/* HEADER (catálogo) */
+/* ==========================================================
+   3. HEADER & NAVEGACIÓN
+   ========================================================== */
 .header {
-  padding: 20px 40px;
-  background-color: #000;
-  color: #ff6600;
-  border-radius: 8px;
-  box-shadow: #000;
+  background-color: #121212;
+  border-bottom: 1px solid #222;
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
 }
 
 .header .logo {
-  color: #ff6600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   text-decoration: none;
-  font-size: 22px;
-  font-weight: bold;
-  
-  
+  color: var(--color-text-main);
+  font-size: 20px;
+  font-weight: 700;
+  transition: opacity 0.2s;
 }
 
+.logo-circulo-header {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 900;
+}
 
+/* ==========================================================
+   4. CATÁLOGO, SECCIONES Y FILTROS
+   ========================================================== */
+.catalogo { flex: 1; }
 
-/* SECCIONES */
 section {
   padding: 50px 40px;
   max-width: 1000px;
@@ -101,11 +163,10 @@ section {
 section h2 {
   text-align: center;
   margin-bottom: 30px;
-  color: #ff6600;
+  color: var(--color-primary);
   font-size: 28px;
 }
 
-/* FILTROS */
 .filtros {
   display: flex;
   flex-wrap: wrap;
@@ -123,23 +184,20 @@ section h2 {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
+  transition: all 0.3s ease;
 }
 
-.btn-filtro:hover {
-  background-color: #ffe0cc;
-}
+.btn-filtro:hover { background-color: #ffe0cc; }
 
 .btn-filtro.activo {
-  background-color: #ff6600;
-  color: #000;
-  border-color: #ff6600;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: var(--glow-primary);
 }
 
-.producto.oculto {
-  display: none;
-}
-
-/* CATALOGO */
+/* ==========================================================
+   5. TARJETAS DE PRODUCTO & ELEMENTOS
+   ========================================================== */
 .productos {
   display: flex;
   flex-wrap: wrap;
@@ -148,41 +206,59 @@ section h2 {
 }
 
 .producto {
-  background-color: #1a1a1a;
+  background-color: var(--color-bg-card);
   border-radius: 10px;
   padding: 20px;
   width: 260px;
   text-align: center;
+  border: 1px solid var(--border-dark);
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  border: 1px solid #333;
 }
 
-.producto h3 {
-  color: #ff6600;
-  margin-bottom: 10px;
-}
+.producto.oculto { display: none; }
 
-.producto p {
-  font-size: 14px;
-  margin-bottom: 12px;
-  color: #ccc;
-}
-
-.precio {
-  font-weight: bold;
-  font-size: 18px;
-  color: #ff9933;
-}
-
-.talla {
+.producto-img {
   width: 100%;
-  padding: 8px;
-  margin-top: 10px;
-  border: 1px solid #444;
-  border-radius: 6px;
-  font-size: 13px;
-  background-color: #2a2a2a;
-  color: #f0f0f0;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background-color: #afaeae;
+  transition: border-color 0.2s;
+}
+
+.producto-img:hover {
+  border: 2px solid var(--color-primary);
+}
+
+.producto h3 { color: var(--color-primary); margin-bottom: 10px; }
+.producto p { font-size: 14px; margin-bottom: 12px; color: var(--color-text-muted); }
+.precio { font-weight: bold; font-size: 18px; color: var(--color-primary-light); }
+
+.producto select.presentacion,
+.producto select.talla {
+  width: 100%;
+  padding: 10px 38px 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #f1f1f1;
+  background-color: #2b2b2b;
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 10px 0;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: all 0.2s ease-in-out;
+}
+
+.producto select.presentacion:hover,
+.producto select.talla:hover,
+.producto select.presentacion:focus,
+.producto select.talla:focus {
+  border-color: var(--color-primary);
 }
 
 .control-cantidad {
@@ -195,384 +271,47 @@ section h2 {
 .control-cantidad .cantidad {
   width: 50px;
   padding: 6px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-input);
   border-radius: 6px;
   text-align: center;
-  background-color: #2a2a2a;
+  background-color: var(--color-bg-input);
   color: #f0f0f0;
 }
 
-.btn-agregar-carrito {
-  background-color: #ff6600;
+.btn-agregar-carrito, #btn-enviar-pedido {
+  background-color: var(--color-primary);
   color: #000;
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
   font-weight: bold;
 }
 
-.btn-agregar-carrito:hover {
-  background-color: #e65c00;
+.btn-agregar-carrito:hover, #btn-enviar-pedido:hover {
+  background-color: var(--color-primary-hover);
 }
 
-/* CARRITO */
-.carrito {
-  background-color: #1a1a1a;
-  border-radius: 10px;
-  max-width: 500px;
-  border: 1px solid #333;
-  padding: 20px;
-}
-
-
-
-.item-carrito {
-  display: grid;
-  /* 
-     Columna 1: Cantidad (35px)
-     Columna 2: Nombre (Toma todo el espacio restante 1fr)
-     Columna 3: Subtotal (Ancho fijo de 90px para que NUNCA se mueva)
-     Columna 4: Botón eliminar (30px)
-  */
-  grid-template-columns: 35px 1fr 90px 30px;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 0;
-  border-bottom: 1px solid #333;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.item-cantidad {
-  font-weight: bold;
-  color: #ff6600;
-  text-align: left;
-}
-
-.item-nombre {
-  color: #fff;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0; /* Clave: impide que textos largos deformen la columna de precios */
-}
-
-.item-subtotal {
-  font-weight: bold;
-  color: #ff9933;
-  text-align: right; /* Clave: alinea todos los valores numéricos a la derecha */
-  white-space: nowrap;
-}
-
-.btn-eliminar {
-  background-color: #e53935;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 1;
-  justify-self: end;
-}
-.btn-eliminar:hover {
-  background-color: #c62828;
-}
-
-/* Contenedor o tarjeta del carrito estática al hacer scroll */
-/* CARRITO (Contenedor principal) */
-.carrito-container {
-  background-color: #1a1a1a;
-  border-radius: 10px;
-  max-width: 500px;
-  border: 1px solid #333;
-  padding: 20px;
-  margin: 30px auto;
-}
-#total-carrito {
-  font-weight: bold;
-  font-size: 18px;
-  margin-bottom: 15px;
-  color: #ff9933;
-}
-
-#btn-enviar-pedido {
-  background-color: #ff6600;
-  color: #000;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-}
-
-#btn-enviar-pedido:hover {
-  background-color: #e65c00;
-}
-
-/* FOOTER */
-.footer {
-  text-align: center;
-  padding: 20px;
-  background-color: #000;
-  color: #ff6600;
-}
-
-/* Estilo para los desplegables de presentación */
-.producto select.presentacion,
-.producto select.talla {
-  width: 100%;
-  padding: 10px 38px 10px 12px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #f1f1f1;
-  background-color: #2b2b2b;
-  border: 1px solid #444444;
-  border-radius: 8px;
-  cursor: pointer;
-  outline: none;
-  margin: 10px 0;
-  transition: all 0.2s ease-in-out;
-
-  /* Personalización de la flecha del select */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-}
-
-/* Efecto hover y focus */
-.producto select.presentacion:hover,
-.producto select.talla:hover {
-  border-color: #ff6600;
-}
-
-.producto select.presentacion:focus,
-.producto select.talla:focus {
-  border-color: #ff6600;
-  box-shadow: 0 0 0 3px rgb(248, 125, 10);
-}
-
-/* Estilo para las opciones del menú desplegable */
-.producto select.presentacion option,
-.producto select.talla option {
-  background-color: #1f1f1f;
-  color: #ffffff;
-  padding: 10px;
-}
-
-/* ============================================= */
-/* RESPONSIVE - TABLETS (hasta 768px)             */
-/* ============================================= */
-@media (max-width: 768px) {
-  section {
-    padding: 40px 20px;
-  }
-
-  .inicio h1 {
-    font-size: 30px;
-  }
-
-  .inicio p {
-    font-size: 15px;
-  }
-
-  section h2 {
-    font-size: 24px;
-  }
-
-  .producto {
-    width: 100%;
-    max-width: 320px;
-  }
-
-  .carrito {
-    max-width: 100%;
-  }
-
-  .header {
-    padding: 15px 20px;
-    text-align: center;
-  }
-}
-
-/* Estilos para el bloque de domicilio dentro del carrito */
-.opcion-domicilio {
-  margin: 15px 0;
-  padding: 10px 0;
-  border-top: 1px solid #333;
-  text-align: left;
-}
-
-.titulo-domicilio {
-  color: #ff6600;
-  font-weight: bold;
-  margin-bottom: 8px;
-  font-size: 0.95em;
-}
-
-.radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.radio-group label {
-  color: #ffffff;
-  font-size: 0.9em;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.radio-group input[type="radio"] {
-  accent-color: #ff6600; /* Aplica el color naranja al botón radio */
-  cursor: pointer;
-}
-
-/* ============================================= */
-/* RESPONSIVE - CELULARES (hasta 480px)           */
-/* ============================================= */
-@media (max-width: 480px) {
-  .logo-circulo {
-    width: 70px;
-    height: 70px;
-    font-size: 22px;
-  }
-
-  .inicio h1 {
-    font-size: 26px;
-  }
-
-  .inicio p {
-    font-size: 14px;
-  }
-
-  .btn-hero {
-    padding: 12px 24px;
-    font-size: 14px;
-  }
-
-  section h2 {
-    font-size: 20px;
-  }
-
-  .filtros {
-    gap: 8px;
-  }
-
-  .btn-filtro {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-
-  .productos {
-    gap: 15px;
-  }
-
-  .producto {
-    padding: 15px;
-  }
-
-  .control-cantidad {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .control-cantidad .cantidad {
-    width: 100%;
-  }
-
-  #lista-carrito li {
-    font-size: 14px;
-  }
-
-  /* Carrito adaptado a celulares */
-  .carrito-container {
-    width: 100%;
-    margin-top: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  }
-
-
-  /* Evita que iOS haga zoom automático al tocar inputs/selects */
-  .control-cantidad .cantidad,
-  .producto select.presentacion,
-  .producto select.talla {
-    font-size: 16px;
-  }
-
-  /* Tamaño táctil mínimo en botones */
-  .btn-agregar-carrito {
-    padding: 12px 16px;
-    font-size: 14px;
-    min-height: 44px;
-    width: 100%;
-  }
-
-  /* Header en columna si crece con más elementos */
-  .header {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  /* Items del carrito: evitar que el texto se apriete */
-  .item-carrito {
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  .item-subtotal {
-    margin: 0;
-  }
-
-  /* Carrito pegado abajo mientras se hace scroll por el catálogo */
-  .carrito {
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.5);
-  }
-}
-
-/* Botón Flotante del Carrito */
+/* ==========================================================
+   6. CARRITO & MODAL
+   ========================================================== */
 .btn-carrito-flotante {
   position: fixed;
   top: 20px;
   right: 20px;
-  background-color: #ff6600;
+  background-color: var(--color-primary);
   color: #000;
   border: none;
   border-radius: 50px;
   padding: 12px 20px;
   font-size: 18px;
   font-weight: bold;
-  box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
   cursor: pointer;
   z-index: 999;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: transform 0.2s, box-shadow 0.3s ease;
-  box-shadow: 0 0 15px #ff6600, 0 0 30px rgba(255, 102, 0, 0.6);
-}
-
-.btn-carrito-flotante:active {
-  transform: scale(0.95);
-}
-
-.btn-carrito-flotante:hover {
-  box-shadow: 0 0 20px #ff6600, 0 0 40px rgba(255, 102, 0, 0.8);
+  box-shadow: var(--glow-primary);
 }
 
 #contador-carrito {
@@ -583,53 +322,37 @@ section h2 {
   font-size: 14px;
 }
 
-/* Modal del Carrito */
 .modal-carrito {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
-  align-items: flex-end; /* En móviles abre desde abajo tipo App */
+  align-items: flex-end;
   z-index: 1000;
-  transition: opacity 0.3s ease;
 }
 
-.modal-carrito.oculto-modal {
-  display: none;
-}
+.modal-carrito.oculto-modal, .modal-zoom.oculto-modal { display: none; }
 
-.modal-contenido {
-  background-color: #1a1a1a;
+.modal-contenido, .carrito-container {
+  background-color: var(--color-bg-card);
   width: 100%;
   max-width: 500px;
   border-radius: 16px 16px 0 0;
   padding: 20px;
-  border-top: 2px solid #ff6600;
+  border-top: 2px solid var(--color-primary);
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 -5px 25px rgba(0,0,0,0.8);
+  color: var(--color-text-main);
 }
 
-@media (min-width: 600px) {
-  .modal-carrito {
-    align-items: center; /* En PC se centra */
-  }
-  .modal-contenido {
-    border-radius: 12px;
-    border: 1px solid #333;
-  }
-}
-
+/* Header del modal */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-dark);
   padding-bottom: 10px;
   margin-bottom: 15px;
 }
@@ -637,7 +360,7 @@ section h2 {
 .modal-header h2 {
   margin: 0;
   font-size: 20px;
-  color: #ff6600;
+  color: var(--color-primary);
 }
 
 .btn-cerrar {
@@ -648,38 +371,60 @@ section h2 {
   cursor: pointer;
 }
 
-.btn-cerrar:hover {
-  color: #fff;
+.btn-cerrar:hover { color: #fff; }
+
+/* Lista de ítems */
+.item-carrito {
+  display: grid;
+  grid-template-columns: 35px 1fr 90px 30px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-dark);
 }
 
-.modal-header-acciones {
+.item-cantidad { font-weight: bold; color: var(--color-primary); }
+.item-nombre { color: var(--color-text-main); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-subtotal { font-weight: bold; color: var(--color-primary-light); text-align: right; }
+
+.btn-eliminar {
+  background-color: var(--color-danger);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
 }
 
-/* Agrupa y alinea los botones en la esquina superior derecha */
-.modal-header-acciones {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.btn-eliminar:hover { background-color: var(--color-danger-hover); }
+
+/* Sección Domicilio */
+.opcion-domicilio {
+  margin: 15px 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-dark);
+  text-align: left;
 }
 
-/* Contenedor flexible para empujar el botón al extremo derecho */
 .domicilio-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
-/* Elimina márgenes sobrantes que puedan empujar el botón hacia abajo */
-.domicilio-header .titulo-domicilio {
+.titulo-domicilio {
+  color: var(--color-primary);
+  font-weight: bold;
   margin: 0;
+  font-size: 0.95em;
 }
 
-/* Botón compacto alineado a la derecha */
 .btn-vaciar {
   background-color: transparent;
   color: #ff4d4d;
@@ -689,7 +434,7 @@ section h2 {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap; /* Evita que el texto del botón se parta */
+  white-space: nowrap;
 }
 
 .btn-vaciar:hover {
@@ -697,196 +442,45 @@ section h2 {
   color: #ffffff;
 }
 
-
-
-
-
-/* ==========================================================
-   INICIO MINIMALISTA Y PROFESIONAL (index.html)
-   ========================================================== */
-
-.body-inicio {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  background-color: #0d0d0d;
+.radio-group {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
-.contenedor-inicio {
-  text-align: center;
-  padding: 30px 20px;
-  max-width: 500px;
-  width: 90%;
-}
-
-/* Logo "Qs" estilizado */
-.logo-circulo-inicio {
-  width: 110px;
-  height: 110px;
-  background: linear-gradient(135deg, #ff6600 0%, #e65c00 100%);
-  color: #000;
-  border-radius: 50%;
+.radio-group label {
+  color: var(--color-text-main);
+  font-size: 0.9em;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 0 auto 30px auto;
-  font-size: 42px;
-  font-weight: 900;
-  letter-spacing: -1px;
-  box-shadow: 0 0 25px rgba(255, 102, 0, 0.5);
-  animation: pulsoLogo 3s infinite ease-in-out;
+  gap: 6px;
 }
 
-/* Título */
-.titulo-inicio {
-  color: #ffffff;
-  font-size: 36px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  letter-spacing: -0.5px;
+.radio-group input[type="radio"] {
+  accent-color: var(--color-primary);
+  cursor: pointer;
 }
 
-/* Subtítulo */
-.subtitulo-inicio {
-  color: #a0a0a0;
-  font-size: 16px;
-  margin-bottom: 35px;
-  line-height: 1.5;
-  font-weight: 400;
+/* Total y Enviar */
+#total-carrito {
+  font-weight: bold;
+  font-size: 18px;
+  margin: 15px 0;
+  color: var(--color-primary-light);
 }
 
-/* Botón principal con brillo */
-.btn-inicio-glow {
-  display: inline-block;
-  background-color: #ff6600;
-  color: #000000;
-  padding: 14px 38px;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 17px;
-  box-shadow: 0 0 15px #ff6600, 0 0 30px rgba(255, 102, 0, 0.4);
-  transition: all 0.3s ease;
-}
-
-.btn-inicio-glow:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 0 22px #ff6600, 0 0 45px rgba(255, 102, 0, 0.7);
-  background-color: #ff751a;
-}
-
-.btn-inicio-glow:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* Animación sutil para el logo */
-@keyframes pulsoLogo {
-  0% {
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 35px rgba(255, 102, 0, 0.8);
-  }
-  100% {
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.4);
-  }
-}
-
-
-/* Header superior del catálogo */
-.header {
-  background-color: #121212;
-  border-bottom: 1px solid #222;
-  padding: 12px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(8px);
-}
-
-/* Enlace del logo */
-.header .logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  color: #ffffff;
-  font-size: 20px;
-  font-weight: 700;
-  width: fit-content;
-  transition: opacity 0.2s;
-}
-
-.header .logo:hover {
-  opacity: 0.9;
-}
-
-/* Círculo miniatura del logo Qs */
-.logo-circulo-header {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #ff6600 0%, #e65c00 100%);
-  color: #000;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 900;
-  box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
-}
-
-html, body {
-  height: 100%;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.catalogo {
-  flex: 1;
-}
-
-
-
-
-
-
-
-/* ==========================================================
-   IMÁGENES DE PRODUCTO"
-   ========================================================== */
-
-.producto-img {
+#btn-enviar-pedido {
   width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  background-color: #afaeae; /* se ve mientras carga o si falta la imagen */
+  padding: 12px 20px;
+  font-size: 15px;
 }
 
-.producto-img:hover {
-  border-color: #ff6600;
-  box-shadow: 0 0 0 3px rgb(248, 125, 10)
-}
-
-
-
-
+/* Modal Zoom */
 .modal-zoom {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.9);
   display: flex;
   justify-content: center;
@@ -895,15 +489,42 @@ body {
   cursor: zoom-out;
 }
 
-.modal-zoom.oculto-modal {
-  display: none;
+.modal-zoom img { max-width: 90%; max-height: 90%; object-fit: contain; }
+
+/* ==========================================================
+   7. FOOTER & EXTRAS
+   ========================================================== */
+.footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #000;
+  color: var(--color-primary);
 }
 
-.modal-zoom img {
-  max-width: 90%;
-  max-height: 90%;
-  object-fit: contain;
-  border-radius: 8px;
+@keyframes pulsoLogo {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 102, 0, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(255, 102, 0, 0.8); }
 }
 
+/* ==========================================================
+   8. MEDIA QUERIES (RESPONSIVE)
+   ========================================================== */
+@media (min-width: 600px) {
+  .modal-carrito { align-items: center; }
+  .modal-contenido { border-radius: 12px; border: 1px solid var(--border-dark); }
+}
 
+@media (max-width: 768px) {
+  section { padding: 40px 20px; }
+  .inicio h1 { font-size: 30px; }
+  .producto { width: 100%; max-width: 320px; }
+  .header { padding: 15px 20px; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .logo-circulo { width: 70px; height: 70px; font-size: 22px; }
+  .control-cantidad { flex-direction: column; width: 100%; }
+  .control-cantidad .cantidad { width: 100%; }
+  .btn-agregar-carrito { width: 100%; min-height: 44px; }
+  .item-carrito { flex-wrap: wrap; gap: 4px; }
+}
