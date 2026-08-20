@@ -31,10 +31,13 @@
 
       <!-- PRODUCTO CORREGIDO: ALCOHOL AL 90% CON SELECTOR DE PRESENTACIONES -->
       <div class="producto" data-categoria="liquidos" data-nombre="Alcohol al 96%">
+        
         <h3>Alcohol al 96%</h3>
         <p>Alcohol al 96% de alta pureza. Limpieza profunda y evaporación rápida.</p>
+        <img src="imagenes/alcohol.webp" alt="Alcohol al 96%" class="producto-img">
         
         <select class="presentacion">
+      
           <option value="1/4 Litro" data-precio="3000">1/4 Litro - $3.000</option>
           <option value="Medio Litro" data-precio="5500">Medio Litro - $5.500</option>
           <option value="Litro" data-precio="10000" selected>1 Litro - $10.000</option>
@@ -52,6 +55,8 @@
       <div class="producto" data-categoria="liquidos" data-nombre="Jabón Liquido Industrial">
         <h3>Jabón Liquido Industrial</h3>
         <p>Poderoso desengrasante industrial para limpieza profunda y eliminación de residuos difíciles.</p>
+        <img src="imagenes/alcohol.png" alt="Alcohol al 96%" class="producto-img">
+        
         
         <select class="presentacion">
           <option value="Litro" data-precio="3000" selected>1 Litro - $3.000</option>
@@ -68,6 +73,8 @@
       <div class="producto" data-categoria="liquidos" data-nombre="Acido Nitrico">
         <h3>Acido Nitrico</h3>
         <p>Limpiador químico de alta potencia. Elimina óxido, sarro y suciedad pesada</p>
+        <img src="imagenes/alcohol.png" alt="Alcohol al 96%" class="producto-img">
+        
         
         <select class="presentacion">
           <option value="Medio Litro" data-precio="5500">Medio Litro - $5.000</option>
@@ -85,6 +92,8 @@
       <div class="producto" data-categoria="liquidos" data-nombre="Formol">
         <h3>Formol</h3>
         <p>Solución desinfectante e industrial. Potente eliminador de hongos, bacterias y malos olores</p>
+        <img src="imagenes/alcohol.png" alt="Alcohol al 96%" class="producto-img">
+        
         
         <select class="presentacion">
           <option value="Medio Litro" data-precio="5500">Medio Litro - $5.000</option>
@@ -102,6 +111,8 @@
       <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero x 1/4" data-precio="600">
         <h3>Envase Mantequero x 1/4</h3>
         <p>Envase resistente con tapa de seguridad.</p>
+        <img src="imagenes/alcohol.png" alt="Alcohol al 96%" class="producto-img">
+        
         <span class="precio">$600</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
@@ -112,6 +123,8 @@
        <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero x medio litro" data-precio="700">
         <h3>Envase Mantequero x Medio litro</h3>
         <p>Envase resistente con tapa de seguridad.</p>
+        <img src="imagenes/alcohol.png" alt="Alcohol al 96%" class="producto-img">
+        
         <span class="precio">$700</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
@@ -122,6 +135,9 @@
        <div class="producto" data-categoria="envases" data-nombre="Envase Mantequero x 1 litro" data-precio="800">
         <h3>Envase Mantequero x 1 litro</h3>
         <p>Envase resistente con tapa de seguridad.</p>
+        <img src="imagenes/alcohol.png" alt="Alcohol al 96%" class="producto-img">
+        
+        
         <span class="precio">$800</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
@@ -132,6 +148,7 @@
       <div class="producto" data-categoria="perfumeria" data-nombre="Esencia Cítrica" data-precio="12000">
         <h3>Esencia Cítrica</h3>
         <p>Aroma fresco y duradero.</p>
+        <img src="imagenes/alcohol.png" alt="Alcohol al 96%" class="producto-img">
         <span class="precio">$12.000</span>
         <div class="control-cantidad">
           <input type="number" class="cantidad" value="1" min="1">
@@ -181,6 +198,10 @@
   <footer class="footer">
     <p>&copy; 2026 Quimicos de la Sabana. Todos los derechos reservados.</p>
   </footer>
+
+  <div id="modal-zoom" class="modal-zoom oculto-modal">
+  <img id="zoom-imagen-actual" src="" alt="Imagen ampliada">
+</div>
 
   <script src="script.js"></script>
 </body>

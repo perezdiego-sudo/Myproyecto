@@ -187,3 +187,21 @@ btnEnviarPedido.addEventListener('click', () => {
   const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
   window.open(url, '_blank');
 });
+
+// ==========================================================
+// ZOOM: ampliar imagen del producto al hacer clic
+// ==========================================================
+
+const modalZoom = document.getElementById('modal-zoom');
+const zoomImagenActual = document.getElementById('zoom-imagen-actual');
+
+document.querySelectorAll('.producto-img').forEach(imagen => {
+  imagen.addEventListener('click', () => {
+    zoomImagenActual.src = imagen.src;
+    modalZoom.classList.remove('oculto-modal');
+  });
+});
+
+modalZoom.addEventListener('click', () => {
+  modalZoom.classList.add('oculto-modal');
+});
