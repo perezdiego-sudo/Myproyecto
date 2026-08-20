@@ -166,7 +166,7 @@ btnEnviarPedido.addEventListener('click', () => {
   mensaje += '```    COMPROBANTE DE PEDIDO     ```%0A';
   mensaje += `\`\`\`Fecha: ${fecha} | ${hora}\`\`\`%0A`;
   mensaje += '```==============================```%0A%0A';
-  mensaje += 'Hola, quiero realizar el siguiente pedido:%0A%0A';
+  mensaje += 'Hola, quimicos de la sabana quiero realizar el siguiente pedido:%0A%0A';
 
   carrito.forEach(item => {
     const subtotal = item.precio * item.cantidad;
@@ -186,63 +186,4 @@ btnEnviarPedido.addEventListener('click', () => {
 
   const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
   window.open(url, '_blank');
-});
-
-// ==========================================================
-// VER MÁS - MODAL DE DETALLE DE PRODUCTO
-// ==========================================================
-
-const modalDetalle = document.getElementById('modal-detalle');
-const btnCerrarDetalle = document.getElementById('btn-cerrar-detalle');
-const detalleTitulo = document.getElementById('detalle-titulo');
-const detalleImagenActual = document.getElementById('detalle-imagen-actual');
-const detalleMiniaturas = document.getElementById('detalle-miniaturas');
-const detalleDescripcion = document.getElementById('detalle-descripcion');
-
-document.querySelectorAll('.btn-ver-mas').forEach(boton => {
-  boton.addEventListener('click', () => {
-    const productoDiv = boton.closest('.producto');
-    const nombre = productoDiv.dataset.nombre;
-    const descripcion = boton.dataset.descripcion;
-    const imagenes = boton.dataset.imagenes.split(',');
-
-    detalleTitulo.textContent = nombre;
-    detalleDescripcion.textContent = descripcion;
-    detalleImagenActual.src = imagenes[0];
-
-    detalleMiniaturas.innerHTML = '';
-   detalleMiniaturas.innerHTML = '';
-
-if (imagenes.length > 1) {
-  imagenes.forEach((img, i) => {
-    const miniatura = document.createElement('img');
-    miniatura.src = img;
-    miniatura.classList.add('miniatura');
-    if (i === 0) miniatura.classList.add('activa');
-
-    miniatura.addEventListener('click', () => {
-      detalleImagenActual.src = img;
-      detalleMiniaturas.querySelectorAll('.miniatura').forEach(m => m.classList.remove('activa'));
-      miniatura.classList.add('activa');
-    });
-
-    detalleMiniaturas.appendChild(miniatura);
-  });
-}
-
-    modalDetalle.classList.remove('oculto-modal');
-  });
-});
-
-btnCerrarDetalle.addEventListener('click', () => {
-  modalDetalle.classList.add('oculto-modal');
-});
-
-// Cerrar el modal de detalle si el cliente toca fuera de la ventana
-modalDetalle.addEventListener('click', (e) => {
-  if (e.target === modalDetalle) {
-    modalDetalle.classList.add('oculto-modal');
-  }
-
-  
 });
