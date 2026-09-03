@@ -28,7 +28,7 @@ html, body {
 }
 
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
   color: #333;
   line-height: 1.6;
   background-color: var(--color-bg-dark);
