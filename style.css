@@ -79,7 +79,7 @@ body {
 
 .titulo-inicio, .inicio h1 {
   color: var(--color-text-main);
-  font-size: 36px;
+  font-size: 29px;
   font-weight: 800;
   margin-bottom: 12px;
   letter-spacing: -0.5px;
@@ -108,6 +108,59 @@ body {
   transform: translateY(-3px) scale(1.03);
   box-shadow: 0 0 22px var(--color-primary), 0 0 45px rgba(255, 102, 0, 0.7);
   background-color: #ff751a;
+}
+
+@keyframes pulsoLogo {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 102, 0, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(255, 102, 0, 0.8); }
+}
+
+/* Tarjetas de horario/ubicación en el inicio */
+.info-inicio {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: rgba(255, 102, 0, 0.08);
+  border: 1px solid rgba(255, 102, 0, 0.3);
+  border-radius: 10px;
+  padding: 12px 18px;
+  max-width: 380px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.info-card:hover {
+  border-color: #ff6600;
+  background-color: rgba(255, 102, 0, 0.15);
+}
+
+.info-icono { font-size: 22px; }
+
+.info-texto {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.info-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ff9933;
+  font-weight: 600;
+}
+
+.info-valor {
+  font-size: 14px;
+  color: #f0f0f0;
+  font-weight: 500;
 }
 
 /* ==========================================================
@@ -213,7 +266,18 @@ section h2 {
   text-align: center;
   border: 1px solid var(--border-dark);
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
 }
+
+.producto:nth-child(1) { animation-delay: 0.05s; }
+.producto:nth-child(2) { animation-delay: 0.1s; }
+.producto:nth-child(3) { animation-delay: 0.15s; }
+.producto:nth-child(4) { animation-delay: 0.2s; }
+.producto:nth-child(5) { animation-delay: 0.25s; }
+.producto:nth-child(6) { animation-delay: 0.3s; }
+.producto:nth-child(7) { animation-delay: 0.35s; }
+.producto:nth-child(8) { animation-delay: 0.4s; }
 
 .producto.oculto { display: none; }
 
@@ -345,6 +409,7 @@ section h2 {
   max-height: 85vh;
   overflow-y: auto;
   color: var(--color-text-main);
+  animation: fadeInUp 0.3s ease;
 }
 
 /* Header del modal */
@@ -495,6 +560,25 @@ section h2 {
   cursor: pointer;
 }
 
+.input-direccion {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  background-color: var(--color-bg-input);
+  color: #f0f0f0;
+  font-size: 14px;
+}
+
+.input-direccion:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.3);
+}
+
+.input-direccion.oculto { display: none; }
+
 /* Total y Enviar */
 #total-carrito {
   font-weight: bold;
@@ -524,21 +608,11 @@ section h2 {
 .modal-zoom img { max-width: 90%; max-height: 90%; object-fit: contain; }
 
 /* ==========================================================
-   7. FOOTER & EXTRAS
+   7. FOOTER
    ========================================================== */
 .footer {
-  text-align: center;
-  padding: 20px;
   background-color: #000;
   color: var(--color-primary);
-}
-
-@keyframes pulsoLogo {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 102, 0, 0.4); }
-  50% { box-shadow: 0 0 35px rgba(255, 102, 0, 0.8); }
-}
-.footer {
-  background-color: #000;
   padding: 40px 20px 20px;
 }
 
@@ -552,9 +626,7 @@ section h2 {
   text-align: left;
 }
 
-.footer-columna {
-  min-width: 220px;
-}
+.footer-columna { min-width: 220px; }
 
 .footer-logo {
   display: flex;
@@ -582,7 +654,6 @@ section h2 {
   color: #ccc;
   font-size: 14px;
   margin-bottom: 6px;
-  
 }
 
 .footer-derechos {
@@ -594,24 +665,24 @@ section h2 {
 .footer-derechos p {
   color: #666;
   font-size: 12px;
-  
 }
 
-@media (max-width: 480px) {
-  .footer-contenido {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 25px;
+/* ==========================================================
+   8. ANIMACIONES
+   ========================================================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
   }
-
-  .footer-logo {
-    justify-content: flex-end;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 /* ==========================================================
-   8. MEDIA QUERIES (RESPONSIVE)
+   9. MEDIA QUERIES (RESPONSIVE)
    ========================================================== */
 @media (min-width: 600px) {
   .modal-carrito { align-items: center; }
@@ -631,86 +702,21 @@ section h2 {
   .control-cantidad .cantidad { width: 100%; }
   .btn-agregar-carrito { width: 100%; min-height: 44px; }
   .item-carrito { flex-wrap: wrap; gap: 4px; }
-}
 
-.info-inicio {
-  margin-top: 35px;
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.info-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background-color: rgba(255, 102, 0, 0.08);
-  border: 1px solid rgba(255, 102, 0, 0.3);
-  border-radius: 10px;
-  padding: 12px 18px;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.info-card:hover {
-  border-color: #ff6600;
-  background-color: rgba(255, 102, 0, 0.15);
-}
-
-.info-icono {
-  font-size: 22px;
-}
-
-.info-texto {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.info-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #ff9933;
-  font-weight: 600;
-}
-
-.info-valor {
-  font-size: 14px;
-  color: #f0f0f0;
-  font-weight: 500;
-}
-
-@media (max-width: 480px) {
   .info-inicio {
     flex-direction: column;
     align-items: center;
     gap: 10px;
   }
 
-  .info-card {
-    width: 100%;
-    max-width: 280px;
+  .info-card { width: 100%; }
+
+  .footer-contenido {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 25px;
   }
-}
 
-.input-direccion {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px 12px;
-  border: 1px solid #444;
-  border-radius: 8px;
-  background-color: #2a2a2a;
-  color: #f0f0f0;
-  font-size: 14px;
-}
-
-.input-direccion:focus {
-  outline: none;
-  border-color: #ff6600;
-  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.3);
-}
-
-.input-direccion.oculto {
-  display: none;
+  .footer-logo { justify-content: flex-end; }
 }
