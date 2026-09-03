@@ -193,11 +193,11 @@ btnEnviarPedido.addEventListener('click', () => {
   const hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
   let mensaje = '```==============================```%0A';
-  mensaje += '*QUÍMICOS DE LA SABANA*%0A';
+  mensaje += '*QUIMIASEO Y PERFUMERIA SINCELEJO*%0A';
   mensaje += '```    COMPROBANTE DE PEDIDO     ```%0A';
   mensaje += `\`\`\`Fecha: ${fecha} | ${hora}\`\`\`%0A`;
   mensaje += '```==============================```%0A%0A';
-  mensaje += 'Hola, quimicos de la sabana quiero realizar el siguiente pedido:%0A%0A';
+  mensaje += 'Hola, quimiaseo quiero realizar el siguiente pedido:%0A%0A';
 
   carrito.forEach(item => {
     const subtotal = item.precio * item.cantidad;
