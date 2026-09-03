@@ -726,3 +726,37 @@ section h2 {
 
   .footer-logo { justify-content: flex-end; }
 }
+
+/* ==========================================================
+   AJUSTES PARA MÓVIL (CORRECCIÓN DE OVERLAP Y FILTROS)
+   ========================================================== */
+@media (max-width: 480px) {
+  /* 1. Mover el botón flotante abajo a la derecha estilo App */
+  .btn-carrito-flotante {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 16px;
+    font-size: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 15px var(--color-primary);
+  }
+
+  /* 2. Header despejado sin choques de texto */
+  .header {
+    padding-right: 20px;
+    justify-content: center;
+  }
+
+  /* 3. Permite hacer scroll horizontal en los filtros si no caben */
+  .filtros {
+    justify-content: flex-start;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .btn-filtro {
+    flex: 0 0 auto;
+  }
+}
