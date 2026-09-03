@@ -226,6 +226,20 @@ btnEnviarPedido.addEventListener('click', () => {
 });
 
 // ==========================================================
+  // VACIA Y LIMPIA EL CARRITO AUTOMÁTICAMENTE TRAS ENVIAR
+  // ==========================================================
+  carrito = [];
+  localStorage.removeItem('carrito');
+  actualizarCarrito();
+  
+  if (modalCarrito) {
+    modalCarrito.classList.add('oculto-modal');
+  }
+
+
+
+
+// ==========================================================
 // ZOOM: ampliar imagen del producto al hacer clic
 // ==========================================================
 
