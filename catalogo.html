@@ -14,8 +14,11 @@
   </button>
 
   <header class="header">
-    <a href="index.html" class="logo">Quimicos de la sabana</a>
-  </header>
+  <a href="index.html" class="logo">
+    <div class="logo-circulo-header">Qs</div>
+    <span>Químicos de la sabana</span>
+  </a>
+</header>
 
   <section id="catalogo" class="catalogo">
     <h2>Nuestro Catálogo</h2>
@@ -165,6 +168,39 @@
 <!-- Modal del Carrito -->
 <div id="modal-carrito" class="modal-carrito oculto-modal">
   <div class="modal-contenido">
+
+    <div class="modal-header">
+      <h2>Tu Carrito</h2>
+      <div class="modal-header-acciones">
+        <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <ul id="lista-carrito"></ul>
+
+      <div class="opcion-domicilio">
+        <div class="domicilio-header">
+          <p class="titulo-domicilio">¿Requiere domicilio?</p>
+          <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
+        </div>
+
+        <div class="radio-group">
+          <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
+          <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+        </div>
+
+        <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa">
+      </div>
+
+      <p id="total-carrito">Total: $0</p>
+      <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
+    </div>
+
+  </div>
+</div><!-- Modal del Carrito -->
+<div id="modal-carrito" class="modal-carrito oculto-modal">
+  <div class="modal-contenido">
     
     <div class="modal-header">
       <h2>Tu Carrito</h2>
@@ -175,6 +211,8 @@
 
     <div class="modal-body">
       <ul id="lista-carrito"></ul>
+
+    </div>  
 
        <div class="opcion-domicilio">
   <!-- Fila alineada con el texto a la izquierda y el botón a la derecha -->
@@ -187,6 +225,8 @@
     <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
     <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
   </div>
+  <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa">
+</div>
 </div>
 
       <p id="total-carrito">Total: $0</p>
@@ -194,14 +234,31 @@
     </div>
 
   </div>
-</div>
-  <footer class="footer">
+<footer class="footer">
+  <div class="footer-contenido">
+    <div class="footer-columna">
+      <div class="footer-logo">
+        <div class="logo-circulo-header">Qs</div>
+        <span>Químicos de la sabana</span>
+      </div>
+      <p class="footer-texto">Productos químicos de calidad, industriales y domésticos.</p>
+    </div>
+
+    <div class="footer-columna">
+      <h4>Contacto</h4>
+      <p>📍 Calle 32B #16C-51, El Cauca, Sincelejo - Sucre</p>
+      <p>🕒 Lunes a Sábado, 8am - 6pm</p>
+    </div>
+  </div>
+
+  <div class="footer-derechos">
     <p>&copy; 2026 Quimicos de la Sabana. Todos los derechos reservados.</p>
-  </footer>
+  </div>
+</footer>
 
   <div id="modal-zoom" class="modal-zoom oculto-modal">
   <img id="zoom-imagen-actual" src="" alt="Imagen ampliada">
-</div>
+  </div>
 
   <script src="script.js"></script>
 </body>

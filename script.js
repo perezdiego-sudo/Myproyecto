@@ -1,4 +1,4 @@
-// FILTROS DE CATEGORÍA
+/// FILTROS DE CATEGORÍA
 const botonesFiltro = document.querySelectorAll('.btn-filtro');
 const productos = document.querySelectorAll('.producto');
 
@@ -26,6 +26,8 @@ const btnAbrirCarrito = document.getElementById('btn-abrir-carrito');
 const btnCerrarCarrito = document.getElementById('btn-cerrar-carrito');
 const btnVaciarCarrito = document.getElementById('btn-vaciar-carrito');
 const contadorCarrito = document.getElementById('contador-carrito');
+const inputDireccion = document.getElementById('input-direccion');
+const radiosEnvio = document.querySelectorAll('input[name="tipoEnvio"]');
 
 const NUMERO_WHATSAPP = "573136375152";
 
@@ -70,6 +72,17 @@ if (modalCarrito) {
     }
   });
 }
+
+// Mostrar/ocultar el campo de dirección según la opción elegida
+radiosEnvio.forEach(radio => {
+  radio.addEventListener('change', () => {
+    if (radio.value === 'Sí' && radio.checked) {
+      inputDireccion.classList.remove('oculto');
+    } else if (radio.value === 'No' && radio.checked) {
+      inputDireccion.classList.add('oculto');
+    }
+  });
+});
 
 // Renderizar carrito si ya tenía items al abrir la página
 document.addEventListener('DOMContentLoaded', actualizarCarrito);
@@ -124,16 +137,29 @@ function actualizarCarrito() {
     li.classList.add('item-carrito');
 
     li.innerHTML = `
-      <span class="item-cantidad">${item.cantidad}x</span>
-      <span class="item-nombre">${item.nombre}</span>
-      <span class="item-subtotal">$${subtotal.toLocaleString('es-CO')}</span>
-      <button class="btn-eliminar" aria-label="Eliminar producto">✕</button>
-    `;
+  <div class="item-cantidad-control">
+    <button class="btn-restar" aria-label="Restar cantidad">−</button>
+    <span class="item-cantidad">${item.cantidad}</span>
+    <button class="btn-sumar" aria-label="Sumar cantidad">+</button>
+  </div>
+  <span class="item-nombre">${item.nombre}</span>
+  <span class="item-subtotal">$${subtotal.toLocaleString('es-CO')}</span>
+  <button class="btn-eliminar" aria-label="Eliminar producto">✕</button>
+`;
 
-    li.querySelector('.btn-eliminar').addEventListener('click', () => {
-      carrito.splice(index, 1);
-      actualizarCarrito();
-    });
+    li.querySelector('.btn-sumar').addEventListener('click', () => {
+  carrito[index].cantidad += 1;
+  actualizarCarrito();
+});
+
+li.querySelector('.btn-restar').addEventListener('click', () => {
+  if (carrito[index].cantidad > 1) {
+    carrito[index].cantidad -= 1;
+  } else {
+    carrito.splice(index, 1);
+  }
+  actualizarCarrito();
+});
 
     listaCarrito.appendChild(li);
   });
@@ -157,6 +183,11 @@ btnEnviarPedido.addEventListener('click', () => {
   }
 
   const requiereDomicilio = document.querySelector('input[name="tipoEnvio"]:checked').value;
+
+  if (requiereDomicilio === 'Sí' && inputDireccion.value.trim() === '') {
+    alert('Por favor escribe la dirección para el domicilio.');
+    return;
+  }
   
   const fecha = new Date().toLocaleDateString('es-CO');
   const hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
@@ -180,6 +211,12 @@ btnEnviarPedido.addEventListener('click', () => {
 
   mensaje += '%0A```==============================```%0A';
   mensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}%0A`;
+
+  if (requiereDomicilio === 'Sí') {
+    const direccion = inputDireccion.value.trim();
+    mensaje += `*Dirección:* ${direccion}%0A`;
+  }
+
   mensaje += `*TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}%0A`;
   mensaje += '```==============================```%0A';
   mensaje += '_(El valor final con domicilio será confirmado por el vendedor)_';
