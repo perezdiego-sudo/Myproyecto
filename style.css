@@ -268,6 +268,12 @@ section h2 {
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   animation: fadeInUp 0.5s ease forwards;
   opacity: 0;
+  display: flex;
+  flex-direction: column;
+}p+
+
+.producto .control-cantidad {
+  margin-top: auto;
 }
 
 .producto:nth-child(1) { animation-delay: 0.05s; }
