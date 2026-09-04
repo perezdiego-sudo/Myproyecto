@@ -58,8 +58,6 @@ body {
   padding: 40px 15px;
 }
 
-
-
 .contenedor-inicio {
   text-align: center;
   max-width: 650px;
@@ -525,7 +523,17 @@ section h2 {
 }
 
 .item-cantidad { font-weight: bold; color: var(--color-primary); }
-.item-nombre { color: var(--color-text-main); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* CLASE MODIFICADA: Permite que el texto baje a la siguiente línea */
+.item-nombre { 
+  color: var(--color-text-main); 
+  font-weight: 500; 
+  white-space: normal; 
+  word-wrap: break-word; 
+  overflow: visible;
+  line-height: 1.3;
+}
+
 .item-subtotal { font-weight: bold; color: var(--color-primary); text-align: right; }
 
 .btn-eliminar {
@@ -755,7 +763,9 @@ section h2 {
   .control-cantidad { flex-direction: column; width: 100%; }
   .control-cantidad .cantidad { width: 100%; }
   .btn-agregar-carrito { width: 100%; min-height: 44px; }
-  .item-carrito { flex-wrap: wrap; gap: 4px; }
+  
+  /* El gap se reduce un poco para ajustar mejor la grilla original de .item-carrito */
+  .item-carrito { gap: 4px; } 
 
   .footer-contenido {
     flex-direction: column;
