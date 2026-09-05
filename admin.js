@@ -1,4 +1,3 @@
-// IMPORTACIÓN DE FIREBASE (Asegúrate de tener tu archivo firebase-config.js o tus credenciales)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
   getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
@@ -7,7 +6,7 @@ import {
   getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// REEMPLAZA ESTE OBJETO CON TU CONFIGURACIÓN DE FIREBASE SI LO TIENES EN OTRO LADO
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyB5iP0E5BVu0XX0bclE-0j1ym24GRbYDNQ",
   authDomain: "quimiaseo-caribe.firebaseapp.com",
@@ -24,45 +23,38 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // ELEMENTOS DEL DOM
-const vistaLogin = document.getElementById('vista-login');
-const vistaAdmin = document.getElementById('vista-admin');
-const formLogin = document.getElementById('form-login');
+const loginSection = document.getElementById('login-section');
+const panelSection = document.getElementById('panel-section');
+const userInfo = document.getElementById('user-info');
 const userEmailSpan = document.getElementById('user-email');
+const formLogin = document.getElementById('form-login');
 const btnLogout = document.getElementById('btn-logout');
 
-const kpiTotal = document.getElementById('kpi-total');
-const kpiStock = document.getElementById('kpi-stock');
-
 const formProducto = document.getElementById('form-producto');
-const productoIdInput = document.getElementById('producto-id');
-const nombreInput = document.getElementById('nombre');
-const categoriaInput = document.getElementById('categoria');
-const stockInput = document.getElementById('stock');
-const descripcionInput = document.getElementById('descripcion');
-const imagenInput = document.getElementById('imagen');
-const imgPreview = document.getElementById('img-preview');
-const previewPlaceholder = document.getElementById('preview-placeholder');
-const contenedorPresentaciones = document.getElementById('contenedor-presentaciones');
-const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion');
-const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
-const tituloForm = document.getElementById('titulo-form');
-
-const tablaBody = document.getElementById('tabla-body');
-const inputBuscar = document.getElementById('input-buscar');
-const filtroCategoria = document.getElementById('filtro-tabla-categoria');
+const formTitle = document.getElementById('form-title');
+const prodIdInput = document.getElementById('prod-id');
+const prodNombreInput = document.getElementById('prod-nombre');
+const prodCategoriaInput = document.getElementById('prod-categoria');
+const prodPrecioInput = document.getElementById('prod-precio');
+const prodStockInput = document.getElementById('prod-stock');
+const unidadStockTxt = document.getElementById('unidad-stock-txt');
+const btnCancelarEdit = document.getElementById('btn-cancelar-edit');
+const tablaBody = document.getElementById('tabla-productos-body');
 
 let todosLosProductos = [];
 
 // AUTENTICACIÓN
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    vistaLogin.classList.add('oculto');
-    vistaAdmin.classList.remove('oculto');
+    loginSection.classList.add('hidden');
+    panelSection.classList.remove('hidden');
+    userInfo.classList.remove('hidden');
     userEmailSpan.textContent = user.email;
     cargarProductos();
   } else {
-    vistaLogin.classList.remove('oculto');
-    vistaAdmin.classList.add('oculto');
+    loginSection.classList.remove('hidden');
+    panelSection.classList.add('hidden');
+    userInfo.classList.add('hidden');
   }
 });
 
@@ -84,155 +76,68 @@ btnLogout.addEventListener('click', () => {
   mostrarToast('Sesión cerrada', 'exito');
 });
 
-// GESTIÓN DE PRESENTACIONES EN EL FORMULARIO
-btnAgregarPresentacion.addEventListener('click', () => agregarFilaPresentacion());
-
-function agregarFilaPresentacion(nombre = '', precio = '') {
-  const row = document.createElement('div');
-  row.className = 'presentacion-row';
-  row.innerHTML = `
-    <input type="text" class="pres-nombre" placeholder="Medida (ej: 1 Litro, Galón)" value="${nombre}" required>
-    <input type="number" class="pres-precio" placeholder="Precio ($)" value="${precio}" min="0" step="any" required>
-    <button type="button" class="btn-eliminar"><i class="fa-solid fa-trash"></i></button>
-  `;
-
-  row.querySelector('.btn-eliminar').addEventListener('click', () => {
-    if (contenedorPresentaciones.children.length > 1) {
-      row.remove();
-    } else {
-      mostrarToast('Debe haber al menos una presentación', 'error');
-    }
-  });
-
-  contenedorPresentaciones.appendChild(row);
-}
-
-// PREVIEW DE IMAGEN
-imagenInput.addEventListener('input', () => {
-  const url = imagenInput.value.trim();
-  if (url) {
-    imgPreview.src = url;
-    imgPreview.classList.remove('oculto');
-    previewPlaceholder.classList.add('oculto');
-  } else {
-    imgPreview.classList.add('oculto');
-    previewPlaceholder.classList.remove('oculto');
-  }
-});
-
-// CARGAR PRODUCTOS DESDE FIRESTORE
+// CARGAR PRODUCTOS DESDE FIRESTORE EN TIEMPO REAL
 function cargarProductos() {
   onSnapshot(collection(db, 'productos'), (snapshot) => {
     todosLosProductos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    actualizarMetricas(todosLosProductos);
     renderizarTabla(todosLosProductos);
   });
 }
 
-// ACTUALIZAR LAS 3 MÉTRICAS
-function actualizarMetricas(productos) {
-  const totalProds = productos.length;
-  const totalUnidadesStock = productos.reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
-
-  if (kpiTotal) kpiTotal.textContent = totalProds;
-  if (kpiStock) kpiStock.textContent = totalUnidadesStock;
-}
-
-// RENDERIZAR TABLA
+// RENDERIZAR TABLA EN PANTALLA
 function renderizarTabla(productos) {
-  const textoBuscado = inputBuscar.value.toLowerCase().trim();
-  const catFiltrada = filtroCategoria.value;
-
-  const filtrados = productos.filter(p => {
-    const coincideNombre = p.nombre.toLowerCase().includes(textoBuscado);
-    const coincideCat = catFiltrada === 'todos' || p.categoria === catFiltrada;
-    return coincideNombre && coincideCat;
-  });
-
-  if (filtrados.length === 0) {
-    tablaBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:16px;">No se encontraron productos</td></tr>`;
+  if (productos.length === 0) {
+    tablaBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:16px; color:#888;">No hay productos registrados</td></tr>`;
     return;
   }
 
-  tablaBody.innerHTML = filtrados.map(p => {
-    const preciosTexto = p.presentaciones ? p.presentaciones.map(pr => `${pr.nombre}: $${pr.precio}`).join('<br>') : '';
-    
-    return `
-      <tr>
-        <td>
-          <div class="contenedor-img-tabla">
-            <img src="${p.imagen}" class="tabla-img" onerror="this.src='https://via.placeholder.com/40'">
-          </div>
-        </td>
-        <td><strong>${p.nombre}</strong></td>
-        <td><span style="text-transform:capitalize;">${p.categoria}</span></td>
-        <td><strong>${p.stock || 0}</strong> ${obtenerUnidadStock(p.categoria)}</td>
-        <td style="font-size: 11px;">${preciosTexto}</td>
-        <td>
-          <button class="btn-editar" data-id="${p.id}"><i class="fa-solid fa-pen"></i></button>
-          <button class="btn-eliminar" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>
-        </td>
-      </tr>
-    `;
-  }).join('');
+  tablaBody.innerHTML = productos.map(p => `
+    <tr>
+      <td><strong>${p.nombre || ''}</strong></td>
+      <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
+      <td>$${(Number(p.precio) || 0).toLocaleString()}</td>
+      <td><strong>${p.stock || 0}</strong> ${obtenerUnidadStock(p.categoria)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-sm btn-edit" data-id="${p.id}"><i class="fa-solid fa-pen"></i> Editar</button>
+          <button class="btn-sm btn-delete" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
 
-  // Eventos de botones en la tabla
-  tablaBody.querySelectorAll('.btn-editar').forEach(btn => {
+  // Eventos de botones
+  tablaBody.querySelectorAll('.btn-edit').forEach(btn => {
     btn.addEventListener('click', () => editarProducto(btn.dataset.id));
   });
 
-  tablaBody.querySelectorAll('.btn-eliminar').forEach(btn => {
+  tablaBody.querySelectorAll('.btn-delete').forEach(btn => {
     btn.addEventListener('click', () => eliminarProducto(btn.dataset.id));
   });
 }
 
-async function procesarPedidoCliente(productoId, cantidadComprada, datosCliente) {
-  try {
-    const productoRef = doc(db, 'productos', productoId);
-
-    // 1. Resta automáticamente la cantidad comprada al stock actual
-    await updateDoc(productoRef, {
-      stock: increment(-cantidadComprada)
-    });
-
-    // 2. Guarda el registro del pedido en la colección 'pedidos'
-    await addDoc(collection(db, 'pedidos'), {
-      productoId: productoId,
-      cantidad: cantidadComprada,
-      cliente: datosCliente,
-      fecha: new Date(),
-      estado: 'completado'
-    });
-
-    alert("¡Pedido realizado con éxito!");
-  } catch (error) {
-    console.error("Error al procesar el pedido:", error);
-    alert("Ocurrió un error al procesar tu compra.");
-  }
+// OBTENER UNIDAD DE MEDIDA
+function obtenerUnidadStock(cat) {
+  const unidades = { polvos: 'kg', liquidos: 'L', perfumeria: 'L', envases: 'unid.' };
+  return unidades[cat] || 'unid.';
 }
 
-// FILTROS
-inputBuscar.addEventListener('input', () => renderizarTabla(todosLosProductos));
-filtroCategoria.addEventListener('change', () => renderizarTabla(todosLosProductos));
+prodCategoriaInput.addEventListener('change', () => {
+  const unidad = obtenerUnidadStock(prodCategoriaInput.value);
+  if (unidadStockTxt) unidadStockTxt.textContent = unidad;
+  prodStockInput.placeholder = `Ej: 50 ${unidad}`;
+});
 
-// GUARDAR / ACTUALIZAR PRODUCTO
+// GUARDAR O ACTUALIZAR PRODUCTO
 formProducto.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const id = productoIdInput.value;
-  const filasPres = document.querySelectorAll('.presentacion-row');
-  const presentaciones = Array.from(filasPres).map(row => ({
-    nombre: row.querySelector('.pres-nombre').value.trim(),
-    precio: parseFloat(row.querySelector('.pres-precio').value)
-  }));
-
+  const id = prodIdInput.value;
   const dataProducto = {
-    nombre: nombreInput.value.trim(),
-    categoria: categoriaInput.value,
-    stock: parseInt(stockInput.value) || 0,
-    descripcion: descripcionInput.value.trim(),
-    imagen: imagenInput.value.trim(),
-    presentaciones
+    nombre: prodNombreInput.value.trim(),
+    categoria: prodCategoriaInput.value,
+    precio: parseFloat(prodPrecioInput.value) || 0,
+    stock: parseFloat(prodStockInput.value) || 0
   };
 
   try {
@@ -249,83 +154,49 @@ formProducto.addEventListener('submit', async (e) => {
   }
 });
 
-// EDITAR Y ELIMINAR
+// EDITAR PRODUCTO
 function editarProducto(id) {
   const prod = todosLosProductos.find(p => p.id === id);
   if (!prod) return;
 
-  productoIdInput.value = prod.id;
-  nombreInput.value = prod.nombre;
-  categoriaInput.value = prod.categoria;
-  stockInput.value = prod.stock || 0;
-  descripcionInput.value = prod.descripcion;
-  imagenInput.value = prod.imagen;
-  imgPreview.src = prod.imagen;
-  imgPreview.classList.remove('oculto');
-  previewPlaceholder.classList.add('oculto');
+  prodIdInput.value = prod.id;
+  prodNombreInput.value = prod.nombre || '';
+  prodCategoriaInput.value = prod.categoria || 'polvos';
+  prodPrecioInput.value = prod.precio || 0;
+  prodStockInput.value = prod.stock || 0;
 
-  contenedorPresentaciones.innerHTML = '';
-  if (prod.presentaciones && prod.presentaciones.length > 0) {
-    prod.presentaciones.forEach(pr => agregarFilaPresentacion(pr.nombre, pr.precio));
-  } else {
-    agregarFilaPresentacion();
-  }
-
-  tituloForm.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
-  btnCancelarEdicion.classList.remove('oculto');
+  if (unidadStockTxt) unidadStockTxt.textContent = obtenerUnidadStock(prod.categoria);
+  formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
+  btnCancelarEdit.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ELIMINAR PRODUCTO
 async function eliminarProducto(id) {
   if (confirm('¿Eliminar este producto permanentemente?')) {
     try {
       await deleteDoc(doc(db, 'productos', id));
       mostrarToast('Producto eliminado', 'exito');
     } catch (err) {
-      mostrarToast('Error al eliminar', 'error');
+      mostrarToast('Error al eliminar: ' + err.message, 'error');
     }
   }
 }
 
-btnCancelarEdicion.addEventListener('click', limpiarFormulario);
+btnCancelarEdit.addEventListener('click', limpiarFormulario);
 
 function limpiarFormulario() {
   formProducto.reset();
-  productoIdInput.value = '';
-  contenedorPresentaciones.innerHTML = '';
-  agregarFilaPresentacion();
-  imgPreview.classList.add('oculto');
-  previewPlaceholder.classList.remove('oculto');
-  tituloForm.innerHTML = `<i class="fa-solid fa-circle-plus"></i> Agregar Nuevo Producto`;
-  btnCancelarEdicion.classList.add('oculto');
+  prodIdInput.value = '';
+  if (unidadStockTxt) unidadStockTxt.textContent = 'kg';
+  formTitle.innerHTML = `<i class="fa-solid fa-square-plus"></i> Registrar Producto`;
+  btnCancelarEdit.classList.add('hidden');
 }
-
-// Retorna la unidad correspondiente según la categoría
-function obtenerUnidadStock(categoria) {
-  const unidades = {
-    polvos: 'kg',
-    liquidos: 'L',
-    perfumeria: 'L',
-    envases: 'unid.'
-  };
-  return unidades[categoria] || 'unid.';
-}
-
-// Actualiza la etiqueta del formulario cuando cambias la categoría
-categoriaInput.addEventListener('change', () => {
-  const unidad = obtenerUnidadStock(categoriaInput.value);
-  const spanUnidad = document.getElementById('unidad-stock-txt');
-  if (spanUnidad) spanUnidad.textContent = unidad;
-  stockInput.placeholder = `Ej: 50 ${unidad}`;
-});
-
-
-// INICIALIZAR PRIMERA FILA AL CARGAR
-agregarFilaPresentacion();
 
 // NOTIFICACIONES TOAST
 function mostrarToast(msj, tipo) {
   const toastContainer = document.getElementById('toast-container');
+  if (!toastContainer) return;
   const toast = document.createElement('div');
   toast.className = `toast ${tipo}`;
   toast.innerHTML = `<i class="fa-solid ${tipo === 'exito' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${msj}`;
