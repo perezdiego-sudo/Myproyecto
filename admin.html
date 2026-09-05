@@ -2,16 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Panel de Administración - Quimiaseo</title>
+  
+  <!-- Fuentes e Iconos Vectoriales -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <link rel="stylesheet" href="style.css">
   
   <style>
     /* ==========================================
-       ESTILOS DEL PANEL DE ADMINISTRACIÓN (MEJORADO)
+       ESTILOS DEL PANEL DE ADMINISTRACIÓN (PRO & MOBILE FIRST)
        ========================================== */
     :root {
       --admin-bg: #f4f6f9;
@@ -24,41 +28,49 @@
       --admin-danger: #e53e3e;
       --admin-danger-bg: #fff5f5;
       --admin-success: #38a169;
+      --admin-warning: #d69e2e;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       background-color: var(--admin-bg);
       color: var(--admin-text);
       font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
     }
 
     .admin-container {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 0 20px 40px;
+      max-width: 1040px;
+      margin: 20px auto;
+      padding: 0 16px 40px;
     }
 
-    /* Tarjetas principales */
+    /* TARJETAS GENERALES */
     .card-panel {
       background: var(--admin-card-bg);
-      padding: 28px;
+      padding: 24px;
       border-radius: 16px;
       border: 1px solid var(--admin-border);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-      margin-bottom: 30px;
+      margin-bottom: 24px;
     }
 
-    /* Barra de estado del usuario */
+    /* BARRA DE USUARIO */
     .header-user {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: var(--admin-card-bg);
-      padding: 16px 24px;
+      padding: 16px 20px;
       border-radius: 12px;
       border: 1px solid var(--admin-border);
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      gap: 12px;
     }
 
     .header-user p {
@@ -72,21 +84,68 @@
       color: var(--admin-primary);
     }
 
-    /* Formulario de Login */
+    /* TARJETAS DE MÉTRICAS (KPIs) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--admin-card-bg);
+      padding: 20px;
+      border-radius: 14px;
+      border: 1px solid var(--admin-border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      transition: transform 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .kpi-titulo {
+      font-size: 12px;
+      color: var(--admin-text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kpi-valor {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--admin-primary);
+    }
+
+    .kpi-activo { 
+      color: var(--admin-success); 
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    /* LOGIN */
     .login-card {
-      max-width: 420px;
-      margin: 60px auto;
+      max-width: 400px;
+      margin: 40px auto;
     }
 
     .login-title {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       color: var(--admin-primary);
       font-size: 22px;
       font-weight: 700;
     }
 
-    /* Grilla de dos columnas para campos */
+    /* FORMULARIO Y GRILLA */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -98,7 +157,7 @@
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -108,13 +167,15 @@
       font-weight: 600;
       color: var(--admin-primary);
       font-size: 13px;
-      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .form-group input, 
     .form-group select, 
     .form-group textarea {
-      padding: 11px 14px;
+      padding: 12px 14px;
       border: 1.5px solid var(--admin-border);
       border-radius: 8px;
       background: #f8fafc;
@@ -122,6 +183,7 @@
       font-size: 14px;
       color: var(--admin-text);
       transition: all 0.2s ease;
+      width: 100%;
     }
 
     .form-group input:focus, 
@@ -133,13 +195,50 @@
       box-shadow: 0 0 0 3px rgba(0, 51, 160, 0.1);
     }
 
-    /* Sub-sección de Presentaciones */
+    /* CAMPO DE IMAGEN Y PREVIEW */
+    .imagen-container-flex {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .contenedor-preview-img {
+      width: 76px;
+      height: 76px;
+      border: 2px dashed var(--admin-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #f8fafc;
+      flex-shrink: 0;
+    }
+
+    .contenedor-preview-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #preview-placeholder {
+      font-size: 10px;
+      color: var(--admin-text-muted);
+      text-align: center;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* PRESENTACIONES Y PRECIOS */
     .section-presentaciones {
       background: #f8fafc;
       padding: 16px;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px dashed #cbd5e1;
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .presentacion-row {
@@ -153,7 +252,7 @@
       background: #ffffff;
     }
 
-    /* Botones */
+    /* BOTONES */
     .btn-submit {
       background: var(--admin-primary);
       color: #ffffff;
@@ -164,6 +263,11 @@
       font-size: 14px;
       cursor: pointer;
       transition: background 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
     }
 
     .btn-submit:hover {
@@ -174,12 +278,16 @@
       background: #e2e8f0;
       color: #475569;
       border: none;
-      padding: 8px 14px;
+      padding: 10px 16px;
       border-radius: 8px;
       font-weight: 600;
       font-size: 13px;
       cursor: pointer;
       transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
     }
 
     .btn-secondary:hover {
@@ -190,12 +298,16 @@
       background: var(--admin-danger-bg);
       color: var(--admin-danger);
       border: 1px solid #fed7d7;
-      padding: 8px 16px;
+      padding: 10px 16px;
       border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
     }
 
     .btn-vaciar:hover {
@@ -207,15 +319,15 @@
       background: var(--admin-danger-bg);
       color: var(--admin-danger);
       border: none;
-      width: 34px;
-      height: 34px;
-      border-radius: 6px;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
       cursor: pointer;
-      font-weight: bold;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease;
+      flex-shrink: 0;
     }
 
     .btn-eliminar:hover {
@@ -227,19 +339,63 @@
       background: #feefc3;
       color: #744210;
       border: none;
-      padding: 6px 12px;
+      padding: 8px 12px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
       font-size: 12px;
-      margin-right: 6px;
+      margin-right: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .btn-editar:hover {
       background: #f6e05e;
     }
 
-    /* Contenedor responsivo para tabla */
+    .form-acciones-flex {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    /* FERRAMIENTAS Y BÚSQUEDA */
+    .tabla-header-tools {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .herramientas-tabla {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--admin-text-muted);
+      font-size: 13px;
+    }
+
+    .input-busqueda {
+      padding-left: 34px !important;
+    }
+
+    /* TABLA RESPONSIVA */
     .tabla-wrapper {
       width: 100%;
       overflow-x: auto;
@@ -247,12 +403,14 @@
       border: 1px solid var(--admin-border);
       box-shadow: 0 4px 15px rgba(0,0,0,0.03);
       background: #ffffff;
+      -webkit-overflow-scrolling: touch;
     }
 
     .tabla-productos {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
+      min-width: 600px;
     }
 
     .tabla-productos th {
@@ -261,7 +419,7 @@
       font-weight: 700;
       padding: 14px 16px;
       border-bottom: 2px solid var(--admin-border);
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -269,7 +427,7 @@
     .tabla-productos td {
       padding: 12px 16px;
       border-bottom: 1px solid var(--admin-border);
-      font-size: 14px;
+      font-size: 13px;
       vertical-align: middle;
     }
 
@@ -277,51 +435,159 @@
       border-bottom: none;
     }
 
-    .tabla-img {
+    .contenedor-img-tabla {
       width: 48px;
       height: 48px;
-      object-fit: cover;
+      background-color: #e2e8f0;
       border-radius: 8px;
-      border: 1px solid var(--admin-border);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .tabla-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* BADGES DE CATEGORÍA */
+    .badge-categoria {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: capitalize;
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    /* TOAST NOTIFICACIONES */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: calc(100vw - 40px);
+    }
+
+    .toast {
+      padding: 14px 18px;
+      border-radius: 10px;
+      background: #1e293b;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.exito { border-left: 4px solid var(--admin-success); }
+    .toast.error { border-left: 4px solid var(--admin-danger); }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
     }
 
     .oculto { display: none !important; }
 
-    /* Ajustes Móviles */
-    @media (max-width: 640px) {
+    /* ==========================================
+       ADAPTACIONES MÓVILES (TELÉFONOS Y TABLETS)
+       ========================================== */
+    @media (max-width: 768px) {
+      /* Evita el zoom en iOS al tocar inputs */
+      .form-group input, 
+      .form-group select, 
+      .form-group textarea {
+        font-size: 16px !important;
+      }
+
+      .admin-container {
+        padding: 0 12px 30px;
+        margin: 12px auto;
+      }
+
+      .card-panel {
+        padding: 18px;
+        border-radius: 12px;
+      }
+
+      .header-user {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+
+      .header-user .btn-vaciar {
+        justify-content: center;
+      }
+
       .form-grid {
         grid-template-columns: 1fr;
       }
-      .card-panel {
-        padding: 20px;
-      }
-      .header-user {
+
+      .imagen-container-flex {
         flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
+      }
+
+      .contenedor-preview-img {
+        width: 100%;
+        height: 100px;
+      }
+
+      .herramientas-tabla {
+        flex-direction: column;
+        max-width: 100%;
+      }
+
+      .form-acciones-flex {
+        flex-direction: column;
+      }
+
+      .form-acciones-flex button {
+        width: 100%;
+      }
+
+      .presentacion-row {
+        flex-wrap: wrap;
+        background: #ffffff;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--admin-border);
+      }
+
+      .presentacion-row input {
+        width: 100% !important;
+      }
+
+      .presentacion-row .btn-eliminar {
+        width: 100%;
+        height: 38px;
+        margin-top: 4px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toast-container {
+        left: 20px;
+        right: 20px;
       }
     }
-
-    .contenedor-img-tabla {
-  width: 48px;
-  height: 48px;
-  background-color: #e2e8f0;
-  border-radius: 8px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.tabla-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
   </style>
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
+  <!-- ENCABEZADO PRINCIPAL -->
   <header class="header">
     <a href="catalogo.html" class="logo">
       <div class="logo-circulo-header">Qpc</div>
@@ -333,44 +599,66 @@
 
     <!-- FORMULARIO DE INICIO DE SESIÓN -->
     <section id="vista-login" class="card-panel login-card">
-      <h2 class="login-title">Acceso Proveedor</h2>
+      <h2 class="login-title"><i class="fa-solid fa-user-shield"></i> Acceso Proveedor</h2>
       <form id="form-login">
         <div class="form-group">
-          <label for="login-email">Correo Electrónico:</label>
+          <label for="login-email"><i class="fa-solid fa-envelope"></i> Correo Electrónico:</label>
           <input type="email" id="login-email" placeholder="admin@quimiaseo.com" required>
         </div>
         <div class="form-group">
-          <label for="login-password">Contraseña:</label>
+          <label for="login-password"><i class="fa-solid fa-key"></i> Contraseña:</label>
           <input type="password" id="login-password" placeholder="••••••••" required>
         </div>
-        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 10px;">Ingresar</button>
+        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 10px;">
+          <i class="fa-solid fa-right-to-bracket"></i> Ingresar al Panel
+        </button>
       </form>
     </section>
 
     <!-- PANEL ADMINISTRATIVO PROTEGIDO -->
     <section id="vista-admin" class="oculto">
       
-      <!-- BARRA DE USUARIO -->
+      <!-- BARRA DE USUARIO ACTIVO -->
       <div class="header-user">
-        <p>Usuario activo: <strong id="user-email">cargando...</strong></p>
-        <button id="btn-logout" class="btn-vaciar">Cerrar Sesión</button>
+        <p><i class="fa-solid fa-circle-user"></i> Usuario activo: <strong id="user-email">cargando...</strong></p>
+        <button id="btn-logout" class="btn-vaciar">
+          <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+        </button>
+      </div>
+
+      <!-- TARJETAS DE MÉTRICAS (KPIs) -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-titulo"><i class="fa-solid fa-box-open"></i> Total Productos</span>
+          <span class="kpi-valor" id="kpi-total">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-titulo"><i class="fa-solid fa-layer-group"></i> Categorías</span>
+          <span class="kpi-valor" id="kpi-categorias">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-titulo"><i class="fa-solid fa-signal"></i> Estado Catálogo</span>
+          <span class="kpi-valor kpi-activo"><i class="fa-solid fa-circle-check"></i> En Línea</span>
+        </div>
       </div>
 
       <!-- FORMULARIO DE PRODUCTO -->
       <div class="card-panel">
-        <h2 id="titulo-form" style="margin-bottom: 20px; color: var(--admin-primary); font-size: 20px;">Agregar Nuevo Producto</h2>
+        <h2 id="titulo-form" style="margin-bottom: 20px; color: var(--admin-primary); font-size: 20px; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-circle-plus"></i> Agregar Nuevo Producto
+        </h2>
         
         <form id="form-producto">
           <input type="hidden" id="producto-id" value="">
 
           <div class="form-grid">
             <div class="form-group">
-              <label for="nombre">Nombre del Producto:</label>
+              <label for="nombre"><i class="fa-solid fa-tag"></i> Nombre del Producto:</label>
               <input type="text" id="nombre" placeholder="Ej: Jabón Multiusos" required>
             </div>
 
             <div class="form-group">
-              <label for="categoria">Categoría:</label>
+              <label for="categoria"><i class="fa-solid fa-folder"></i> Categoría:</label>
               <select id="categoria" required>
                 <option value="envases">Envases Plásticos</option>
                 <option value="liquidos">Líquidos</option>
@@ -380,33 +668,64 @@
             </div>
 
             <div class="form-group form-group-full">
-              <label for="descripcion">Descripción:</label>
+              <label for="descripcion"><i class="fa-solid fa-align-left"></i> Descripción:</label>
               <textarea id="descripcion" rows="2" placeholder="Descripción breve del producto..." required></textarea>
             </div>
 
             <div class="form-group form-group-full">
-              <label for="imagen">Enlace de la Foto (Google Drive o URL directas):</label>
-              <input type="text" id="imagen" placeholder="https://drive.google.com/file/d/..." required>
+              <label for="imagen"><i class="fa-solid fa-image"></i> Enlace de la Foto (Google Drive o URL directa):</label>
+              <div class="imagen-container-flex">
+                <input type="text" id="imagen" placeholder="https://drive.google.com/file/d/..." required style="flex: 1;">
+                <div class="contenedor-preview-img">
+                  <img id="img-preview" src="" alt="Previsualización" class="oculto">
+                  <span id="preview-placeholder"><i class="fa-regular fa-image" style="font-size: 18px;"></i> Vista previa</span>
+                </div>
+              </div>
             </div>
 
             <div class="form-group form-group-full">
-              <label>Presentaciones y Precios:</label>
+              <label><i class="fa-solid fa-coins"></i> Presentaciones y Precios:</label>
               <div class="section-presentaciones">
                 <div id="contenedor-presentaciones"></div>
-                <button type="button" id="btn-agregar-presentacion" class="btn-secondary">+ Agregar presentación</button>
+                <button type="button" id="btn-agregar-presentacion" class="btn-secondary">
+                  <i class="fa-solid fa-plus"></i> Agregar presentación
+                </button>
               </div>
             </div>
           </div>
 
-          <div style="display: flex; gap: 12px; margin-top: 24px;">
-            <button type="submit" id="btn-guardar" class="btn-submit" style="flex: 1;">Guardar Producto</button>
-            <button type="button" id="btn-cancelar-edicion" class="btn-vaciar oculto">Cancelar Edición</button>
+          <div class="form-acciones-flex">
+            <button type="submit" id="btn-guardar" class="btn-submit" style="flex: 1;">
+              <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
+            </button>
+            <button type="button" id="btn-cancelar-edicion" class="btn-vaciar oculto">
+              <i class="fa-solid fa-xmark"></i> Cancelar Edición
+            </button>
           </div>
         </form>
       </div>
 
+      <!-- INVENTARIO Y HERRAMIENTAS -->
+      <div class="tabla-header-tools">
+        <h2 style="color: var(--admin-primary); font-size: 20px; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-boxes-stacked"></i> Productos en Inventario
+        </h2>
+        <div class="herramientas-tabla">
+          <div class="search-input-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="input-buscar" placeholder="Buscar por nombre..." class="input-busqueda">
+          </div>
+          <select id="filtro-tabla-categoria" class="select-busqueda">
+            <option value="todos">Todas las categorías</option>
+            <option value="envases">Envases Plásticos</option>
+            <option value="liquidos">Líquidos</option>
+            <option value="perfumeria">Perfumería</option>
+            <option value="polvos">Polvos</option>
+          </select>
+        </div>
+      </div>
+
       <!-- TABLA DE INVENTARIO -->
-      <h2 style="color: var(--admin-primary); margin-bottom: 16px; font-size: 20px;">Productos en Inventario</h2>
       <div class="tabla-wrapper">
         <table class="tabla-productos">
           <thead>
@@ -420,7 +739,9 @@
           </thead>
           <tbody id="tabla-body">
             <tr>
-              <td colspan="5" style="text-align: center; color: var(--admin-text-muted);">Cargando inventario...</td>
+              <td colspan="5" style="text-align: center; color: var(--admin-text-muted); padding: 24px;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Cargando inventario...
+              </td>
             </tr>
           </tbody>
         </table>
@@ -429,6 +750,9 @@
     </section>
 
   </main>
+
+  <!-- CONTENEDOR PARA NOTIFICACIONES EMERGENTES -->
+  <div id="toast-container" class="toast-container"></div>
 
   <footer class="footer">
     <div class="footer-derechos">
