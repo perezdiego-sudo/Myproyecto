@@ -8,24 +8,304 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  
   <style>
-    .admin-container { max-width: 900px; margin: 30px auto; padding: 20px; flex: 1; }
-    .card-panel { background: var(--color-bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
-    .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-weight: 600; color: var(--color-primary); font-size: 14px; }
-    .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; border: 1px solid var(--border-input); border-radius: 8px; background: var(--color-bg-input); font-family: inherit; font-size: 14px; color: var(--color-text-main); }
-    .presentacion-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
-    .btn-editar { background: var(--color-accent); color: #000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-right: 5px; }
-    .tabla-productos { width: 100%; border-collapse: collapse; background: var(--color-bg-card); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .tabla-productos th, .tabla-productos td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-dark); font-size: 14px; }
-    .tabla-productos th { background: var(--color-primary); color: white; }
-    .tabla-img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
+    /* ==========================================
+       ESTILOS DEL PANEL DE ADMINISTRACIÓN (MEJORADO)
+       ========================================== */
+    :root {
+      --admin-bg: #f4f6f9;
+      --admin-card-bg: #ffffff;
+      --admin-primary: #0033a0;
+      --admin-primary-hover: #002270;
+      --admin-text: #1a202c;
+      --admin-text-muted: #718096;
+      --admin-border: #e2e8f0;
+      --admin-danger: #e53e3e;
+      --admin-danger-bg: #fff5f5;
+      --admin-success: #38a169;
+    }
+
+    body {
+      background-color: var(--admin-bg);
+      color: var(--admin-text);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .admin-container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px 40px;
+    }
+
+    /* Tarjetas principales */
+    .card-panel {
+      background: var(--admin-card-bg);
+      padding: 28px;
+      border-radius: 16px;
+      border: 1px solid var(--admin-border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      margin-bottom: 30px;
+    }
+
+    /* Barra de estado del usuario */
+    .header-user {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--admin-card-bg);
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: 1px solid var(--admin-border);
+      margin-bottom: 25px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .header-user p {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--admin-text-muted);
+    }
+
+    .header-user strong {
+      color: var(--admin-primary);
+    }
+
+    /* Formulario de Login */
+    .login-card {
+      max-width: 420px;
+      margin: 60px auto;
+    }
+
+    .login-title {
+      text-align: center;
+      margin-bottom: 24px;
+      color: var(--admin-primary);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    /* Grilla de dos columnas para campos */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group-full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: var(--admin-primary);
+      font-size: 13px;
+      letter-spacing: 0.2px;
+    }
+
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+      padding: 11px 14px;
+      border: 1.5px solid var(--admin-border);
+      border-radius: 8px;
+      background: #f8fafc;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--admin-text);
+      transition: all 0.2s ease;
+    }
+
+    .form-group input:focus, 
+    .form-group select:focus, 
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--admin-primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 51, 160, 0.1);
+    }
+
+    /* Sub-sección de Presentaciones */
+    .section-presentaciones {
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px dashed #cbd5e1;
+      margin-top: 8px;
+    }
+
+    .presentacion-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .presentacion-row input {
+      background: #ffffff;
+    }
+
+    /* Botones */
+    .btn-submit {
+      background: var(--admin-primary);
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      background: var(--admin-primary-hover);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #475569;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+
+    .btn-vaciar {
+      background: var(--admin-danger-bg);
+      color: var(--admin-danger);
+      border: 1px solid #fed7d7;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-vaciar:hover {
+      background: var(--admin-danger);
+      color: #ffffff;
+    }
+
+    .btn-eliminar {
+      background: var(--admin-danger-bg);
+      color: var(--admin-danger);
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-eliminar:hover {
+      background: var(--admin-danger);
+      color: #ffffff;
+    }
+
+    .btn-editar {
+      background: #feefc3;
+      color: #744210;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+
+    .btn-editar:hover {
+      background: #f6e05e;
+    }
+
+    /* Contenedor responsivo para tabla */
+    .tabla-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--admin-border);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      background: #ffffff;
+    }
+
+    .tabla-productos {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .tabla-productos th {
+      background: #f8fafc;
+      color: var(--admin-primary);
+      font-weight: 700;
+      padding: 14px 16px;
+      border-bottom: 2px solid var(--admin-border);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tabla-productos td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--admin-border);
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .tabla-productos tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tabla-img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--admin-border);
+    }
+
     .oculto { display: none !important; }
-    .header-user { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+    /* Ajustes Móviles */
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .card-panel {
+        padding: 20px;
+      }
+      .header-user {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
 
+  <!-- ENCABEZADO -->
   <header class="header">
     <a href="catalogo.html" class="logo">
       <div class="logo-circulo-header">Qpc</div>
@@ -36,8 +316,8 @@
   <main class="admin-container">
 
     <!-- FORMULARIO DE INICIO DE SESIÓN -->
-    <section id="vista-login" class="card-panel" style="max-width: 400px; margin: 40px auto;">
-      <h2 style="text-align: center; margin-bottom: 20px; color: var(--color-primary);">Acceso Proveedor</h2>
+    <section id="vista-login" class="card-panel login-card">
+      <h2 class="login-title">Acceso Proveedor</h2>
       <form id="form-login">
         <div class="form-group">
           <label for="login-email">Correo Electrónico:</label>
@@ -47,78 +327,89 @@
           <label for="login-password">Contraseña:</label>
           <input type="password" id="login-password" placeholder="••••••••" required>
         </div>
-        <button type="submit" class="btn-agregar-carrito" style="width: 100%; margin-top: 10px; padding: 12px;">Ingresar</button>
+        <button type="submit" class="btn-submit" style="width: 100%; margin-top: 10px;">Ingresar</button>
       </form>
     </section>
 
     <!-- PANEL ADMINISTRATIVO PROTEGIDO -->
     <section id="vista-admin" class="oculto">
+      
+      <!-- BARRA DE USUARIO -->
       <div class="header-user">
-        <p>Usuario activo: <strong id="user-email" style="color: var(--color-primary);"></strong></p>
+        <p>Usuario activo: <strong id="user-email">cargando...</strong></p>
         <button id="btn-logout" class="btn-vaciar">Cerrar Sesión</button>
       </div>
 
+      <!-- FORMULARIO DE PRODUCTO -->
       <div class="card-panel">
-        <h2 id="titulo-form" style="margin-bottom: 20px; color: var(--color-primary);">Agregar Nuevo Producto</h2>
+        <h2 id="titulo-form" style="margin-bottom: 20px; color: var(--admin-primary); font-size: 20px;">Agregar Nuevo Producto</h2>
         
         <form id="form-producto">
           <input type="hidden" id="producto-id" value="">
 
-          <div class="form-group">
-            <label for="nombre">Nombre del Producto:</label>
-            <input type="text" id="nombre" placeholder="Ej: Jabón Multiusos" required>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nombre">Nombre del Producto:</label>
+              <input type="text" id="nombre" placeholder="Ej: Jabón Multiusos" required>
+            </div>
+
+            <div class="form-group">
+              <label for="categoria">Categoría:</label>
+              <select id="categoria" required>
+                <option value="envases">Envases Plásticos</option>
+                <option value="liquidos">Líquidos</option>
+                <option value="perfumeria">Perfumería</option>
+                <option value="polvos">Polvos</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="descripcion">Descripción:</label>
+              <textarea id="descripcion" rows="2" placeholder="Descripción breve del producto..." required></textarea>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="imagen">Enlace de la Foto (Google Drive o URL directas):</label>
+              <input type="text" id="imagen" placeholder="https://drive.google.com/file/d/..." required>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label>Presentaciones y Precios:</label>
+              <div class="section-presentaciones">
+                <div id="contenedor-presentaciones"></div>
+                <button type="button" id="btn-agregar-presentacion" class="btn-secondary">+ Agregar presentación</button>
+              </div>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="categoria">Categoría:</label>
-            <select id="categoria" required>
-              <option value="envases">Envases Plásticos</option>
-              <option value="liquidos">Líquidos</option>
-              <option value="perfumeria">Perfumería</option>
-              <option value="polvos">Polvos</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion" rows="2" placeholder="Descripción breve del producto..." required></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="imagen">Enlace de la Foto (Google Drive o URL):</label>
-            <input type="text" id="imagen" placeholder="https://drive.google.com/file/d/..." required>
-          </div>
-
-          <div class="form-group">
-            <label>Presentaciones y Precios:</label>
-            <div id="contenedor-presentaciones"></div>
-            <button type="button" id="btn-agregar-presentacion" class="btn-filtro" style="margin-top: 8px;">+ Agregar presentación</button>
-          </div>
-
-          <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button type="submit" id="btn-guardar" class="btn-agregar-carrito" style="flex: 1; padding: 12px;">Guardar Producto</button>
+          <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <button type="submit" id="btn-guardar" class="btn-submit" style="flex: 1;">Guardar Producto</button>
             <button type="button" id="btn-cancelar-edicion" class="btn-vaciar oculto">Cancelar Edición</button>
           </div>
         </form>
       </div>
 
-      <h2 style="color: var(--color-primary); margin-bottom: 15px;">Productos en Inventario</h2>
-      <table class="tabla-productos">
-        <thead>
-          <tr>
-            <th>Imagen</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Presentaciones</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-body">
-          <tr>
-            <td colspan="5" style="text-align: center;">Cargando inventario...</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- TABLA DE INVENTARIO -->
+      <h2 style="color: var(--admin-primary); margin-bottom: 16px; font-size: 20px;">Productos en Inventario</h2>
+      <div class="tabla-wrapper">
+        <table class="tabla-productos">
+          <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Presentaciones</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-body">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--admin-text-muted);">Cargando inventario...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
     </section>
 
   </main>
