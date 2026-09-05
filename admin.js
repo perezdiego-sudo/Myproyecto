@@ -9,12 +9,14 @@ import {
 
 // REEMPLAZA ESTE OBJETO CON TU CONFIGURACIÓN DE FIREBASE SI LO TIENES EN OTRO LADO
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROYECTO.firebaseapp.com",
-  projectId: "TU_PROYECTO",
-  storageBucket: "TU_PROYECTO.appspot.com",
-  messagingSenderId: "NUMERO",
-  appId: "ID_APP"
+  apiKey: "AIzaSyB5iP0E5BVu0XX0bclE-0j1ym24GRbYDNQ",
+  authDomain: "quimiaseo-caribe.firebaseapp.com",
+  databaseURL: "https://quimiaseo-caribe-default-rtdb.firebaseio.com",
+  projectId: "quimiaseo-caribe",
+  storageBucket: "quimiaseo-caribe.firebasestorage.app",
+  messagingSenderId: "673921871746",
+  appId: "1:673921871746:web:7b2203db138de8edf0a99b",
+  measurementId: "G-MRCXCVJS84"
 };
 
 const app = initializeApp(firebaseConfig);
