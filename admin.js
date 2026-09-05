@@ -19,6 +19,7 @@ const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion
 const tablaBody = document.getElementById('tabla-body');
 
 let productosData = {};
+let unsubscribeProductos = null;
 
 // ==========================================
 // 1. CONTROL DE SESIÓN EN TIEMPO REAL
@@ -29,10 +30,14 @@ onAuthStateChanged(auth, (user) => {
     vistaAdmin.classList.remove('oculto');
     userEmail.textContent = user.email;
     inicializarFormulario();
+
+    // Detener suscripciones previas si la sesión cambia para evitar duplicaciones
+    if (unsubscribeProductos) unsubscribeProductos();
     escucharProductos();
   } else {
     vistaLogin.classList.remove('oculto');
     vistaAdmin.classList.add('oculto');
+    if (unsubscribeProductos) unsubscribeProductos();
   }
 });
 
@@ -66,12 +71,17 @@ function agregarFilaPresentacion(nombre = '', precio = '') {
   div.innerHTML = `
     <input type="text" class="pres-nombre" placeholder="Ej: Litro, Galón, Unidad" value="${nombre}" required style="flex: 2;">
     <input type="number" class="pres-precio" placeholder="Precio ($)" value="${precio}" required style="flex: 1;">
-    <button type="button" class="btn-eliminar" onclick="this.parentElement.remove()">✕</button>
+    <button type="button" class="btn-eliminar btn-quitar-fila">✕</button>
   `;
+  
+  div.querySelector('.btn-quitar-fila').addEventListener('click', () => div.remove());
   contenedorPresentaciones.appendChild(div);
 }
 
-btnAgregarPresentacion.addEventListener('click', () => agregarFilaPresentacion('', ''));
+btnAgregarPresentacion.addEventListener('click', (e) => {
+  e.preventDefault();
+  agregarFilaPresentacion('', '');
+});
 
 function inicializarFormulario() {
   formProducto.reset();
@@ -83,7 +93,10 @@ function inicializarFormulario() {
   agregarFilaPresentacion('', '');
 }
 
-btnCancelarEdicion.addEventListener('click', inicializarFormulario);
+btnCancelarEdicion.addEventListener('click', (e) => {
+  e.preventDefault();
+  inicializarFormulario();
+});
 
 // ==========================================
 // 3. GUARDAR / EDITAR EN FIRESTORE
@@ -122,10 +135,10 @@ formProducto.addEventListener('submit', async (e) => {
 });
 
 // ==========================================
-// 4. LECTURA Y ACCIONES DE TABLA
+// 4. LECTURA Y DELEGACIÓN DE EVENTOS EN TABLA
 // ==========================================
 function escucharProductos() {
-  onSnapshot(collection(db, "productos"), (snapshot) => {
+  unsubscribeProductos = onSnapshot(collection(db, "productos"), (snapshot) => {
     tablaBody.innerHTML = '';
     productosData = {};
 
@@ -150,54 +163,54 @@ function escucharProductos() {
         <td>${prod.categoria || ''}</td>
         <td><small>${listaPres}</small></td>
         <td>
-          <button class="btn-editar" data-id="${id}">Editar</button>
-          <button class="btn-eliminar btn-borrar-prod" data-id="${id}">✕</button>
+          <button type="button" class="btn-editar" data-id="${id}">Editar</button>
+          <button type="button" class="btn-eliminar btn-borrar-prod" data-id="${id}">✕</button>
         </td>
       `;
       tablaBody.appendChild(tr);
     });
-
-    // Acción Cargar Datos en Formulario
-    document.querySelectorAll('.btn-editar').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
-        const prod = productosData[id];
-
-        if (prod) {
-          productoIdInput.value = id;
-          document.getElementById('nombre').value = prod.nombre || '';
-          document.getElementById('categoria').value = prod.categoria || 'envases';
-          document.getElementById('descripcion').value = prod.descripcion || '';
-          document.getElementById('imagen').value = prod.imagen || '';
-
-          contenedorPresentaciones.innerHTML = '';
-          if (prod.presentaciones && prod.presentaciones.length > 0) {
-            prod.presentaciones.forEach(p => agregarFilaPresentacion(p.nombre, p.precio));
-          } else {
-            agregarFilaPresentacion('', '');
-          }
-
-          tituloForm.textContent = 'Editar Producto';
-          btnGuardar.textContent = 'Actualizar Producto';
-          btnCancelarEdicion.classList.remove('oculto');
-
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      });
-    });
-
-    // Acción Borrar
-    document.querySelectorAll('.btn-borrar-prod').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const id = e.target.dataset.id;
-        if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
-          try {
-            await deleteDoc(doc(db, "productos", id));
-          } catch (err) {
-            alert("Error al eliminar: " + err.message);
-          }
-        }
-      });
-    });
   });
 }
+
+// Delegación de eventos única fuera del snapshot para evitar reinicios de listeners
+tablaBody.addEventListener('click', async (e) => {
+  const btnEditar = e.target.closest('.btn-editar');
+  const btnBorrar = e.target.closest('.btn-borrar-prod');
+
+  if (btnEditar) {
+    const id = btnEditar.dataset.id;
+    const prod = productosData[id];
+
+    if (prod) {
+      productoIdInput.value = id;
+      document.getElementById('nombre').value = prod.nombre || '';
+      document.getElementById('categoria').value = prod.categoria || 'envases';
+      document.getElementById('descripcion').value = prod.descripcion || '';
+      document.getElementById('imagen').value = prod.imagen || '';
+
+      contenedorPresentaciones.innerHTML = '';
+      if (prod.presentaciones && prod.presentaciones.length > 0) {
+        prod.presentaciones.forEach(p => agregarFilaPresentacion(p.nombre, p.precio));
+      } else {
+        agregarFilaPresentacion('', '');
+      }
+
+      tituloForm.textContent = 'Editar Producto';
+      btnGuardar.textContent = 'Actualizar Producto';
+      btnCancelarEdicion.classList.remove('oculto');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  if (btnBorrar) {
+    const id = btnBorrar.dataset.id;
+    if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
+      try {
+        await deleteDoc(doc(db, "productos", id));
+      } catch (err) {
+        alert("Error al eliminar: " + err.message);
+      }
+    }
+  }
+});
