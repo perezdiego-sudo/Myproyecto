@@ -779,13 +779,45 @@ section h2 {
   .footer-logo { justify-content: flex-end; }
 }
 
-.header-derecha {
+/* Contenedor principal de la barra superior */
+.header {
   display: flex;
+  justify-content: space-between; /* Empuja el logo a la izquierda y el botón a la derecha */
   align-items: center;
-  gap: 15px; /* Espacio entre el botón Admin y el Carrito */
+  padding: 12px 24px;
+  background-color: #0033a0; /* Tu azul actual */
 }
 
+/* Ajuste del logo y texto principal */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Estilo del botón de Panel Admin */
 .btn-admin {
+  color: #ffffff; /* Blanco para alto contraste */
+  background-color: rgba(255, 255, 255, 0.15); /* Fondo traslúcido elegante */
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap; /* Impide que el texto se empalme */
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-admin:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+} 
+
+.btn-admin {
+  margin-right: 95px; /* Empuja el botón hacia la izquierda del carrito */
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.2);
   padding: 8px 14px;
@@ -796,6 +828,23 @@ section h2 {
   white-space: nowrap;
 }
 
-.btn-admin:hover {
-  background-color: rgba(255, 255, 255, 0.35);
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+/* Aplica el margen al enlace del Panel Admin */
+.header .btn-secundario,
+.header .btn-admin {
+  margin-right: 120px; /* Crea el espacio suficiente a la izquierda del carrito */
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
 }
