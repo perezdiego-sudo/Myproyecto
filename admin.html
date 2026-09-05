@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="style.css">
   
   <style>
-    /* RESET DE CONTENCIÓN ESTRICTA PARA MÓVIL */
     *, *:before, *:after {
       box-sizing: border-box !important;
     }
@@ -23,7 +22,6 @@
       overflow-x: hidden !important;
       margin: 0 !important;
       padding: 0 !important;
-      position: relative;
     }
 
     :root {
@@ -45,7 +43,6 @@
       font-family: 'Poppins', sans-serif;
     }
 
-    /* HEADER FIX */
     header.header-admin {
       width: 100% !important;
       max-width: 100% !important;
@@ -56,7 +53,6 @@
       justify-content: flex-start !important;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       margin: 0 !important;
-      box-sizing: border-box !important;
     }
 
     header.header-admin .logo {
@@ -83,13 +79,11 @@
       flex-shrink: 0;
     }
 
-    /* CONTENEDOR PRINCIPAL */
     .admin-container {
       width: 100% !important;
       max-width: 100% !important;
       margin: 0 auto;
       padding: 12px 12px calc(100px + env(safe-area-inset-bottom, 16px)) 12px !important;
-      box-sizing: border-box !important;
     }
 
     .card-panel {
@@ -100,8 +94,6 @@
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
       margin-bottom: 16px;
       width: 100% !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
     }
 
     .header-user {
@@ -115,7 +107,6 @@
       margin-bottom: 16px;
       gap: 10px;
       width: 100% !important;
-      box-sizing: border-box !important;
     }
 
     .header-user p { 
@@ -127,23 +118,24 @@
     }
     .header-user strong { color: var(--admin-primary); }
 
-    /* METRICAS KPI */
+    /* KPIS / 3 TARJETAS */
     .kpi-grid {
       display: grid !important;
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 10px !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 8px !important;
       margin-bottom: 16px;
       width: 100% !important;
     }
 
     .kpi-card {
       background: var(--admin-card-bg);
-      padding: 12px;
+      padding: 10px 8px;
       border-radius: 12px;
       border: 1px solid var(--admin-border);
       display: flex;
       flex-direction: column;
       gap: 2px;
+      text-align: center;
     }
 
     .kpi-titulo {
@@ -153,22 +145,24 @@
       text-transform: uppercase;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
     }
 
     .kpi-valor {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
       color: var(--admin-primary);
     }
 
     .kpi-activo {
       color: var(--admin-success);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      gap: 3px;
     }
 
     .login-card { max-width: 400px !important; margin: 20px auto; }
@@ -209,17 +203,8 @@
       font-size: 14px;
       color: var(--admin-text);
       width: 100% !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
     }
 
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      outline: none;
-      border-color: var(--admin-primary);
-      background: #ffffff;
-    }
-
-    /* PREVIEW DE FOTO */
     .imagen-container-flex { 
       display: flex; 
       flex-direction: column;
@@ -255,7 +240,6 @@
       border-radius: 10px;
       border: 1px dashed #cbd5e1;
       width: 100% !important;
-      box-sizing: border-box !important;
     }
 
     .presentacion-row {
@@ -355,7 +339,6 @@
     .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--admin-text-muted); font-size: 12px; }
     .input-busqueda { padding-left: 34px !important; }
 
-    /* TABLA CON SCROLL AISLADO */
     .tabla-wrapper {
       width: 100% !important;
       max-width: 100% !important;
@@ -402,11 +385,13 @@
 
     .oculto { display: none !important; }
 
-    /* MEDIA QUERIES PARA ESCRITORIO */
     @media (min-width: 769px) {
       .admin-container { padding: 20px !important; }
       .form-grid { grid-template-columns: 1fr 1fr; }
-      .kpi-grid { grid-template-columns: repeat(4, 1fr) !important; }
+      .kpi-card { padding: 12px; text-align: left; }
+      .kpi-titulo { justify-content: flex-start; font-size: 11px; }
+      .kpi-valor { font-size: 22px; text-align: left; }
+      .kpi-activo { justify-content: flex-start; font-size: 13px; }
       .header-user { flex-direction: row; }
       .imagen-container-flex { flex-direction: row; }
       .contenedor-preview-img { width: 70px; height: 70px; }
@@ -426,7 +411,7 @@
 
   <main class="admin-container">
 
-    <!-- VISTA LOGIN -->
+    <!-- LOGIN -->
     <section id="vista-login" class="card-panel login-card">
       <h2 class="login-title"><i class="fa-solid fa-user-shield"></i> Acceso Proveedor</h2>
       <form id="form-login">
@@ -444,10 +429,9 @@
       </form>
     </section>
 
-    <!-- PANEL ADMINISTRATIVO -->
+    <!-- PANEL -->
     <section id="vista-admin" class="oculto">
       
-      <!-- BARRA USUARIO -->
       <div class="header-user">
         <p><i class="fa-solid fa-circle-user"></i> Sesión: <strong id="user-email">cargando...</strong></p>
         <button id="btn-logout" class="btn-vaciar">
@@ -455,19 +439,15 @@
         </button>
       </div>
 
-      <!-- KPIs / TARJETAS DE MÉTRICAS -->
+      <!-- METRICAS KPI (3 TARJETAS) -->
       <div class="kpi-grid">
         <div class="kpi-card">
           <span class="kpi-titulo"><i class="fa-solid fa-box-archive"></i> Productos</span>
           <span class="kpi-valor" id="kpi-total">0</span>
         </div>
         <div class="kpi-card">
-          <span class="kpi-titulo"><i class="fa-solid fa-layer-group"></i> Categorías</span>
-          <span class="kpi-valor" id="kpi-categorias">0</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-titulo"><i class="fa-solid fa-tags"></i> Variaciones</span>
-          <span class="kpi-valor" id="kpi-presentaciones">0</span>
+          <span class="kpi-titulo"><i class="fa-solid fa-cubes"></i> Stock Total</span>
+          <span class="kpi-valor" id="kpi-stock">0</span>
         </div>
         <div class="kpi-card">
           <span class="kpi-titulo"><i class="fa-solid fa-bolt"></i> Estado</span>
@@ -475,7 +455,7 @@
         </div>
       </div>
 
-      <!-- FORMULARIO DE PRODUCTOS -->
+      <!-- FORMULARIO -->
       <div class="card-panel">
         <h2 id="titulo-form" style="margin-bottom: 14px; color: var(--admin-primary); font-size: 16px; display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-circle-plus"></i> Agregar Nuevo Producto
@@ -498,6 +478,11 @@
                 <option value="perfumeria">Perfumería</option>
                 <option value="polvos">Polvos</option>
               </select>
+            </div>
+
+            <div class="form-group">
+              <label for="stock"><i class="fa-solid fa-cubes"></i> Unidades en Stock:</label>
+              <input type="number" id="stock" min="0" placeholder="Ej: 50" value="10" required>
             </div>
 
             <div class="form-group form-group-full">
@@ -538,7 +523,7 @@
         </form>
       </div>
 
-      <!-- BUSCADOR Y FILTROS -->
+      <!-- BUSCADOR -->
       <div class="tabla-header-tools">
         <h2 style="color: var(--admin-primary); font-size: 16px; margin: 0; display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-boxes-stacked"></i> Productos en Inventario
@@ -558,7 +543,7 @@
         </div>
       </div>
 
-      <!-- TABLA DE INVENTARIO -->
+      <!-- TABLA -->
       <div class="tabla-wrapper">
         <table class="tabla-productos">
           <thead>
@@ -566,13 +551,14 @@
               <th>Foto</th>
               <th>Nombre</th>
               <th>Categoría</th>
+              <th>Stock</th>
               <th>Precios</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="tabla-body">
             <tr>
-              <td colspan="5" style="text-align: center; color: var(--admin-text-muted); padding: 16px;">
+              <td colspan="6" style="text-align: center; color: var(--admin-text-muted); padding: 16px;">
                 <i class="fa-solid fa-spinner fa-spin"></i> Cargando datos...
               </td>
             </tr>
