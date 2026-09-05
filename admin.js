@@ -166,7 +166,7 @@ function renderizarTabla(productos) {
         </td>
         <td><strong>${p.nombre}</strong></td>
         <td><span style="text-transform:capitalize;">${p.categoria}</span></td>
-        <td><strong>${p.stock || 0}</strong> u.</td>
+        <td><strong>${p.stock || 0}</strong> ${obtenerUnidadStock(p.categoria)}</td>
         <td style="font-size: 11px;">${preciosTexto}</td>
         <td>
           <button class="btn-editar" data-id="${p.id}"><i class="fa-solid fa-pen"></i></button>
@@ -274,6 +274,26 @@ function limpiarFormulario() {
   tituloForm.innerHTML = `<i class="fa-solid fa-circle-plus"></i> Agregar Nuevo Producto`;
   btnCancelarEdicion.classList.add('oculto');
 }
+
+// Retorna la unidad correspondiente según la categoría
+function obtenerUnidadStock(categoria) {
+  const unidades = {
+    polvos: 'kg',
+    liquidos: 'L',
+    perfumeria: 'L',
+    envases: 'unid.'
+  };
+  return unidades[categoria] || 'unid.';
+}
+
+// Actualiza la etiqueta del formulario cuando cambias la categoría
+categoriaInput.addEventListener('change', () => {
+  const unidad = obtenerUnidadStock(categoriaInput.value);
+  const spanUnidad = document.getElementById('unidad-stock-txt');
+  if (spanUnidad) spanUnidad.textContent = unidad;
+  stockInput.placeholder = `Ej: 50 ${unidad}`;
+});
+
 
 // INICIALIZAR PRIMERA FILA AL CARGAR
 agregarFilaPresentacion();
