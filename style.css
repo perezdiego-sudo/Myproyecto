@@ -838,7 +838,7 @@ section h2 {
 /* Aplica el margen al enlace del Panel Admin */
 .header .btn-secundario,
 .header .btn-admin {
-  margin-right: 120px; /* Crea el espacio suficiente a la izquierda del carrito */
+  margin-right: 100px; /* Crea el espacio suficiente a la izquierda del carrito */
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.2);
   padding: 8px 14px;
