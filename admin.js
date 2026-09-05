@@ -138,7 +138,11 @@ formProducto.addEventListener('submit', async (e) => {
 // 4. LECTURA Y DELEGACIÓN DE EVENTOS EN TABLA
 // ==========================================
 function escucharProductos() {
+  // Escucha cambios descartando variaciones de metadatos locales
   unsubscribeProductos = onSnapshot(collection(db, "productos"), (snapshot) => {
+    // Si el cambio es solo una confirmación local de lectura/escritura, no redibujar
+    if (snapshot.metadata.hasPendingWrites) return;
+
     tablaBody.innerHTML = '';
     productosData = {};
 
@@ -146,6 +150,8 @@ function escucharProductos() {
       tablaBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay productos registrados.</td></tr>';
       return;
     }
+
+    const fragmento = document.createDocumentFragment();
 
     snapshot.forEach((documento) => {
       const prod = documento.data();
@@ -158,7 +164,11 @@ function escucharProductos() {
         : 'Sin precios';
 
       tr.innerHTML = `
-        <td><img src="${prod.imagen || ''}" class="tabla-img" alt="${prod.nombre}" onerror="this.src='https://via.placeholder.com/50?text=Error'"></td>
+        <td>
+          <div class="contenedor-img-tabla">
+            <img src="${prod.imagen || ''}" class="tabla-img" alt="${prod.nombre}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/50?text=Error'">
+          </div>
+        </td>
         <td><strong>${prod.nombre || ''}</strong></td>
         <td>${prod.categoria || ''}</td>
         <td><small>${listaPres}</small></td>
@@ -167,8 +177,10 @@ function escucharProductos() {
           <button type="button" class="btn-eliminar btn-borrar-prod" data-id="${id}">✕</button>
         </td>
       `;
-      tablaBody.appendChild(tr);
+      fragmento.appendChild(tr);
     });
+
+    tablaBody.appendChild(fragmento);
   });
 }
 
