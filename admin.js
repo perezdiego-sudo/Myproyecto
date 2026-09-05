@@ -16,10 +16,42 @@ const btnGuardar = document.getElementById('btn-guardar');
 const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
 const contenedorPresentaciones = document.getElementById('contenedor-presentaciones');
 const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion');
-const tablaBody = document.getElementById('tabla-body');
+const imagenInput = document.getElementById('imagen');
+const imgPreview = document.getElementById('img-preview');
+const previewPlaceholder = document.getElementById('preview-placeholder');
 
+const tablaBody = document.getElementById('tabla-body');
+const inputBuscar = document.getElementById('input-buscar');
+const filtroCategoria = document.getElementById('filtro-tabla-categoria');
+
+const kpiTotal = document.getElementById('kpi-total');
+const kpiCategorias = document.getElementById('kpi-categorias');
+const kpiPresentaciones = document.getElementById('kpi-presentaciones');
+
+let productosLocales = [];
 let productosData = {};
 let unsubscribeProductos = null;
+
+// ==========================================
+// NOTIFICACIONES TOAST (SIN ALERT)
+// ==========================================
+function mostrarToast(mensaje, tipo = 'exito') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  const icono = tipo === 'exito' ? 'fa-circle-check' : 'fa-circle-exclamation';
+  
+  toast.innerHTML = `<i class="fa-solid ${icono}"></i> <span>${mensaje}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3200);
+}
 
 // ==========================================
 // 1. CONTROL DE SESIÓN EN TIEMPO REAL
@@ -31,7 +63,6 @@ onAuthStateChanged(auth, (user) => {
     userEmail.textContent = user.email;
     inicializarFormulario();
 
-    // Detener suscripciones previas si la sesión cambia para evitar duplicaciones
     if (unsubscribeProductos) unsubscribeProductos();
     escucharProductos();
   } else {
@@ -49,15 +80,19 @@ formLogin.addEventListener('submit', async (e) => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     formLogin.reset();
+    mostrarToast("Inicio de sesión exitoso", "exito");
   } catch (error) {
-    alert("Error de autenticación: Verifica tu correo y contraseña.");
+    mostrarToast("Error de autenticación: Verifica tus datos.", "error");
   }
 });
 
-btnLogout.addEventListener('click', () => signOut(auth));
+btnLogout.addEventListener('click', () => {
+  signOut(auth);
+  mostrarToast("Sesión cerrada", "exito");
+});
 
 // ==========================================
-// 2. CONVERSOR DE DRIVE Y PRESENTACIONES
+// 2. CONVERSOR DE DRIVE, PREVIEW Y PRESENTACIONES
 // ==========================================
 function convertirLinkGoogleDrive(url) {
   if (!url) return '';
@@ -65,16 +100,41 @@ function convertirLinkGoogleDrive(url) {
   return match && match[1] ? `https://lh3.googleusercontent.com/d/${match[1]}` : url;
 }
 
+imagenInput.addEventListener('input', () => {
+  const urlProcesada = convertirLinkGoogleDrive(imagenInput.value.trim());
+  if (urlProcesada) {
+    imgPreview.src = urlProcesada;
+    imgPreview.classList.remove('oculto');
+    previewPlaceholder.classList.add('oculto');
+  } else {
+    imgPreview.src = '';
+    imgPreview.classList.add('oculto');
+    previewPlaceholder.classList.remove('oculto');
+  }
+});
+
+imgPreview.addEventListener('error', () => {
+  imgPreview.classList.add('oculto');
+  previewPlaceholder.classList.remove('oculto');
+});
+
 function agregarFilaPresentacion(nombre = '', precio = '') {
   const div = document.createElement('div');
   div.classList.add('presentacion-row');
   div.innerHTML = `
     <input type="text" class="pres-nombre" placeholder="Ej: Litro, Galón, Unidad" value="${nombre}" required style="flex: 2;">
     <input type="number" class="pres-precio" placeholder="Precio ($)" value="${precio}" required style="flex: 1;">
-    <button type="button" class="btn-eliminar btn-quitar-fila">✕</button>
+    <button type="button" class="btn-eliminar btn-quitar-fila"><i class="fa-solid fa-xmark"></i></button>
   `;
   
-  div.querySelector('.btn-quitar-fila').addEventListener('click', () => div.remove());
+  div.querySelector('.btn-quitar-fila').addEventListener('click', () => {
+    const filas = contenedorPresentaciones.querySelectorAll('.presentacion-row');
+    if (filas.length > 1) {
+      div.remove();
+    } else {
+      mostrarToast("Debe existir al menos una presentación", "error");
+    }
+  });
   contenedorPresentaciones.appendChild(div);
 }
 
@@ -86,10 +146,12 @@ btnAgregarPresentacion.addEventListener('click', (e) => {
 function inicializarFormulario() {
   formProducto.reset();
   productoIdInput.value = '';
-  tituloForm.textContent = 'Agregar Nuevo Producto';
-  btnGuardar.textContent = 'Guardar Producto';
+  tituloForm.innerHTML = `<i class="fa-solid fa-circle-plus"></i> Agregar Nuevo Producto`;
+  btnGuardar.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Producto`;
   btnCancelarEdicion.classList.add('oculto');
   contenedorPresentaciones.innerHTML = '';
+  imgPreview.classList.add('oculto');
+  previewPlaceholder.classList.remove('oculto');
   agregarFilaPresentacion('', '');
 }
 
@@ -99,7 +161,26 @@ btnCancelarEdicion.addEventListener('click', (e) => {
 });
 
 // ==========================================
-// 3. GUARDAR / EDITAR EN FIRESTORE
+// 3. CÁLCULO DE MÉTRICAS (KPIs)
+// ==========================================
+function actualizarMetricas(productos) {
+  const totalProductos = productos.length;
+  const categoriasUnicas = new Set(productos.map(p => p.categoria).filter(Boolean));
+  let variacionesTotales = 0;
+
+  productos.forEach(p => {
+    if (Array.isArray(p.presentaciones)) {
+      variacionesTotales += p.presentaciones.length;
+    }
+  });
+
+  kpiTotal.textContent = totalProductos;
+  kpiCategorias.textContent = categoriasUnicas.size;
+  kpiPresentaciones.textContent = variacionesTotales;
+}
+
+// ==========================================
+// 4. GUARDAR / EDITAR EN FIRESTORE
 // ==========================================
 formProducto.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -123,68 +204,97 @@ formProducto.addEventListener('submit', async (e) => {
   try {
     if (id) {
       await updateDoc(doc(db, "productos", id), datosProducto);
-      alert("Producto actualizado correctamente.");
+      mostrarToast("Producto actualizado correctamente.", "exito");
     } else {
       await addDoc(collection(db, "productos"), datosProducto);
-      alert("Producto agregado al catálogo.");
+      mostrarToast("Producto agregado al catálogo.", "exito");
     }
     inicializarFormulario();
   } catch (error) {
-    alert("Error al procesar la solicitud: " + error.message);
+    mostrarToast("Error al procesar: " + error.message, "error");
   }
 });
 
 // ==========================================
-// 4. LECTURA Y DELEGACIÓN DE EVENTOS EN TABLA
+// 5. LECTURA Y RENDERIZADO CON FILTROS
 // ==========================================
 function escucharProductos() {
-  // Escucha cambios descartando variaciones de metadatos locales
   unsubscribeProductos = onSnapshot(collection(db, "productos"), (snapshot) => {
-    // Si el cambio es solo una confirmación local de lectura/escritura, no redibujar
     if (snapshot.metadata.hasPendingWrites) return;
 
-    tablaBody.innerHTML = '';
+    productosLocales = [];
     productosData = {};
-
-    if (snapshot.empty) {
-      tablaBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay productos registrados.</td></tr>';
-      return;
-    }
-
-    const fragmento = document.createDocumentFragment();
 
     snapshot.forEach((documento) => {
       const prod = documento.data();
-      const id = documento.id;
-      productosData[id] = prod;
-
-      const tr = document.createElement('tr');
-      const listaPres = prod.presentaciones 
-        ? prod.presentaciones.map(p => `${p.nombre}: $${Number(p.precio).toLocaleString('es-CO')}`).join('<br>') 
-        : 'Sin precios';
-
-      tr.innerHTML = `
-        <td>
-          <div class="contenedor-img-tabla">
-            <img src="${prod.imagen || ''}" class="tabla-img" alt="${prod.nombre}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/50?text=Error'">
-          </div>
-        </td>
-        <td><strong>${prod.nombre || ''}</strong></td>
-        <td>${prod.categoria || ''}</td>
-        <td><small>${listaPres}</small></td>
-        <td>
-          <button type="button" class="btn-editar" data-id="${id}">Editar</button>
-          <button type="button" class="btn-eliminar btn-borrar-prod" data-id="${id}">✕</button>
-        </td>
-      `;
-      fragmento.appendChild(tr);
+      prod.id = documento.id;
+      productosLocales.push(prod);
+      productosData[documento.id] = prod;
     });
 
-    tablaBody.appendChild(fragmento);
+    actualizarMetricas(productosLocales);
+    renderizarTabla();
   });
 }
 
-// Delegación de eventos única fuera del snapshot para evitar reinicios de listeners
+function renderizarTabla() {
+  const textoBusqueda = inputBuscar ? inputBuscar.value.toLowerCase().trim() : '';
+  const categoriaFiltro = filtroCategoria ? filtroCategoria.value : 'todos';
+
+  const productosFiltrados = productosLocales.filter(prod => {
+    const coincideNombre = (prod.nombre || '').toLowerCase().includes(textoBusqueda);
+    const coincideCategoria = categoriaFiltro === 'todos' || prod.categoria === categoriaFiltro;
+    return coincideNombre && coincideCategoria;
+  });
+
+  tablaBody.innerHTML = '';
+
+  if (productosFiltrados.length === 0) {
+    tablaBody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; color: var(--admin-text-muted); padding: 24px;">
+          <i class="fa-solid fa-magnifying-glass" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+          No se encontraron productos coincidentes.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const fragmento = document.createDocumentFragment();
+
+  productosFiltrados.forEach((prod) => {
+    const tr = document.createElement('tr');
+    const listaPres = prod.presentaciones 
+      ? prod.presentaciones.map(p => `${p.nombre}: <strong>$${Number(p.precio).toLocaleString('es-CO')}</strong>`).join('<br>') 
+      : 'Sin precios';
+
+    tr.innerHTML = `
+      <td>
+        <div class="contenedor-img-tabla">
+          <img src="${prod.imagen || ''}" class="tabla-img" alt="${prod.nombre}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/50?text=Sin+Foto'">
+        </div>
+      </td>
+      <td><strong>${prod.nombre || ''}</strong></td>
+      <td><span class="badge-categoria" style="text-transform: capitalize; background: #e0e7ff; color: #3730a3; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${prod.categoria || ''}</span></td>
+      <td><small>${listaPres}</small></td>
+      <td>
+        <button type="button" class="btn-editar" data-id="${prod.id}"><i class="fa-solid fa-pen-to-square"></i> Editar</button>
+        <button type="button" class="btn-eliminar btn-borrar-prod" data-id="${prod.id}"><i class="fa-solid fa-trash-can"></i></button>
+      </td>
+    `;
+    fragmento.appendChild(tr);
+  });
+
+  tablaBody.appendChild(fragmento);
+}
+
+if (inputBuscar) inputBuscar.addEventListener('input', renderizarTabla);
+if (filtroCategoria) filtroCategoria.addEventListener('change', renderizarTabla);
+
+// ==========================================
+// 6. DELEGACIÓN DE EVENTOS EN TABLA
+// ==========================================
 tablaBody.addEventListener('click', async (e) => {
   const btnEditar = e.target.closest('.btn-editar');
   const btnBorrar = e.target.closest('.btn-borrar-prod');
@@ -200,6 +310,12 @@ tablaBody.addEventListener('click', async (e) => {
       document.getElementById('descripcion').value = prod.descripcion || '';
       document.getElementById('imagen').value = prod.imagen || '';
 
+      if (prod.imagen) {
+        imgPreview.src = prod.imagen;
+        imgPreview.classList.remove('oculto');
+        previewPlaceholder.classList.add('oculto');
+      }
+
       contenedorPresentaciones.innerHTML = '';
       if (prod.presentaciones && prod.presentaciones.length > 0) {
         prod.presentaciones.forEach(p => agregarFilaPresentacion(p.nombre, p.precio));
@@ -207,8 +323,8 @@ tablaBody.addEventListener('click', async (e) => {
         agregarFilaPresentacion('', '');
       }
 
-      tituloForm.textContent = 'Editar Producto';
-      btnGuardar.textContent = 'Actualizar Producto';
+      tituloForm.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
+      btnGuardar.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Actualizar Producto`;
       btnCancelarEdicion.classList.remove('oculto');
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -220,8 +336,9 @@ tablaBody.addEventListener('click', async (e) => {
     if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
       try {
         await deleteDoc(doc(db, "productos", id));
+        mostrarToast("Producto eliminado", "exito");
       } catch (err) {
-        alert("Error al eliminar: " + err.message);
+        mostrarToast("Error al eliminar: " + err.message, "error");
       }
     }
   }
