@@ -778,3 +778,24 @@ section h2 {
 
   .footer-logo { justify-content: flex-end; }
 }
+
+.header-derecha {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre el botón Admin y el Carrito */
+}
+
+.btn-admin {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-admin:hover {
+  background-color: rgba(255, 255, 255, 0.35);
+}

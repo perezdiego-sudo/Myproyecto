@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración - Quimiaseo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-container { max-width: 900px; margin: 30px auto; padding: 20px; flex: 1; }
+    .card-panel { background: var(--color-bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+    .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-weight: 600; color: var(--color-primary); font-size: 14px; }
+    .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; border: 1px solid var(--border-input); border-radius: 8px; background: var(--color-bg-input); font-family: inherit; font-size: 14px; color: var(--color-text-main); }
+    .presentacion-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+    .btn-editar { background: var(--color-accent); color: #000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-right: 5px; }
+    .tabla-productos { width: 100%; border-collapse: collapse; background: var(--color-bg-card); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .tabla-productos th, .tabla-productos td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-dark); font-size: 14px; }
+    .tabla-productos th { background: var(--color-primary); color: white; }
+    .tabla-img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
+    .oculto { display: none !important; }
+    .header-user { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <a href="catalogo.html" class="logo">
+      <div class="logo-circulo-header">Qpc</div>
+      <span>Panel de Administración</span>
+    </a>
+  </header>
+
+  <main class="admin-container">
+
+    <!-- FORMULARIO DE INICIO DE SESIÓN -->
+    <section id="vista-login" class="card-panel" style="max-width: 400px; margin: 40px auto;">
+      <h2 style="text-align: center; margin-bottom: 20px; color: var(--color-primary);">Acceso Proveedor</h2>
+      <form id="form-login">
+        <div class="form-group">
+          <label for="login-email">Correo Electrónico:</label>
+          <input type="email" id="login-email" placeholder="admin@quimiaseo.com" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña:</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-agregar-carrito" style="width: 100%; margin-top: 10px; padding: 12px;">Ingresar</button>
+      </form>
+    </section>
+
+    <!-- PANEL ADMINISTRATIVO PROTEGIDO -->
+    <section id="vista-admin" class="oculto">
+      <div class="header-user">
+        <p>Usuario activo: <strong id="user-email" style="color: var(--color-primary);"></strong></p>
+        <button id="btn-logout" class="btn-vaciar">Cerrar Sesión</button>
+      </div>
+
+      <div class="card-panel">
+        <h2 id="titulo-form" style="margin-bottom: 20px; color: var(--color-primary);">Agregar Nuevo Producto</h2>
+        
+        <form id="form-producto">
+          <input type="hidden" id="producto-id" value="">
+
+          <div class="form-group">
+            <label for="nombre">Nombre del Producto:</label>
+            <input type="text" id="nombre" placeholder="Ej: Jabón Multiusos" required>
+          </div>
+
+          <div class="form-group">
+            <label for="categoria">Categoría:</label>
+            <select id="categoria" required>
+              <option value="envases">Envases Plásticos</option>
+              <option value="liquidos">Líquidos</option>
+              <option value="perfumeria">Perfumería</option>
+              <option value="polvos">Polvos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" rows="2" placeholder="Descripción breve del producto..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="imagen">Enlace de la Foto (Google Drive o URL):</label>
+            <input type="text" id="imagen" placeholder="https://drive.google.com/file/d/..." required>
+          </div>
+
+          <div class="form-group">
+            <label>Presentaciones y Precios:</label>
+            <div id="contenedor-presentaciones"></div>
+            <button type="button" id="btn-agregar-presentacion" class="btn-filtro" style="margin-top: 8px;">+ Agregar presentación</button>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="submit" id="btn-guardar" class="btn-agregar-carrito" style="flex: 1; padding: 12px;">Guardar Producto</button>
+            <button type="button" id="btn-cancelar-edicion" class="btn-vaciar oculto">Cancelar Edición</button>
+          </div>
+        </form>
+      </div>
+
+      <h2 style="color: var(--color-primary); margin-bottom: 15px;">Productos en Inventario</h2>
+      <table class="tabla-productos">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Presentaciones</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-body">
+          <tr>
+            <td colspan="5" style="text-align: center;">Cargando inventario...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-derechos">
+      <p>&copy; 2026 QUIMIASEO Y PERFUMERIA SINCELEJO. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
