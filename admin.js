@@ -1,13 +1,23 @@
-// IMPORTACIÓN DE FIREBASE (Asegúrate de tener tu archivo firebase-config.js o tus credenciales)
+// admin.js - Módulo de Gestión de Inventario y Autenticación con Firebase v10
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { 
-  getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  onSnapshot, 
+  runTransaction 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// REEMPLAZA ESTE OBJETO CON TU CONFIGURACIÓN DE FIREBASE SI LO TIENES EN OTRO LADO
+// 1. Configuración Real de Firebase Quimiaseo Caribe
 const firebaseConfig = {
   apiKey: "AIzaSyB5iP0E5BVu0XX0bclE-0j1ym24GRbYDNQ",
   authDomain: "quimiaseo-caribe.firebaseapp.com",
@@ -19,291 +29,301 @@ const firebaseConfig = {
   measurementId: "G-MRCXCVJS84"
 };
 
+// 2. Inicialización
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ELEMENTOS DEL DOM
-const vistaLogin = document.getElementById('vista-login');
-const vistaAdmin = document.getElementById('vista-admin');
-const formLogin = document.getElementById('form-login');
-const userEmailSpan = document.getElementById('user-email');
-const btnLogout = document.getElementById('btn-logout');
+const productosRef = collection(db, "productos");
 
-const kpiTotal = document.getElementById('kpi-total');
-const kpiStock = document.getElementById('kpi-stock');
+// Referencias DOM
+const loginSection = document.getElementById("login-section");
+const panelSection = document.getElementById("panel-section");
+const userInfo = document.getElementById("user-info");
+const userEmailSpan = document.getElementById("user-email");
 
-const formProducto = document.getElementById('form-producto');
-const productoIdInput = document.getElementById('producto-id');
-const nombreInput = document.getElementById('nombre');
-const categoriaInput = document.getElementById('categoria');
-const stockInput = document.getElementById('stock');
-const descripcionInput = document.getElementById('descripcion');
-const imagenInput = document.getElementById('imagen');
-const imgPreview = document.getElementById('img-preview');
-const previewPlaceholder = document.getElementById('preview-placeholder');
-const contenedorPresentaciones = document.getElementById('contenedor-presentaciones');
-const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion');
-const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
-const tituloForm = document.getElementById('titulo-form');
+const formLogin = document.getElementById("form-login");
+const inputLoginEmail = document.getElementById("login-email");
+const inputLoginPass = document.getElementById("login-password");
+const btnLogout = document.getElementById("btn-logout");
 
-const tablaBody = document.getElementById('tabla-body');
-const inputBuscar = document.getElementById('input-buscar');
-const filtroCategoria = document.getElementById('filtro-tabla-categoria');
+const formProducto = document.getElementById("form-producto");
+const inputProdId = document.getElementById("prod-id");
+const inputProdNombre = document.getElementById("prod-nombre");
+const selectProdCat = document.getElementById("prod-categoria");
+const inputProdPrecio = document.getElementById("prod-precio");
+const inputProdStock = document.getElementById("prod-stock");
+const spanUnidadStock = document.getElementById("unidad-stock-txt");
 
-let todosLosProductos = [];
+const formTitle = document.getElementById("form-title");
+const btnGuardarProd = document.getElementById("btn-guardar-prod");
+const btnCancelarEdit = document.getElementById("btn-cancelar-edit");
+const tablaBody = document.getElementById("tabla-productos-body");
 
-// AUTENTICACIÓN
+let unsubscribeProductos = null;
+
+// ==========================================
+// 3. OBTENER UNIDAD SEGÚN CATEGORÍA
+// ==========================================
+
+export function obtenerUnidadStock(categoria) {
+  const cat = (categoria || '').toLowerCase();
+  switch (cat) {
+    case 'polvos':
+      return 'kg';
+    case 'liquidos':
+    case 'perfumeria':
+      return 'L';
+    case 'envases':
+      return 'unid.';
+    default:
+      return 'unid.';
+  }
+}
+
+// Cambiar la etiqueta dinámicamente al seleccionar categoría
+selectProdCat.addEventListener("change", () => {
+  const unidad = obtenerUnidadStock(selectProdCat.value);
+  if (spanUnidadStock) spanUnidadStock.textContent = unidad;
+  inputProdStock.placeholder = `Ej: 50 ${unidad}`;
+});
+
+function mostrarToast(mensaje, tipo = "info") {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${tipo}`;
+  
+  const icon = tipo === "exito" ? "fa-circle-check" : (tipo === "error" ? "fa-circle-exclamation" : "fa-info-circle");
+  toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${mensaje}</span>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 4000);
+}
+
+// ==========================================
+// 4. AUTENTICACIÓN
+// ==========================================
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    vistaLogin.classList.add('oculto');
-    vistaAdmin.classList.remove('oculto');
+    loginSection.classList.add("hidden");
+    panelSection.classList.remove("hidden");
+    userInfo.classList.remove("hidden");
     userEmailSpan.textContent = user.email;
-    cargarProductos();
+
+    escucharProductos();
   } else {
-    vistaLogin.classList.remove('oculto');
-    vistaAdmin.classList.add('oculto');
+    loginSection.classList.remove("hidden");
+    panelSection.classList.add("hidden");
+    userInfo.classList.add("hidden");
+    userEmailSpan.textContent = "";
+
+    if (unsubscribeProductos) unsubscribeProductos();
   }
 });
 
-formLogin.addEventListener('submit', async (e) => {
+formLogin.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
+  const email = inputLoginEmail.value.trim();
+  const password = inputLoginPass.value.trim();
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    mostrarToast('Sesión iniciada con éxito', 'exito');
-  } catch (err) {
-    mostrarToast('Credenciales incorrectas: ' + err.message, 'error');
-  }
-});
-
-btnLogout.addEventListener('click', () => {
-  signOut(auth);
-  mostrarToast('Sesión cerrada', 'exito');
-});
-
-// GESTIÓN DE PRESENTACIONES EN EL FORMULARIO
-btnAgregarPresentacion.addEventListener('click', () => agregarFilaPresentacion());
-
-function agregarFilaPresentacion(nombre = '', precio = '') {
-  const row = document.createElement('div');
-  row.className = 'presentacion-row';
-  row.innerHTML = `
-    <input type="text" class="pres-nombre" placeholder="Medida (ej: 1 Litro, Galón)" value="${nombre}" required>
-    <input type="number" class="pres-precio" placeholder="Precio ($)" value="${precio}" min="0" step="any" required>
-    <button type="button" class="btn-eliminar"><i class="fa-solid fa-trash"></i></button>
-  `;
-
-  row.querySelector('.btn-eliminar').addEventListener('click', () => {
-    if (contenedorPresentaciones.children.length > 1) {
-      row.remove();
+    mostrarToast("¡Bienvenido al Panel de Administración!", "exito");
+    formLogin.reset();
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error.code, error.message);
+    if (error.code === 'auth/api-key-not-valid') {
+      mostrarToast("API Key no válida. Revisa las credenciales.", "error");
+    } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+      mostrarToast("Credenciales incorrectas: Correo o contraseña erróneos.", "error");
     } else {
-      mostrarToast('Debe haber al menos una presentación', 'error');
+      mostrarToast(`Error: ${error.message}`, "error");
     }
-  });
-
-  contenedorPresentaciones.appendChild(row);
-}
-
-// PREVIEW DE IMAGEN
-imagenInput.addEventListener('input', () => {
-  const url = imagenInput.value.trim();
-  if (url) {
-    imgPreview.src = url;
-    imgPreview.classList.remove('oculto');
-    previewPlaceholder.classList.add('oculto');
-  } else {
-    imgPreview.classList.add('oculto');
-    previewPlaceholder.classList.remove('oculto');
   }
 });
 
-// CARGAR PRODUCTOS DESDE FIRESTORE
-function cargarProductos() {
-  onSnapshot(collection(db, 'productos'), (snapshot) => {
-    todosLosProductos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    actualizarMetricas(todosLosProductos);
-    renderizarTabla(todosLosProductos);
+btnLogout.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    mostrarToast("Has cerrado sesión.", "exito");
+  } catch (error) {
+    mostrarToast("Error al cerrar sesión", "error");
+  }
+});
+
+// ==========================================
+// 5. GESTIÓN DE PRODUCTOS (CRUD)
+// ==========================================
+
+function escucharProductos() {
+  unsubscribeProductos = onSnapshot(productosRef, (snapshot) => {
+    const productos = [];
+    snapshot.forEach((docSnap) => {
+      productos.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    renderizarTabla(productos);
+  }, (error) => {
+    mostrarToast("Error al cargar productos.", "error");
   });
 }
 
-// ACTUALIZAR LAS 3 MÉTRICAS
-function actualizarMetricas(productos) {
-  const totalProds = productos.length;
-  const totalUnidadesStock = productos.reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
-
-  if (kpiTotal) kpiTotal.textContent = totalProds;
-  if (kpiStock) kpiStock.textContent = totalUnidadesStock;
-}
-
-// RENDERIZAR TABLA
 function renderizarTabla(productos) {
-  const textoBuscado = inputBuscar.value.toLowerCase().trim();
-  const catFiltrada = filtroCategoria.value;
-
-  const filtrados = productos.filter(p => {
-    const coincideNombre = p.nombre.toLowerCase().includes(textoBuscado);
-    const coincideCat = catFiltrada === 'todos' || p.categoria === catFiltrada;
-    return coincideNombre && coincideCat;
-  });
-
-  if (filtrados.length === 0) {
-    tablaBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:16px;">No se encontraron productos</td></tr>`;
+  if (productos.length === 0) {
+    tablaBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #777;">No hay productos en el inventario.</td></tr>`;
     return;
   }
 
-  tablaBody.innerHTML = filtrados.map(p => {
-    const preciosTexto = p.presentaciones ? p.presentaciones.map(pr => `${pr.nombre}: $${pr.precio}`).join('<br>') : '';
+  tablaBody.innerHTML = productos.map((p) => {
+    const unidad = obtenerUnidadStock(p.categoria);
+    const precioFormat = Number(p.precio || 0).toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
     
     return `
       <tr>
+        <td><strong>${p.nombre || 'Sin nombre'}</strong></td>
+        <td><span class="badge-cat cat-${p.categoria || 'envases'}">${p.categoria || 'N/A'}</span></td>
+        <td>${precioFormat}</td>
         <td>
-          <div class="contenedor-img-tabla">
-            <img src="${p.imagen}" class="tabla-img" onerror="this.src='https://via.placeholder.com/40'">
-          </div>
+          <strong style="font-size: 1.05rem; color: #0d47a1;">${p.stock || 0}</strong> ${unidad}
         </td>
-        <td><strong>${p.nombre}</strong></td>
-        <td><span style="text-transform:capitalize;">${p.categoria}</span></td>
-        <td><strong>${p.stock || 0}</strong> ${obtenerUnidadStock(p.categoria)}</td>
-        <td style="font-size: 11px;">${preciosTexto}</td>
         <td>
-          <button class="btn-editar" data-id="${p.id}"><i class="fa-solid fa-pen"></i></button>
-          <button class="btn-eliminar" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>
+          <div class="action-btns">
+            <button class="btn-sm btn-edit" onclick="prepararEdicion('${p.id}', '${p.nombre}', '${p.categoria}', ${p.precio}, ${p.stock})" title="Editar Producto">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button class="btn-sm btn-discount" onclick="promptDescontarStock('${p.id}', '${p.nombre}', ${p.stock}, '${p.categoria}')" title="Descontar Pedido">
+              <i class="fa-solid fa-minus"></i> Pedido
+            </button>
+            <button class="btn-sm btn-delete" onclick="confirmarEliminar('${p.id}', '${p.nombre}')" title="Eliminar Producto">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </td>
       </tr>
     `;
-  }).join('');
-
-  // Eventos de botones en la tabla
-  tablaBody.querySelectorAll('.btn-editar').forEach(btn => {
-    btn.addEventListener('click', () => editarProducto(btn.dataset.id));
-  });
-
-  tablaBody.querySelectorAll('.btn-eliminar').forEach(btn => {
-    btn.addEventListener('click', () => eliminarProducto(btn.dataset.id));
-  });
+  }).join("");
 }
 
-// FILTROS
-inputBuscar.addEventListener('input', () => renderizarTabla(todosLosProductos));
-filtroCategoria.addEventListener('change', () => renderizarTabla(todosLosProductos));
-
-// GUARDAR / ACTUALIZAR PRODUCTO
-formProducto.addEventListener('submit', async (e) => {
+formProducto.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const id = productoIdInput.value;
-  const filasPres = document.querySelectorAll('.presentacion-row');
-  const presentaciones = Array.from(filasPres).map(row => ({
-    nombre: row.querySelector('.pres-nombre').value.trim(),
-    precio: parseFloat(row.querySelector('.pres-precio').value)
-  }));
+  const id = inputProdId.value;
+  const nombre = inputProdNombre.value.trim();
+  const categoria = selectProdCat.value;
+  const precio = parseFloat(inputProdPrecio.value);
+  const stock = parseFloat(inputProdStock.value);
 
-  const dataProducto = {
-    nombre: nombreInput.value.trim(),
-    categoria: categoriaInput.value,
-    stock: parseInt(stockInput.value) || 0,
-    descripcion: descripcionInput.value.trim(),
-    imagen: imagenInput.value.trim(),
-    presentaciones
+  const productoData = {
+    nombre,
+    categoria,
+    precio,
+    stock,
+    actualizadoEn: new Date()
   };
 
   try {
     if (id) {
-      await updateDoc(doc(db, 'productos', id), dataProducto);
-      mostrarToast('Producto actualizado', 'exito');
+      await updateDoc(doc(db, "productos", id), productoData);
+      mostrarToast(`Producto "${nombre}" actualizado.`, "exito");
     } else {
-      await addDoc(collection(db, 'productos'), dataProducto);
-      mostrarToast('Producto registrado', 'exito');
+      await addDoc(productosRef, { ...productoData, creadoEn: new Date() });
+      mostrarToast(`Producto "${nombre}" agregado.`, "exito");
     }
-    limpiarFormulario();
-  } catch (err) {
-    mostrarToast('Error al guardar: ' + err.message, 'error');
+    resetFormulario();
+  } catch (error) {
+    mostrarToast("Error al guardar en la base de datos.", "error");
   }
 });
 
-// EDITAR Y ELIMINAR
-function editarProducto(id) {
-  const prod = todosLosProductos.find(p => p.id === id);
-  if (!prod) return;
+window.prepararEdicion = (id, nombre, categoria, precio, stock) => {
+  inputProdId.value = id;
+  inputProdNombre.value = nombre;
+  selectProdCat.value = categoria;
+  inputProdPrecio.value = precio;
+  inputProdStock.value = stock;
 
-  productoIdInput.value = prod.id;
-  nombreInput.value = prod.nombre;
-  categoriaInput.value = prod.categoria;
-  stockInput.value = prod.stock || 0;
-  descripcionInput.value = prod.descripcion;
-  imagenInput.value = prod.imagen;
-  imgPreview.src = prod.imagen;
-  imgPreview.classList.remove('oculto');
-  previewPlaceholder.classList.add('oculto');
+  spanUnidadStock.textContent = obtenerUnidadStock(categoria);
+  formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
+  btnGuardarProd.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Actualizar Producto`;
+  btnCancelarEdit.classList.remove("hidden");
+};
 
-  contenedorPresentaciones.innerHTML = '';
-  if (prod.presentaciones && prod.presentaciones.length > 0) {
-    prod.presentaciones.forEach(pr => agregarFilaPresentacion(pr.nombre, pr.precio));
-  } else {
-    agregarFilaPresentacion();
-  }
+btnCancelarEdit.addEventListener("click", resetFormulario);
 
-  tituloForm.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
-  btnCancelarEdicion.classList.remove('oculto');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-async function eliminarProducto(id) {
-  if (confirm('¿Eliminar este producto permanentemente?')) {
-    try {
-      await deleteDoc(doc(db, 'productos', id));
-      mostrarToast('Producto eliminado', 'exito');
-    } catch (err) {
-      mostrarToast('Error al eliminar', 'error');
-    }
-  }
-}
-
-btnCancelarEdicion.addEventListener('click', limpiarFormulario);
-
-function limpiarFormulario() {
+function resetFormulario() {
+  inputProdId.value = "";
   formProducto.reset();
-  productoIdInput.value = '';
-  contenedorPresentaciones.innerHTML = '';
-  agregarFilaPresentacion();
-  imgPreview.classList.add('oculto');
-  previewPlaceholder.classList.remove('oculto');
-  tituloForm.innerHTML = `<i class="fa-solid fa-circle-plus"></i> Agregar Nuevo Producto`;
-  btnCancelarEdicion.classList.add('oculto');
+  spanUnidadStock.textContent = obtenerUnidadStock(selectProdCat.value);
+  formTitle.innerHTML = `<i class="fa-solid fa-square-plus"></i> Registrar Producto`;
+  btnGuardarProd.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Producto`;
+  btnCancelarEdit.classList.add("hidden");
 }
 
-// Retorna la unidad correspondiente según la categoría
-function obtenerUnidadStock(categoria) {
-  const unidades = {
-    polvos: 'kg',
-    liquidos: 'L',
-    perfumeria: 'L',
-    envases: 'unid.'
-  };
-  return unidades[categoria] || 'unid.';
+window.confirmarEliminar = async (id, nombre) => {
+  if (confirm(`¿Deseas eliminar el producto "${nombre}"?`)) {
+    try {
+      await deleteDoc(doc(db, "productos", id));
+      mostrarToast(`Producto "${nombre}" eliminado.`, "exito");
+    } catch (error) {
+      mostrarToast("Error al eliminar.", "error");
+    }
+  }
+};
+
+// ==========================================
+// 6. DESCUENTO AUTOMÁTICO / TRANSACCIONAL DE STOCK
+// ==========================================
+
+export async function descontarStock(productoId, cantidadPedida) {
+  const prodRef = doc(db, "productos", productoId);
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const prodDoc = await transaction.get(prodRef);
+
+      if (!prodDoc.exists()) {
+        throw new Error("El producto no existe.");
+      }
+
+      const data = prodDoc.data();
+      const stockActual = Number(data.stock) || 0;
+      const unidad = obtenerUnidadStock(data.categoria);
+
+      if (stockActual < cantidadPedida) {
+        throw new Error(`Stock insuficiente de "${data.nombre}". Quedan ${stockActual} ${unidad} y se solicitaron ${cantidadPedida} ${unidad}.`);
+      }
+
+      const nuevoStock = stockActual - cantidadPedida;
+      transaction.update(prodRef, { stock: nuevoStock });
+    });
+
+    mostrarToast(`Se descontaron ${cantidadPedida} unidades del inventario.`, "exito");
+    return true;
+
+  } catch (error) {
+    console.error("Error al descontar stock:", error.message);
+    mostrarToast(error.message, "error");
+    return false;
+  }
 }
 
-// Actualiza la etiqueta del formulario cuando cambias la categoría
-categoriaInput.addEventListener('change', () => {
-  const unidad = obtenerUnidadStock(categoriaInput.value);
-  const spanUnidad = document.getElementById('unidad-stock-txt');
-  if (spanUnidad) spanUnidad.textContent = unidad;
-  stockInput.placeholder = `Ej: 50 ${unidad}`;
-});
+// Botón de acceso rápido en la tabla para simular/procesar un pedido
+window.promptDescontarStock = async (id, nombre, stockActual, categoria) => {
+  const unidad = obtenerUnidadStock(categoria);
+  const resp = prompt(`Ingresa la cantidad enviada en el pedido para "${nombre}" (Stock actual: ${stockActual} ${unidad}):`, "10");
+  
+  if (resp === null) return;
 
+  const cantidad = parseFloat(resp);
+  if (isNaN(cantidad) || cantidad <= 0) {
+    mostrarToast("Ingresa un número mayor a 0.", "error");
+    return;
+  }
 
-// INICIALIZAR PRIMERA FILA AL CARGAR
-agregarFilaPresentacion();
-
-// NOTIFICACIONES TOAST
-function mostrarToast(msj, tipo) {
-  const toastContainer = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = `toast ${tipo}`;
-  toast.innerHTML = `<i class="fa-solid ${tipo === 'exito' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${msj}`;
-  toastContainer.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
-}
+  await descontarStock(id, cantidad);
+};
