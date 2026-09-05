@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Migración a Firebase</title>
+  <style>
+    body { font-family: sans-serif; background: #0d0d0d; color: #fff; padding: 40px; }
+    button { background: #ff6600; color: #000; border: none; padding: 14px 28px; font-size: 16px; border-radius: 8px; cursor: pointer; }
+    #resultado { margin-top: 20px; white-space: pre-wrap; color: #ccc; }
+  </style>
+</head>
+<body>
+
+  <h1>Migración de productos a Firebase</h1>
+  <p>Haz clic en el botón UNA sola vez para subir tus productos actuales a Firestore.</p>
+  <button id="btn-migrar">Migrar productos</button>
+  <div id="resultado"></div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    // Tus productos actuales, copiados de catalogo.html
+    const productos = [
+      {
+        nombre: "Alcohol al 96%",
+        descripcion: "Alcohol al 96% de alta pureza. Limpieza profunda y evaporación rápida.",
+        categoria: "liquidos",
+        imagen: "imagenes/images.jpg",
+        presentaciones: [
+          { nombre: "1/4 Litro", precio: 3000 },
+          { nombre: "Medio Litro", precio: 5500 },
+          { nombre: "Litro", precio: 10000 },
+          { nombre: "20 Litros", precio: 180000 }
+        ]
+      },
+      {
+        nombre: "Jabón Liquido Industrial",
+        descripcion: "Poderoso desengrasante industrial para limpieza profunda y eliminación de residuos difíciles.",
+        categoria: "liquidos",
+        imagen: "imagenes/alcohol.png",
+        presentaciones: [
+          { nombre: "Litro", precio: 3000 },
+          { nombre: "20 Litros", precio: 60000 }
+        ]
+      },
+      {
+        nombre: "Acido Nitrico",
+        descripcion: "Limpiador químico de alta potencia. Elimina óxido, sarro y suciedad pesada",
+        categoria: "liquidos",
+        imagen: "imagenes/alcohol.png",
+        presentaciones: [
+          { nombre: "Medio Litro", precio: 5000 },
+          { nombre: "Litro", precio: 10000 },
+          { nombre: "20 Litros", precio: 200000 }
+        ]
+      },
+      {
+        nombre: "Formol",
+        descripcion: "Solución desinfectante e industrial. Potente eliminador de hongos, bacterias y malos olores",
+        categoria: "liquidos",
+        imagen: "imagenes/alcohol.png",
+        presentaciones: [
+          { nombre: "Medio Litro", precio: 5000 },
+          { nombre: "Litro", precio: 10000 },
+          { nombre: "20 Litros", precio: 200000 }
+        ]
+      },
+      {
+        nombre: "Envase Mantequero x 1/4",
+        descripcion: "Envase resistente con tapa de seguridad.",
+        categoria: "envases",
+        imagen: "imagenes/alcohol.png",
+        presentaciones: [
+          { nombre: "Unidad", precio: 600 }
+        ]
+      },
+      {
+        nombre: "Envase Mantequero x Medio litro",
+        descripcion: "Envase resistente con tapa de seguridad.",
+        categoria: "envases",
+        imagen: "imagenes/alcohol.png",
+        presentaciones: [
+          { nombre: "Unidad", precio: 700 }
+        ]
+      },
+      {
+        nombre: "Envase Mantequero x 1 litro",
+        descripcion: "Envase resistente con tapa de seguridad.",
+        categoria: "envases",
+        imagen: "imagenes/alcohol.png",
+        presentaciones: [
+          { nombre: "Unidad", precio: 800 }
+        ]
+      },
+      {
+        nombre: "Esencia Cítrica",
+        descripcion: "Aroma fresco y duradero.",
+        categoria: "perfumeria",
+        imagen: "imagenes/alcohol.png",
+        presentaciones: [
+          { nombre: "Unidad", precio: 12000 }
+        ]
+      },
+      {
+        nombre: "Bicarbonato de Sodio",
+        descripcion: "Polvo multiusos para limpieza, desinfección y neutralización de olores.",
+        categoria: "polvos",
+        imagen: "imagenes/bicarbonato.jpg",
+        presentaciones: [
+          { nombre: "4 Onzas", precio: 2000 },
+          { nombre: "Libra", precio: 4000 },
+          { nombre: "Kilo", precio: 8000 }
+        ]
+      }
+    ];
+
+    document.getElementById('btn-migrar').addEventListener('click', async () => {
+      const resultado = document.getElementById('resultado');
+      resultado.textContent = "Migrando...\n";
+
+      for (const producto of productos) {
+        try {
+          await addDoc(collection(db, "productos"), producto);
+          resultado.textContent += `✓ ${producto.nombre} agregado\n`;
+        } catch (error) {
+          resultado.textContent += `✗ Error con ${producto.nombre}: ${error.message}\n`;
+        }
+      }
+
+      resultado.textContent += "\n¡Migración terminada! Revisa Firestore en la consola de Firebase.";
+    });
+  </script>
+
+</body>
+</html>
