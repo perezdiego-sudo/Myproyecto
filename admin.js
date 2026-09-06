@@ -38,7 +38,7 @@ const STOCK_MINIMO_POR_DEFECTO = 5;
 // ==========================================================
 
 function obtenerUnidadStock(categoria) {
-  const unidades = { polvos: 'kg', liquidos: 'L', perfumeria: 'L', envases: 'unid.' };
+  const unidades = { polvos: 'kg', liquidos: 'L', perfumeria: 'L', sabores: 'L', envases: 'unid.' };
   return unidades[categoria] || 'unid.';
 }
 
