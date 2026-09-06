@@ -4,11 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Administración - Quimiaseo Caribe</title>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
-  
+
   <style>
     :root {
       --primary-color: #0d47a1;
@@ -19,25 +17,12 @@
       --border-color: #e0e0e0;
       --success-color: #2e7d32;
       --danger-color: #c62828;
-      --warning-color: #f57c00;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* Header Bar */
     header {
       background-color: var(--primary-color);
       color: #ffffff;
@@ -48,32 +33,18 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
-      font-size: 1.25rem;
-    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.25rem; }
 
     .brand-logo {
       background-color: #ffffff;
       color: var(--primary-color);
-      width: 38px;
-      height: 38px;
+      width: 38px; height: 38px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.9rem;
     }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
+    .user-info { display: flex; align-items: center; gap: 15px; }
 
     .btn-logout {
       background-color: rgba(255,255,255,0.15);
@@ -84,239 +55,157 @@
       cursor: pointer;
       transition: background-color 0.2s;
     }
+    .btn-logout:hover { background-color: rgba(255,255,255,0.3); }
 
-    .btn-logout:hover {
-      background-color: rgba(255,255,255,0.3);
-    }
+    main { flex: 1; max-width: 1200px; width: 100%; margin: 30px auto; padding: 0 20px; }
 
-    main {
-      flex: 1;
-      max-width: 1200px;
-      width: 100%;
-      margin: 30px auto;
-      padding: 0 20px;
-    }
-
-    /* Formulario de Login */
     .login-container {
-      max-width: 420px;
-      margin: 40px auto;
-      background: var(--card-bg);
-      border-radius: 12px;
+      max-width: 420px; margin: 40px auto;
+      background: var(--card-bg); border-radius: 12px;
       padding: 35px 30px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
       border: 1px solid var(--border-color);
     }
 
     .login-title {
-      text-align: center;
-      color: var(--primary-color);
-      font-size: 1.4rem;
-      margin-bottom: 25px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      text-align: center; color: var(--primary-color);
+      font-size: 1.4rem; margin-bottom: 25px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
     }
 
-    .form-group {
-      margin-bottom: 18px;
-    }
+    .form-group { margin-bottom: 18px; }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #444;
-    }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; color: #444; }
 
-    .form-group input, .form-group select {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      font-size: 0.95rem;
-      background-color: #f9fbfd;
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 11px 14px;
+      border: 1px solid var(--border-color); border-radius: 6px;
+      font-size: 0.95rem; background-color: #f9fbfd;
       transition: border-color 0.2s;
     }
 
-    .form-group input:focus, .form-group select:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      background-color: #ffffff;
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none; border-color: var(--primary-color); background-color: #ffffff;
     }
 
     .btn-primary {
-      width: 100%;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      width: 100%; background-color: var(--primary-color); color: white;
+      border: none; padding: 12px; border-radius: 6px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: background-color 0.2s;
     }
+    .btn-primary:hover { background-color: var(--primary-dark); }
 
-    .btn-primary:hover {
-      background-color: var(--primary-dark);
-    }
-
-    /* Grid del Dashboard */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 25px;
-    }
-
-    @media (max-width: 850px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+    .dashboard-grid { display: grid; grid-template-columns: 380px 1fr; gap: 25px; }
+    @media (max-width: 850px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
     .card {
-      background: var(--card-bg);
-      border-radius: 10px;
-      padding: 22px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-      border: 1px solid var(--border-color);
+      background: var(--card-bg); border-radius: 10px; padding: 22px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
     }
 
     .card-title {
-      font-size: 1.15rem;
-      color: var(--primary-color);
-      margin-bottom: 18px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #eef2f7;
-      display: flex;
-      align-items: center;
+      font-size: 1.15rem; color: var(--primary-color); margin-bottom: 18px;
+      padding-bottom: 10px; border-bottom: 2px solid #eef2f7;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Presentaciones dinámicas */
+    #lista-presentaciones {
+      display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;
+    }
+
+    .fila-presentacion {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
       gap: 8px;
+      align-items: center;
     }
 
-    /* Tabla */
-    .table-responsive {
-      overflow-x: auto;
+    .fila-presentacion input {
+      padding: 9px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.9rem;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
+    .btn-quitar-presentacion {
+      background: #ffebee; color: var(--danger-color);
+      border: none; border-radius: 6px;
+      width: 34px; height: 34px; cursor: pointer;
     }
 
-    th, td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 0.92rem;
+    .btn-agregar-presentacion {
+      background: #e3f2fd; color: var(--primary-color);
+      border: 1px dashed var(--primary-color);
+      border-radius: 6px; padding: 8px; width: 100%;
+      cursor: pointer; font-weight: 600; margin-bottom: 18px;
     }
+    .btn-agregar-presentacion:hover { background: #bbdefb; }
 
-    th {
-      background-color: #f8fafc;
-      color: #555;
-      font-weight: 600;
-    }
+    .table-responsive { overflow-x: auto; }
 
-    tr:hover {
-      background-color: #f1f5f9;
-    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.92rem; }
+
+    th { background-color: #f8fafc; color: #555; font-weight: 600; }
+
+    tr:hover { background-color: #f1f5f9; }
 
     .badge-cat {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      text-transform: capitalize;
+      display: inline-block; padding: 3px 8px; border-radius: 12px;
+      font-size: 0.78rem; font-weight: 600; text-transform: capitalize;
     }
-
     .cat-polvos { background: #fff3e0; color: #e65100; }
     .cat-liquidos { background: #e3f2fd; color: #1565c0; }
     .cat-perfumeria { background: #f3e5f5; color: #7b1fa2; }
     .cat-envases { background: #e8f5e9; color: #2e7d32; }
 
-    .action-btns {
-      display: flex;
-      gap: 6px;
-    }
+    .action-btns { display: flex; gap: 6px; }
 
     .btn-sm {
-      padding: 5px 10px;
-      font-size: 0.8rem;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      padding: 5px 10px; font-size: 0.8rem; border-radius: 4px;
+      border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
     }
-
     .btn-edit { background: #eceff1; color: #37474f; }
     .btn-edit:hover { background: #cfd8dc; }
-    .btn-discount { background: #fff3e0; color: #ef6c00; font-weight: 600; }
-    .btn-discount:hover { background: #ffe0b2; }
     .btn-delete { background: #ffebee; color: #c62828; }
     .btn-delete:hover { background: #ffcdd2; }
 
-    /* Toasts / Notificaciones */
-    #toast-container {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-    }
+    #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; }
 
     .toast {
-      background-color: #212121;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: fadeIn 0.3s ease-out;
+      background-color: #212121; color: white; padding: 12px 24px; border-radius: 8px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3); font-size: 0.9rem;
+      display: flex; align-items: center; gap: 10px; animation: fadeIn 0.3s ease-out;
     }
-
     .toast.error { background-color: var(--danger-color); }
     .toast.exito { background-color: var(--success-color); }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- Barra Superior -->
   <header>
-    <div class="brand">
-      <div class="brand-logo">Qpc</div>
-      <span>Panel de Administración</span>
-    </div>
-    <div class="user-info hidden" id="user-info">
-      <span id="user-email" style="font-size: 0.88rem; opacity: 0.9;"></span>
-      <button class="btn-logout" id="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
-    </div>
-  </header>
+  <a href="catalogo.html" class="brand" style="text-decoration: none; color: white;">
+    <div class="brand-logo">Qpc</div>
+    <span>Panel de Administración</span>
+  </a>
+  <div class="user-info hidden" id="user-info">
+    <span id="user-email" style="font-size: 0.88rem; opacity: 0.9;"></span>
+    <button class="btn-logout" id="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+  </div>
+</header>
 
   <main>
     <!-- SECCIÓN LOGIN -->
     <section id="login-section" class="login-container">
-      <div class="login-title">
-        <i class="fa-solid fa-user-shield"></i> Acceso Proveedor
-      </div>
+      <div class="login-title"><i class="fa-solid fa-user-shield"></i> Acceso Proveedor</div>
       <form id="form-login">
         <div class="form-group">
           <label for="login-email"><i class="fa-solid fa-envelope"></i> Correo Electrónico:</label>
@@ -334,8 +223,8 @@
 
     <!-- SECCIÓN PANEL DE ADMINISTRACIÓN -->
     <section id="panel-section" class="dashboard-grid hidden">
-      
-      <!-- Columna Izquierda: Formulario de Registro / Edición -->
+
+      <!-- Columna Izquierda: Formulario -->
       <div class="card">
         <h2 class="card-title" id="form-title">
           <i class="fa-solid fa-square-plus"></i> Registrar Producto
@@ -345,61 +234,62 @@
 
           <div class="form-group">
             <label for="prod-nombre">Nombre del Producto:</label>
-            <input type="text" id="prod-nombre" placeholder="Ej: Tixotrol" required>
+            <input type="text" id="prod-nombre" placeholder="Ej: Alcohol al 96%" required>
+          </div>
+
+          <div class="form-group">
+            <label for="prod-descripcion">Descripción:</label>
+            <textarea id="prod-descripcion" rows="2" placeholder="Ej: Alcohol de alta pureza..." required></textarea>
           </div>
 
           <div class="form-group">
             <label for="prod-categoria">Categoría:</label>
             <select id="prod-categoria" required>
-              <option value="polvos">Polvos (Kilos - kg)</option>
-              <option value="liquidos">Líquidos (Litros - L)</option>
-              <option value="perfumeria">Perfumería (Litros - L)</option>
-              <option value="envases">Envases (Unidades - unid.)</option>
+              <option value="polvos">Polvos</option>
+              <option value="liquidos">Líquidos</option>
+              <option value="perfumeria">Perfumería</option>
+              <option value="envases">Envases</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="prod-precio">Precio ($):</label>
-            <input type="number" id="prod-precio" step="0.01" min="0" placeholder="Ej: 15000" required>
+            <label for="prod-imagen">Link de la imagen (URL):</label>
+            <input type="text" id="prod-imagen" placeholder="imagenes/producto.jpg o link de internet">
           </div>
 
           <div class="form-group">
-            <label for="prod-stock">
-              <i class="fa-solid fa-cubes"></i> Stock (<span id="unidad-stock-txt">kg</span>):
-            </label>
-            <input type="number" id="prod-stock" step="0.01" min="0" placeholder="Ej: 50 kg" required>
+            <label>Presentaciones y precios:</label>
+            <div id="lista-presentaciones"></div>
+            <button type="button" class="btn-agregar-presentacion" id="btn-agregar-presentacion">
+              <i class="fa-solid fa-plus"></i> Agregar presentación
+            </button>
           </div>
 
           <button type="submit" class="btn-primary" id="btn-guardar-prod">
             <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
           </button>
-          
+
           <button type="button" class="btn-primary hidden" id="btn-cancelar-edit" style="background-color: #78909c; margin-top: 8px;">
             <i class="fa-solid fa-xmark"></i> Cancelar Edición
           </button>
         </form>
       </div>
 
-      <!-- Columna Derecha: Tabla de Inventario -->
+      <!-- Columna Derecha: Tabla -->
       <div class="card">
-        <h2 class="card-title">
-          <i class="fa-solid fa-boxes-stacked"></i> Inventario de Productos
-        </h2>
+        <h2 class="card-title"><i class="fa-solid fa-boxes-stacked"></i> Inventario de Productos</h2>
         <div class="table-responsive">
           <table>
             <thead>
               <tr>
                 <th>Producto</th>
                 <th>Categoría</th>
-                <th>Precio</th>
-                <th>Stock Actual</th>
+                <th>Presentaciones</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody id="tabla-productos-body">
-              <tr>
-                <td colspan="5" style="text-align: center; color: #888;">Cargando inventario...</td>
-              </tr>
+              <tr><td colspan="4" style="text-align: center; color: #888;">Cargando inventario...</td></tr>
             </tbody>
           </table>
         </div>
@@ -410,7 +300,6 @@
 
   <div id="toast-container"></div>
 
-  <!-- JavaScript Firebase -->
   <script type="module" src="admin.js"></script>
 
 </body>

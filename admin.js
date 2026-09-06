@@ -1,26 +1,10 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { 
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { 
-  getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-// Configuración de Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyB5iP0E5BVu0XX0bclE-0j1ym24GRbYDNQ",
-  authDomain: "quimiaseo-caribe.firebaseapp.com",
-  databaseURL: "https://quimiaseo-caribe-default-rtdb.firebaseio.com",
-  projectId: "quimiaseo-caribe",
-  storageBucket: "quimiaseo-caribe.firebasestorage.app",
-  messagingSenderId: "673921871746",
-  appId: "1:673921871746:web:7b2203db138de8edf0a99b",
-  measurementId: "G-MRCXCVJS84"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+import { db, auth } from "./firebase_config.js";
+import {
+  signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // ELEMENTOS DEL DOM
 const loginSection = document.getElementById('login-section');
@@ -34,16 +18,51 @@ const formProducto = document.getElementById('form-producto');
 const formTitle = document.getElementById('form-title');
 const prodIdInput = document.getElementById('prod-id');
 const prodNombreInput = document.getElementById('prod-nombre');
+const prodDescripcionInput = document.getElementById('prod-descripcion');
 const prodCategoriaInput = document.getElementById('prod-categoria');
-const prodPrecioInput = document.getElementById('prod-precio');
-const prodStockInput = document.getElementById('prod-stock');
-const unidadStockTxt = document.getElementById('unidad-stock-txt');
+const prodImagenInput = document.getElementById('prod-imagen');
+const listaPresentaciones = document.getElementById('lista-presentaciones');
+const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion');
 const btnCancelarEdit = document.getElementById('btn-cancelar-edit');
 const tablaBody = document.getElementById('tabla-productos-body');
 
 let todosLosProductos = [];
 
+// ==========================================================
+// PRESENTACIONES DINÁMICAS (agregar/quitar filas nombre + precio)
+// ==========================================================
+
+function crearFilaPresentacion(nombre = '', precio = '') {
+  const fila = document.createElement('div');
+  fila.classList.add('fila-presentacion');
+  fila.innerHTML = `
+    <input type="text" class="presentacion-nombre" placeholder="Ej: 1/4 Litro" value="${nombre}" required>
+    <input type="number" class="presentacion-precio" placeholder="Precio" min="0" value="${precio}" required>
+    <button type="button" class="btn-quitar-presentacion"><i class="fa-solid fa-trash"></i></button>
+  `;
+  fila.querySelector('.btn-quitar-presentacion').addEventListener('click', () => fila.remove());
+  listaPresentaciones.appendChild(fila);
+}
+
+btnAgregarPresentacion.addEventListener('click', () => crearFilaPresentacion());
+
+function obtenerPresentacionesDelFormulario() {
+  const filas = listaPresentaciones.querySelectorAll('.fila-presentacion');
+  const presentaciones = [];
+
+  filas.forEach(fila => {
+    const nombre = fila.querySelector('.presentacion-nombre').value.trim();
+    const precio = parseFloat(fila.querySelector('.presentacion-precio').value) || 0;
+    if (nombre) presentaciones.push({ nombre, precio });
+  });
+
+  return presentaciones;
+}
+
+// ==========================================================
 // AUTENTICACIÓN
+// ==========================================================
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
     loginSection.classList.add('hidden');
@@ -76,7 +95,10 @@ btnLogout.addEventListener('click', () => {
   mostrarToast('Sesión cerrada', 'exito');
 });
 
+// ==========================================================
 // CARGAR PRODUCTOS DESDE FIRESTORE EN TIEMPO REAL
+// ==========================================================
+
 function cargarProductos() {
   onSnapshot(collection(db, 'productos'), (snapshot) => {
     todosLosProductos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -84,29 +106,33 @@ function cargarProductos() {
   });
 }
 
-// RENDERIZAR TABLA EN PANTALLA
 function renderizarTabla(productos) {
   if (productos.length === 0) {
-    tablaBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:16px; color:#888;">No hay productos registrados</td></tr>`;
+    tablaBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:16px; color:#888;">No hay productos registrados</td></tr>`;
     return;
   }
 
-  tablaBody.innerHTML = productos.map(p => `
-    <tr>
-      <td><strong>${p.nombre || ''}</strong></td>
-      <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
-      <td>$${(Number(p.precio) || 0).toLocaleString()}</td>
-      <td><strong>${p.stock || 0}</strong> ${obtenerUnidadStock(p.categoria)}</td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-sm btn-edit" data-id="${p.id}"><i class="fa-solid fa-pen"></i> Editar</button>
-          <button class="btn-sm btn-delete" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  tablaBody.innerHTML = productos.map(p => {
+    const presentaciones = p.presentaciones || [];
+    const resumenPresentaciones = presentaciones
+      .map(pr => `${pr.nombre}: $${(Number(pr.precio) || 0).toLocaleString('es-CO')}`)
+      .join('<br>');
 
-  // Eventos de botones
+    return `
+      <tr>
+        <td><strong>${p.nombre || ''}</strong></td>
+        <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
+        <td>${resumenPresentaciones || '—'}</td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-sm btn-edit" data-id="${p.id}"><i class="fa-solid fa-pen"></i> Editar</button>
+            <button class="btn-sm btn-delete" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
   tablaBody.querySelectorAll('.btn-edit').forEach(btn => {
     btn.addEventListener('click', () => editarProducto(btn.dataset.id));
   });
@@ -116,28 +142,27 @@ function renderizarTabla(productos) {
   });
 }
 
-// OBTENER UNIDAD DE MEDIDA
-function obtenerUnidadStock(cat) {
-  const unidades = { polvos: 'kg', liquidos: 'L', perfumeria: 'L', envases: 'unid.' };
-  return unidades[cat] || 'unid.';
-}
-
-prodCategoriaInput.addEventListener('change', () => {
-  const unidad = obtenerUnidadStock(prodCategoriaInput.value);
-  if (unidadStockTxt) unidadStockTxt.textContent = unidad;
-  prodStockInput.placeholder = `Ej: 50 ${unidad}`;
-});
-
+// ==========================================================
 // GUARDAR O ACTUALIZAR PRODUCTO
+// ==========================================================
+
 formProducto.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  const presentaciones = obtenerPresentacionesDelFormulario();
+
+  if (presentaciones.length === 0) {
+    mostrarToast('Agrega al menos una presentación con su precio', 'error');
+    return;
+  }
 
   const id = prodIdInput.value;
   const dataProducto = {
     nombre: prodNombreInput.value.trim(),
+    descripcion: prodDescripcionInput.value.trim(),
     categoria: prodCategoriaInput.value,
-    precio: parseFloat(prodPrecioInput.value) || 0,
-    stock: parseFloat(prodStockInput.value) || 0
+    imagen: prodImagenInput.value.trim(),
+    presentaciones: presentaciones
   };
 
   try {
@@ -154,24 +179,32 @@ formProducto.addEventListener('submit', async (e) => {
   }
 });
 
+// ==========================================================
 // EDITAR PRODUCTO
+// ==========================================================
+
 function editarProducto(id) {
   const prod = todosLosProductos.find(p => p.id === id);
   if (!prod) return;
 
   prodIdInput.value = prod.id;
   prodNombreInput.value = prod.nombre || '';
+  prodDescripcionInput.value = prod.descripcion || '';
   prodCategoriaInput.value = prod.categoria || 'polvos';
-  prodPrecioInput.value = prod.precio || 0;
-  prodStockInput.value = prod.stock || 0;
+  prodImagenInput.value = prod.imagen || '';
 
-  if (unidadStockTxt) unidadStockTxt.textContent = obtenerUnidadStock(prod.categoria);
+  listaPresentaciones.innerHTML = '';
+  (prod.presentaciones || []).forEach(p => crearFilaPresentacion(p.nombre, p.precio));
+
   formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
   btnCancelarEdit.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ==========================================================
 // ELIMINAR PRODUCTO
+// ==========================================================
+
 async function eliminarProducto(id) {
   if (confirm('¿Eliminar este producto permanentemente?')) {
     try {
@@ -188,12 +221,19 @@ btnCancelarEdit.addEventListener('click', limpiarFormulario);
 function limpiarFormulario() {
   formProducto.reset();
   prodIdInput.value = '';
-  if (unidadStockTxt) unidadStockTxt.textContent = 'kg';
+  listaPresentaciones.innerHTML = '';
+  crearFilaPresentacion(); // deja siempre una fila lista para empezar
   formTitle.innerHTML = `<i class="fa-solid fa-square-plus"></i> Registrar Producto`;
   btnCancelarEdit.classList.add('hidden');
 }
 
+// Arranca con una fila de presentación vacía lista para llenar
+crearFilaPresentacion();
+
+// ==========================================================
 // NOTIFICACIONES TOAST
+// ==========================================================
+
 function mostrarToast(msj, tipo) {
   const toastContainer = document.getElementById('toast-container');
   if (!toastContainer) return;
