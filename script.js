@@ -287,7 +287,7 @@ function actualizarCarrito() {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-import { collection, getDocs, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
 
 async function verificarYDescontarStock(itemsCarrito) {
   // Fase 1: verificar que haya suficiente, sin modificar nada todavía
