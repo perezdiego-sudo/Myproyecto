@@ -885,3 +885,62 @@ section h2 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   }
 }
+
+/* Sombra con profundidad y elevación al pasar el mouse */
+.producto {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.producto:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+/* Contenedor de la imagen con badge de categoría */
+.producto-imagen-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.producto-imagen-wrap .producto-img {
+  margin-bottom: 0;
+  transition: transform 0.3s ease;
+}
+
+.producto:hover .producto-imagen-wrap .producto-img {
+  transform: scale(1.06);
+}
+
+/* Badge de categoría */
+.badge-categoria {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.badge-polvos { background: #fff3e0; color: #e65100; }
+.badge-liquidos { background: #e3f2fd; color: #1565c0; }
+.badge-perfumeria { background: #f3e5f5; color: #7b1fa2; }
+.badge-envases { background: #e8f5e9; color: #2e7d32; }
+
+/* Precio más grande y destacado */
+.precio {
+  display: inline-block;
+  font-size: 22px;
+  font-weight: 800;
+  padding: 4px 0;
+}
+
+.producto select.presentacion {
+  font-weight: 600;
+}

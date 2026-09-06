@@ -67,15 +67,17 @@ async function cargarProductos() {
       }
 
       div.innerHTML = `
-        <img src="${producto.imagen || ''}" alt="${producto.nombre || ''}" class="producto-img">
-        <h3>${producto.nombre || ''}</h3>
-        <p>${producto.descripcion || ''}</p>
-        ${selectorHTML}
-        <div class="control-cantidad">
-          <input type="number" class="cantidad" value="1" min="1">
-          <button class="btn-agregar-carrito">Agregar al carrito</button>
-        </div>
-      `;
+  <div class="producto-imagen-wrap">
+    <span class="badge-categoria badge-${producto.categoria}">${producto.categoria || ''}</span>
+    <img src="${producto.imagen || ''}" alt="${producto.nombre || ''}" class="producto-img">
+  </div>
+  <h3>${producto.nombre || ''}</h3>
+  <p>${producto.descripcion || ''}</p>
+  ${selectorHTML}
+  <div class="control-cantidad">
+    <input type="number" class="cantidad" value="1" min="1">
+    <button class="btn-agregar-carrito">Agregar al carrito</button>
+  </div>
 
       contenedor.appendChild(div);
     });
