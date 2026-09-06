@@ -398,6 +398,22 @@ section h2 {
   background-color: var(--color-primary-hover);
 }
 
+.btn-agregar-carrito:disabled {
+  background-color: #b0bec5;
+  color: #eceff1;
+  cursor: not-allowed;
+}
+
+.producto select.presentacion option:disabled {
+  color: #c62828;
+}
+
+.texto-agotado {
+  color: #c62828;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
 /* ==========================================================
    6. CARRITO & MODAL
    ========================================================== */

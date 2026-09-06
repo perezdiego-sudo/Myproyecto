@@ -1,7 +1,5 @@
 import { db } from "./firebase_config.js";
-import {
-  collection, getDocs, doc, getDoc, runTransaction
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { collection, getDocs, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // ==========================================================
 // REFERENCIAS A ELEMENTOS DEL DOM
@@ -18,11 +16,13 @@ const listaCarrito = document.getElementById('lista-carrito');
 const totalCarrito = document.getElementById('total-carrito');
 const btnEnviarPedido = document.getElementById('btn-enviar-pedido');
 
+// Elementos del Modal Zoom
 const modalZoom = document.getElementById('modal-zoom');
 const zoomImagenActual = document.getElementById('zoom-imagen-actual');
 
 const NUMERO_WHATSAPP = "573136375152";
 
+// Cargar carrito previo desde localStorage
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
 // ==========================================================
@@ -41,62 +41,74 @@ async function cargarProductos() {
       return;
     }
 
-    snapshot.forEach(docSnap => {
-      const producto = docSnap.data();
+    snapshot.forEach(doc => {
+      const producto = doc.data();
       const div = document.createElement('div');
       div.classList.add('producto');
       div.dataset.categoria = producto.categoria || '';
       div.dataset.nombre = producto.nombre || '';
-      div.dataset.id = docSnap.id;
-
-      const stockTotal = (producto.stock === null || producto.stock === undefined) ? null : Number(producto.stock);
-      div.dataset.stock = stockTotal === null ? '' : stockTotal;
+      div.dataset.id = doc.id; 
 
       const presentaciones = producto.presentaciones || [];
       let selectorHTML = '';
-      const agotado = stockTotal !== null && stockTotal <= 0;
+
+      const stockBase = producto.stock; // stock total del producto en su unidad base (null/undefined = ilimitado)
+
+      // Calcula cuántas unidades de una presentación concreta se pueden vender
+      // a partir del stock base del producto y la equivalencia de esa presentación.
+      function calcularDisponible(equivalencia) {
+        if (stockBase === null || stockBase === undefined || stockBase === '') return '';
+        const equiv = Number(equivalencia) || 1;
+        return Math.floor(Number(stockBase) / equiv);
+      }
 
       if (presentaciones.length === 1 && presentaciones[0].nombre === 'Unidad') {
-        const precioNum = Number(presentaciones[0].precio) || 0;
-        const equivalencia = Number(presentaciones[0].equivalencia) || 1;
-        div.dataset.precio = precioNum;
-        div.dataset.equivalencia = equivalencia;
-        selectorHTML = `<span class="precio">$${precioNum.toLocaleString('es-CO')}</span>`;
+        const disponible = calcularDisponible(presentaciones[0].equivalencia);
+        const agotado = disponible !== '' && Number(disponible) <= 0;
+        div.dataset.precio = Number(presentaciones[0].precio) || 0;
+        div.dataset.stock = disponible;
+        selectorHTML = agotado
+          ? `<span class="texto-agotado">Agotado</span>`
+          : `<span class="precio">$${(Number(presentaciones[0].precio) || 0).toLocaleString('es-CO')}</span>`;
       } else if (presentaciones.length > 0) {
+        // Elegimos como opción por defecto la última presentación que SÍ tenga stock;
+        // si todas están agotadas, se deja la última (el producto completo se marcará agotado).
+        let indiceDefecto = presentaciones.length - 1;
+        for (let i = presentaciones.length - 1; i >= 0; i--) {
+          const disp = calcularDisponible(presentaciones[i].equivalencia);
+          if (disp === '' || Number(disp) > 0) { indiceDefecto = i; break; }
+        }
+
         const opciones = presentaciones.map((p, i) => {
-          const seleccionada = i === presentaciones.length - 1 ? 'selected' : '';
           const precioNum = Number(p.precio) || 0;
-          const equivalencia = Number(p.equivalencia) || 1;
-          let sufijo = '';
-          if (stockTotal !== null) {
-            const disponiblesEnEstaPresentacion = Math.floor(stockTotal / equivalencia);
-            sufijo = ` (${disponiblesEnEstaPresentacion} disp.)`;
-          }
-          return `<option value="${p.nombre}" data-precio="${precioNum}" data-equivalencia="${equivalencia}" ${seleccionada}>${p.nombre} - $${precioNum.toLocaleString('es-CO')}${sufijo}</option>`;
+          const disponible = calcularDisponible(p.equivalencia);
+          const agotado = disponible !== '' && Number(disponible) <= 0;
+          const seleccionada = i === indiceDefecto ? 'selected' : '';
+          const disabledAttr = agotado ? 'disabled' : '';
+          const stockTxt = agotado ? ' - AGOTADO' : (disponible === '' ? '' : ` (${disponible} disp.)`);
+          return `<option value="${p.nombre}" data-precio="${precioNum}" data-stock="${disponible}" ${seleccionada} ${disabledAttr}>${p.nombre} - $${precioNum.toLocaleString('es-CO')}${stockTxt}</option>`;
         }).join('');
         selectorHTML = `<select class="presentacion">${opciones}</select>`;
       }
 
       div.innerHTML = `
-        <div class="producto-imagen-wrap">
-          <span class="badge-categoria badge-${producto.categoria}">${producto.categoria || ''}</span>
-          ${agotado ? '<span class="badge-agotado">Agotado</span>' : ''}
-          <img src="${producto.imagen || ''}" alt="${producto.nombre || ''}" class="producto-img">
-        </div>
-        <h3>${producto.nombre || ''}</h3>
-        <p>${producto.descripcion || ''}</p>
-        ${selectorHTML}
-        <div class="control-cantidad">
-          <input type="number" class="cantidad" value="1" min="1" ${agotado ? 'disabled' : ''}>
-          <button class="btn-agregar-carrito" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Agregar al carrito'}</button>
-        </div>
+  <div class="producto-imagen-wrap">
+    <span class="badge-categoria badge-${producto.categoria}">${producto.categoria || ''}</span>
+    <img src="${producto.imagen || 'https://placehold.co/260x140?text=Sin+imagen'}" alt="${producto.nombre || ''}" class="producto-img" onerror="this.onerror=null;this.src='https://placehold.co/260x140?text=Sin+imagen';">
+  </div>
+  <h3>${producto.nombre || ''}</h3>
+  <p>${producto.descripcion || ''}</p>
+  ${selectorHTML}
+  <div class="control-cantidad">
+    <input type="number" class="cantidad" value="1" min="1">
+    <button class="btn-agregar-carrito">Agregar al carrito</button>
+  </div>
       `;
-
-      if (agotado) div.classList.add('agotado');
 
       contenedor.appendChild(div);
     });
 
+    // Una vez creados los productos en el HTML, conectamos sus botones e imágenes
     inicializarEventosProductos();
 
   } catch (error) {
@@ -175,84 +187,107 @@ radiosEnvio.forEach(radio => {
 });
 
 // ==========================================================
-// LÍMITE DE CANTIDAD SEGÚN STOCK DISPONIBLE
+// EVENTOS QUE DEPENDEN DE LOS PRODUCTOS (se re-conectan tras cargarlos)
 // ==========================================================
-
 function actualizarMaxCantidad(productoDiv) {
   const select = productoDiv.querySelector('.presentacion, .talla');
   const inputCantidad = productoDiv.querySelector('.cantidad');
-  const stockTotalTxt = productoDiv.dataset.stock;
+  const stock = select ? select.options[select.selectedIndex].dataset.stock : productoDiv.dataset.stock;
 
-  if (stockTotalTxt === '' || stockTotalTxt === undefined) {
+  if (stock !== undefined && stock !== '') {
+    inputCantidad.max = stock;
+    if (parseInt(inputCantidad.value) > parseInt(stock)) inputCantidad.value = stock;
+  } else {
     inputCantidad.removeAttribute('max');
-    return;
-  }
-
-  const stockTotal = Number(stockTotalTxt);
-  const equivalencia = select
-    ? Number(select.options[select.selectedIndex].dataset.equivalencia) || 1
-    : Number(productoDiv.dataset.equivalencia) || 1;
-
-  const maxUnidades = Math.floor(stockTotal / equivalencia);
-  inputCantidad.max = maxUnidades;
-  if (parseInt(inputCantidad.value) > maxUnidades) {
-    inputCantidad.value = maxUnidades > 0 ? maxUnidades : 1;
   }
 }
 
-// ==========================================================
-// EVENTOS QUE DEPENDEN DE LOS PRODUCTOS
-// ==========================================================
+function actualizarEstadoAgotado(productoDiv) {
+  const select = productoDiv.querySelector('.presentacion, .talla');
+  const boton = productoDiv.querySelector('.btn-agregar-carrito');
+  const inputCantidad = productoDiv.querySelector('.cantidad');
+  const stock = select ? select.options[select.selectedIndex]?.dataset.stock : productoDiv.dataset.stock;
+
+  const agotado = stock !== undefined && stock !== '' && Number(stock) <= 0;
+
+  if (boton) {
+    boton.disabled = agotado;
+    boton.textContent = agotado ? 'Agotado' : 'Agregar al carrito';
+  }
+  if (inputCantidad) {
+    inputCantidad.disabled = agotado;
+  }
+}
 
 function inicializarEventosProductos() {
-  document.querySelectorAll('.producto').forEach(productoDiv => {
-    actualizarMaxCantidad(productoDiv);
-
-    const select = productoDiv.querySelector('.presentacion, .talla');
-    if (select) {
-      select.addEventListener('change', () => actualizarMaxCantidad(productoDiv));
-    }
-  });
-
+  // Botones "Agregar al carrito"
   document.querySelectorAll('.btn-agregar-carrito').forEach(boton => {
     boton.addEventListener('click', () => {
       const productoDiv = boton.closest('.producto');
 
       const selectPresentacion = productoDiv.querySelector('.presentacion, .talla');
       const cantidadInput = productoDiv.querySelector('.cantidad');
-      const cantidad = parseInt(cantidadInput.value) || 1;
+      let cantidad = parseInt(cantidadInput.value) || 1;
 
-      let nombre, precio, presentacionNombre;
+      let nombre, precio, presentacionNombre, stockDisponible;
 
       if (selectPresentacion) {
         const opcionSeleccionada = selectPresentacion.options[selectPresentacion.selectedIndex];
         nombre = `${productoDiv.dataset.nombre} (${opcionSeleccionada.value})`;
         precio = parseInt(opcionSeleccionada.dataset.precio);
         presentacionNombre = opcionSeleccionada.value;
+        stockDisponible = opcionSeleccionada.dataset.stock;
       } else {
         nombre = productoDiv.dataset.nombre;
         precio = parseInt(productoDiv.dataset.precio);
         presentacionNombre = 'Unidad';
+        stockDisponible = productoDiv.dataset.stock;
       }
 
-      if (isNaN(precio)) {
-        console.error(`No se pudo obtener el precio para: ${nombre}`);
-        return;
+      if (stockDisponible !== undefined && stockDisponible !== '') {
+        const stockNum = Number(stockDisponible);
+        if (stockNum <= 0) {
+          alert('Este producto está agotado en esta presentación.');
+          return;
+        }
+        if (cantidad > stockNum) {
+          alert(`Solo hay ${stockNum} disponibles. Se ajustó la cantidad.`);
+          cantidad = stockNum;
+          cantidadInput.value = stockNum;
+        }
       }
 
       const productoId = productoDiv.dataset.id;
+
       const productoExistente = carrito.find(item => item.nombre === nombre);
 
       if (productoExistente) {
         productoExistente.cantidad += cantidad;
       } else {
-        carrito.push({ nombre, precio, cantidad, productoId, presentacionNombre });
+        carrito.push({ nombre, precio, cantidad, presentacionNombre, productoId });
       }
 
       actualizarCarrito();
     });
   });
 
+  // Selector de presentación: actualiza el máximo permitido y si está agotada
+  document.querySelectorAll('.producto').forEach(productoDiv => {
+    const select = productoDiv.querySelector('.presentacion, .talla');
+
+    // Estado inicial al cargar el producto
+    actualizarMaxCantidad(productoDiv);
+    actualizarEstadoAgotado(productoDiv);
+
+    if (select) {
+      select.addEventListener('change', () => {
+        actualizarMaxCantidad(productoDiv);
+        actualizarEstadoAgotado(productoDiv);
+      });
+    }
+  });
+
+  // Zoom de imagen del producto
   document.querySelectorAll('.producto-img').forEach(imagen => {
     imagen.addEventListener('click', () => {
       if (modalZoom && zoomImagenActual) {
@@ -325,49 +360,48 @@ function actualizarCarrito() {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-// ==========================================================
-// VERIFICAR Y DESCONTAR STOCK (unidad base por producto)
-// ==========================================================
+
 
 async function verificarYDescontarStock(itemsCarrito) {
-  // Fase 1: verificar disponibilidad sin modificar nada
+  // Fase 1: verificar que haya suficiente, sin modificar nada todavía
   for (const item of itemsCarrito) {
     if (!item.productoId) continue;
-
     const refProducto = doc(db, 'productos', item.productoId);
     const snap = await getDoc(refProducto);
     if (!snap.exists()) continue;
 
-    const data = snap.data();
-    if (data.stock === null || data.stock === undefined) continue; // stock ilimitado
+    const datos = snap.data();
+    const stockBase = datos.stock;
+    if (stockBase === null || stockBase === undefined) continue; // ilimitado
 
-    const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
-    const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
-    const cantidadEnUnidadBase = item.cantidad * equivalencia;
+    const presentacion = (datos.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
+    const equivalencia = Number(presentacion?.equivalencia) || 1;
+    const necesarioEnBase = item.cantidad * equivalencia;
 
-    if (Number(data.stock) < cantidadEnUnidadBase) {
-      throw new Error(`No hay suficiente stock de "${item.nombre}". Ajusta la cantidad e intenta de nuevo.`);
+    if (Number(stockBase) < necesarioEnBase) {
+      const disponible = Math.floor(Number(stockBase) / equivalencia);
+      throw new Error(`Solo quedan ${disponible} unidades disponibles de "${item.nombre}". Ajusta la cantidad e intenta de nuevo.`);
     }
   }
 
-  // Fase 2: descontar de verdad, un producto a la vez
+  // Fase 2: descontar de verdad, un producto a la vez y de forma transaccional
   for (const item of itemsCarrito) {
     if (!item.productoId) continue;
-
     const refProducto = doc(db, 'productos', item.productoId);
 
     await runTransaction(db, async (transaction) => {
       const snap = await transaction.get(refProducto);
       if (!snap.exists()) return;
 
-      const data = snap.data();
-      if (data.stock === null || data.stock === undefined) return; // ilimitado, no se descuenta
+      const datos = snap.data();
+      const stockBase = datos.stock;
+      if (stockBase === null || stockBase === undefined) return; // ilimitado, no hay nada que descontar
 
-      const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
-      const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
-      const cantidadEnUnidadBase = item.cantidad * equivalencia;
+      const presentacion = (datos.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
+      const equivalencia = Number(presentacion?.equivalencia) || 1;
+      const necesarioEnBase = item.cantidad * equivalencia;
 
-      const nuevoStock = Math.max(0, Number(data.stock) - cantidadEnUnidadBase);
+      const nuevoStock = Math.max(0, Number(stockBase) - necesarioEnBase);
       transaction.update(refProducto, { stock: nuevoStock });
     });
   }
@@ -378,7 +412,7 @@ async function verificarYDescontarStock(itemsCarrito) {
 // ==========================================================
 
 if (btnEnviarPedido) {
-  btnEnviarPedido.addEventListener('click', async () => {
+  btnEnviarPedido.addEventListener('click', async() => {
     if (carrito.length === 0) {
       alert('Tu carrito está vacío. Agrega productos antes de enviar.');
       return;
@@ -391,7 +425,7 @@ if (btnEnviarPedido) {
       return;
     }
 
-    try {
+    try{
       await verificarYDescontarStock(carrito);
     } catch (error) {
       alert(error.message);
@@ -401,42 +435,37 @@ if (btnEnviarPedido) {
     const fecha = new Date().toLocaleDateString('es-CO');
     const hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
-    let mensaje = '```==============================```%0A';
-    mensaje += '*QUIMIASEO Y PERFUMERIA DEL CARIBE*%0A';
-    mensaje += '```    COMPROBANTE DE PEDIDO     ```%0A';
-    mensaje += `\`\`\`Fecha: ${fecha} | ${hora}\`\`\`%0A`;
-    mensaje += '```==============================```%0A%0A';
-    mensaje += 'Hola, quiero realizar el siguiente pedido:%0A%0A';
+    let mensaje = '```==============================```\n';
+    mensaje += '*QUIMIASEO Y PERFUMERIA DEL CARIBE*\n';
+    mensaje += '```    COMPROBANTE DE PEDIDO     ```\n';
+    mensaje += `\`\`\`Fecha: ${fecha} | ${hora}\`\`\`\n`;
+    mensaje += '```==============================```\n\n';
+    mensaje += 'Hola, quiero realizar el siguiente pedido:\n\n';
 
     carrito.forEach(item => {
       const subtotal = item.precio * item.cantidad;
       const esEnvase = item.nombre.toLowerCase().includes('envase');
       const prefijoCantidad = esEnvase ? `${item.cantidad} und x` : `${item.cantidad}x`;
 
-      mensaje += `*${prefijoCantidad}* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
+      mensaje += `*${prefijoCantidad}* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*\n`;
     });
 
     const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
 
-    mensaje += '%0A```==============================```%0A';
-    mensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}%0A`;
+    mensaje += '\n```==============================```\n';
+    mensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}\n`;
 
     if (requiereDomicilio === 'Sí') {
       const direccion = inputDireccion.value.trim();
-      mensaje += `*Dirección:* ${direccion}%0A`;
+      mensaje += `*Dirección:* ${direccion}\n`;
     }
 
-    mensaje += `*TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}%0A`;
-    mensaje += '```==============================```%0A';
+    mensaje += `*TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}\n`;
+    mensaje += '```==============================```\n';
     mensaje += '_(El valor final con domicilio será confirmado por el vendedor)_';
 
-    const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
+    const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
-
-    // El stock ya se descontó, así que el carrito se vacía para evitar descuentos dobles
-    carrito = [];
-    actualizarCarrito();
-    cargarProductos(); // recarga para reflejar el nuevo stock en pantalla
   });
 }
 
