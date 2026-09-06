@@ -33,7 +33,7 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
 
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.25rem; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.25rem; text-decoration: none; color: white; }
 
     .brand-logo {
       background-color: #ffffff;
@@ -111,14 +111,11 @@
       display: flex; align-items: center; gap: 8px;
     }
 
-    /* Presentaciones dinámicas */
-    #lista-presentaciones {
-      display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;
-    }
+    #lista-presentaciones { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 
     .fila-presentacion {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
+      grid-template-columns: 1.2fr 1fr 1fr auto;
       gap: 8px;
       align-items: center;
     }
@@ -127,8 +124,10 @@
       padding: 9px 10px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
+
+    .fila-presentacion small { grid-column: 1 / -1; color: #888; font-size: 0.75rem; margin-top: -6px; }
 
     .btn-quitar-presentacion {
       background: #ffebee; color: var(--danger-color);
@@ -163,7 +162,7 @@
     .cat-perfumeria { background: #f3e5f5; color: #7b1fa2; }
     .cat-envases { background: #e8f5e9; color: #2e7d32; }
 
-    .action-btns { display: flex; gap: 6px; }
+    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 
     .btn-sm {
       padding: 5px 10px; font-size: 0.8rem; border-radius: 4px;
@@ -171,6 +170,8 @@
     }
     .btn-edit { background: #eceff1; color: #37474f; }
     .btn-edit:hover { background: #cfd8dc; }
+    .btn-stock { background: #e8f5e9; color: #2e7d32; }
+    .btn-stock:hover { background: #c8e6c9; }
     .btn-delete { background: #ffebee; color: #c62828; }
     .btn-delete:hover { background: #ffcdd2; }
 
@@ -192,15 +193,15 @@
 <body>
 
   <header>
-  <a href="catalogo.html" class="brand" style="text-decoration: none; color: white;">
-    <div class="brand-logo">Qpc</div>
-    <span>Panel de Administración</span>
-  </a>
-  <div class="user-info hidden" id="user-info">
-    <span id="user-email" style="font-size: 0.88rem; opacity: 0.9;"></span>
-    <button class="btn-logout" id="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
-  </div>
-</header>
+    <a href="catalogo.html" class="brand">
+      <div class="brand-logo">Qpc</div>
+      <span>Panel de Administración</span>
+    </a>
+    <div class="user-info hidden" id="user-info">
+      <span id="user-email" style="font-size: 0.88rem; opacity: 0.9;"></span>
+      <button class="btn-logout" id="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+    </div>
+  </header>
 
   <main>
     <!-- SECCIÓN LOGIN -->
@@ -223,6 +224,24 @@
 
     <!-- SECCIÓN PANEL DE ADMINISTRACIÓN -->
     <section id="panel-section" class="dashboard-grid hidden">
+
+      <!-- Importación masiva -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <h2 class="card-title"><i class="fa-solid fa-file-csv"></i> Importar productos desde CSV</h2>
+        <p style="margin-bottom: 14px; color: #666; font-size: 0.9rem;">
+          Sube un archivo CSV con varios productos a la vez. Cada presentación va en su propia fila, agrupada por el mismo número de producto.
+        </p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <input type="file" id="input-csv" accept=".csv">
+          <button type="button" class="btn-primary" id="btn-importar-csv" style="width: auto; padding: 10px 20px;">
+            <i class="fa-solid fa-upload"></i> Importar
+          </button>
+          <button type="button" class="btn-primary" id="btn-descargar-plantilla" style="width: auto; padding: 10px 20px; background-color: #78909c;">
+            <i class="fa-solid fa-download"></i> Descargar plantilla
+          </button>
+        </div>
+        <p id="progreso-importacion" style="margin-top: 12px; font-size: 0.88rem; color: #444;"></p>
+      </div>
 
       <!-- Columna Izquierda: Formulario -->
       <div class="card">
@@ -248,7 +267,6 @@
               <option value="polvos">Polvos</option>
               <option value="liquidos">Líquidos</option>
               <option value="perfumeria">Perfumería</option>
-              <option value="aromas">Aromas</option>
               <option value="envases">Envases</option>
             </select>
           </div>
@@ -259,7 +277,14 @@
           </div>
 
           <div class="form-group">
-            <label>Presentaciones y precios:</label>
+            <label for="prod-stock">
+              <i class="fa-solid fa-cubes"></i> Stock total (<span id="unidad-stock-txt">kg</span>) — vacío = ilimitado:
+            </label>
+            <input type="number" id="prod-stock" step="0.01" min="0" placeholder="Ej: 50">
+          </div>
+
+          <div class="form-group">
+            <label>Presentaciones, precios y equivalencia:</label>
             <div id="lista-presentaciones"></div>
             <button type="button" class="btn-agregar-presentacion" id="btn-agregar-presentacion">
               <i class="fa-solid fa-plus"></i> Agregar presentación
@@ -285,12 +310,13 @@
               <tr>
                 <th>Producto</th>
                 <th>Categoría</th>
+                <th>Stock</th>
                 <th>Presentaciones</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody id="tabla-productos-body">
-              <tr><td colspan="4" style="text-align: center; color: #888;">Cargando inventario...</td></tr>
+              <tr><td colspan="5" style="text-align: center; color: #888;">Cargando inventario...</td></tr>
             </tbody>
           </table>
         </div>

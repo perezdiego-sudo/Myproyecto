@@ -21,6 +21,8 @@ const prodNombreInput = document.getElementById('prod-nombre');
 const prodDescripcionInput = document.getElementById('prod-descripcion');
 const prodCategoriaInput = document.getElementById('prod-categoria');
 const prodImagenInput = document.getElementById('prod-imagen');
+const prodStockInput = document.getElementById('prod-stock');
+const unidadStockTxt = document.getElementById('unidad-stock-txt');
 const listaPresentaciones = document.getElementById('lista-presentaciones');
 const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion');
 const btnCancelarEdit = document.getElementById('btn-cancelar-edit');
@@ -29,21 +31,37 @@ const tablaBody = document.getElementById('tabla-productos-body');
 let todosLosProductos = [];
 
 // ==========================================================
-// PRESENTACIONES DINÁMICAS (agregar/quitar filas nombre + precio)
+// UNIDAD BASE SEGÚN CATEGORÍA
 // ==========================================================
 
-function crearFilaPresentacion(nombre = '', precio = '', stock = '') {
+function obtenerUnidadStock(categoria) {
+  const unidades = { polvos: 'kg', liquidos: 'L', perfumeria: 'L', envases: 'unid.' };
+  return unidades[categoria] || 'unid.';
+}
+
+prodCategoriaInput.addEventListener('change', () => {
+  unidadStockTxt.textContent = obtenerUnidadStock(prodCategoriaInput.value);
+});
+
+// ==========================================================
+// PRESENTACIONES DINÁMICAS (nombre + precio + equivalencia)
+// ==========================================================
+
+function crearFilaPresentacion(nombre = '', precio = '', equivalencia = '') {
   const fila = document.createElement('div');
   fila.classList.add('fila-presentacion');
   fila.innerHTML = `
     <input type="text" class="presentacion-nombre" placeholder="Ej: 1/4 Litro" value="${nombre}" required>
     <input type="number" class="presentacion-precio" placeholder="Precio" min="0" value="${precio}" required>
-    <input type="number" class="presentacion-stock" placeholder="Stock (vacío = ilimitado)" min="0" value="${stock}">
+    <input type="number" step="0.001" class="presentacion-equivalencia" placeholder="Equivale a" min="0" value="${equivalencia}">
     <button type="button" class="btn-quitar-presentacion"><i class="fa-solid fa-trash"></i></button>
+    <small>Cuánto representa esta presentación de la unidad base (ej: Libra = 0.5 si la base es kg). Vacío = 1.</small>
   `;
   fila.querySelector('.btn-quitar-presentacion').addEventListener('click', () => fila.remove());
   listaPresentaciones.appendChild(fila);
 }
+
+btnAgregarPresentacion.addEventListener('click', () => crearFilaPresentacion());
 
 function obtenerPresentacionesDelFormulario() {
   const filas = listaPresentaciones.querySelectorAll('.fila-presentacion');
@@ -52,9 +70,9 @@ function obtenerPresentacionesDelFormulario() {
   filas.forEach(fila => {
     const nombre = fila.querySelector('.presentacion-nombre').value.trim();
     const precio = parseFloat(fila.querySelector('.presentacion-precio').value) || 0;
-    const stockValor = fila.querySelector('.presentacion-stock').value;
-    const stock = stockValor === '' ? null : parseFloat(stockValor);
-    if (nombre) presentaciones.push({ nombre, precio, stock });
+    const equivaliaValor = fila.querySelector('.presentacion-equivalencia').value;
+    const equivalencia = equivaliaValor === '' ? 1 : parseFloat(equivaliaValor);
+    if (nombre) presentaciones.push({ nombre, precio, equivalencia });
   });
 
   return presentaciones;
@@ -109,7 +127,7 @@ function cargarProductos() {
 
 function renderizarTabla(productos) {
   if (productos.length === 0) {
-    tablaBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:16px; color:#888;">No hay productos registrados</td></tr>`;
+    tablaBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:16px; color:#888;">No hay productos registrados</td></tr>`;
     return;
   }
 
@@ -119,14 +137,21 @@ function renderizarTabla(productos) {
       .map(pr => `${pr.nombre}: $${(Number(pr.precio) || 0).toLocaleString('es-CO')}`)
       .join('<br>');
 
+    const tieneStock = p.stock !== null && p.stock !== undefined && p.stock !== '';
+    const unidad = obtenerUnidadStock(p.categoria);
+    const stockTexto = tieneStock ? `${p.stock} ${unidad}` : 'Ilimitado';
+    const stockColor = tieneStock && Number(p.stock) <= 0 ? '#c62828' : '#333';
+
     return `
       <tr>
         <td><strong>${p.nombre || ''}</strong></td>
         <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
+        <td style="color:${stockColor}; font-weight:600;">${stockTexto}</td>
         <td>${resumenPresentaciones || '—'}</td>
         <td>
           <div class="action-btns">
             <button class="btn-sm btn-edit" data-id="${p.id}"><i class="fa-solid fa-pen"></i> Editar</button>
+            <button class="btn-sm btn-stock" data-id="${p.id}" data-stock="${tieneStock ? p.stock : ''}"><i class="fa-solid fa-cubes"></i> Ajustar</button>
             <button class="btn-sm btn-delete" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>
           </div>
         </td>
@@ -141,6 +166,28 @@ function renderizarTabla(productos) {
   tablaBody.querySelectorAll('.btn-delete').forEach(btn => {
     btn.addEventListener('click', () => eliminarProducto(btn.dataset.id));
   });
+
+  tablaBody.querySelectorAll('.btn-stock').forEach(btn => {
+    btn.addEventListener('click', () => ajustarStockRapido(btn.dataset.id, btn.dataset.stock));
+  });
+}
+
+// ==========================================================
+// AJUSTE RÁPIDO DE STOCK (sin abrir el formulario completo)
+// ==========================================================
+
+async function ajustarStockRapido(id, stockActual) {
+  const nuevoValor = prompt('Nuevo stock total para este producto (deja vacío para ilimitado):', stockActual || '');
+  if (nuevoValor === null) return; // canceló
+
+  const stockNumerico = nuevoValor.trim() === '' ? null : parseFloat(nuevoValor);
+
+  try {
+    await updateDoc(doc(db, 'productos', id), { stock: stockNumerico });
+    mostrarToast('Stock actualizado', 'exito');
+  } catch (err) {
+    mostrarToast('Error al actualizar stock: ' + err.message, 'error');
+  }
 }
 
 // ==========================================================
@@ -157,13 +204,17 @@ formProducto.addEventListener('submit', async (e) => {
     return;
   }
 
+  const stockValor = prodStockInput.value;
+  const stock = stockValor === '' ? null : parseFloat(stockValor);
+
   const id = prodIdInput.value;
   const dataProducto = {
     nombre: prodNombreInput.value.trim(),
     descripcion: prodDescripcionInput.value.trim(),
     categoria: prodCategoriaInput.value,
     imagen: prodImagenInput.value.trim(),
-    presentaciones: presentaciones
+    presentaciones: presentaciones,
+    stock: stock
   };
 
   try {
@@ -193,9 +244,11 @@ function editarProducto(id) {
   prodDescripcionInput.value = prod.descripcion || '';
   prodCategoriaInput.value = prod.categoria || 'polvos';
   prodImagenInput.value = prod.imagen || '';
+  prodStockInput.value = (prod.stock === null || prod.stock === undefined) ? '' : prod.stock;
+  unidadStockTxt.textContent = obtenerUnidadStock(prod.categoria);
 
   listaPresentaciones.innerHTML = '';
-  (prod.presentaciones || []).forEach(p => crearFilaPresentacion(p.nombre, p.precio, p.stock ?? ''));
+  (prod.presentaciones || []).forEach(p => crearFilaPresentacion(p.nombre, p.precio, p.equivalencia ?? ''));
 
   formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
   btnCancelarEdit.classList.remove('hidden');
@@ -222,14 +275,150 @@ btnCancelarEdit.addEventListener('click', limpiarFormulario);
 function limpiarFormulario() {
   formProducto.reset();
   prodIdInput.value = '';
+  prodStockInput.value = '';
+  unidadStockTxt.textContent = obtenerUnidadStock(prodCategoriaInput.value);
   listaPresentaciones.innerHTML = '';
-  crearFilaPresentacion(); // deja siempre una fila lista para empezar
+  crearFilaPresentacion();
   formTitle.innerHTML = `<i class="fa-solid fa-square-plus"></i> Registrar Producto`;
   btnCancelarEdit.classList.add('hidden');
 }
 
 // Arranca con una fila de presentación vacía lista para llenar
 crearFilaPresentacion();
+
+// ==========================================================
+// IMPORTACIÓN MASIVA DESDE CSV
+// ==========================================================
+
+const inputCSV = document.getElementById('input-csv');
+const btnImportarCSV = document.getElementById('btn-importar-csv');
+const btnDescargarPlantilla = document.getElementById('btn-descargar-plantilla');
+const progresoImportacion = document.getElementById('progreso-importacion');
+
+function dividirLineaCSV(linea) {
+  const resultado = [];
+  let actual = '';
+  let dentroDeComillas = false;
+
+  for (let i = 0; i < linea.length; i++) {
+    const car = linea[i];
+    if (car === '"') {
+      dentroDeComillas = !dentroDeComillas;
+    } else if (car === ',' && !dentroDeComillas) {
+      resultado.push(actual);
+      actual = '';
+    } else {
+      actual += car;
+    }
+  }
+  resultado.push(actual);
+  return resultado;
+}
+
+function parsearCSV(texto) {
+  const lineas = texto.split(/\r?\n/).filter(l => l.trim() !== '');
+  const encabezados = dividirLineaCSV(lineas[0]).map(h => h.trim());
+
+  return lineas.slice(1).map(linea => {
+    const valores = dividirLineaCSV(linea);
+    const fila = {};
+    encabezados.forEach((encabezado, i) => {
+      fila[encabezado] = (valores[i] || '').trim();
+    });
+    return fila;
+  });
+}
+
+btnImportarCSV.addEventListener('click', async () => {
+  const archivo = inputCSV.files[0];
+
+  if (!archivo) {
+    mostrarToast('Selecciona un archivo CSV primero', 'error');
+    return;
+  }
+
+  progresoImportacion.textContent = 'Leyendo archivo...';
+
+  try {
+    const texto = await archivo.text();
+    const filas = parsearCSV(texto);
+
+    const productosPorId = {};
+
+    filas.forEach(fila => {
+      const id = fila.id_producto;
+      if (!id) return;
+
+      if (!productosPorId[id]) {
+        productosPorId[id] = {
+          nombre: fila.nombre || '',
+          descripcion: fila.descripcion || '',
+          categoria: fila.categoria || '',
+          imagen: fila.imagen || '',
+          stock: fila.stock === '' || fila.stock === undefined ? null : parseFloat(fila.stock),
+          presentaciones: []
+        };
+      }
+
+      if (fila.presentacion) {
+        productosPorId[id].presentaciones.push({
+          nombre: fila.presentacion,
+          precio: parseFloat(fila.precio) || 0,
+          equivalencia: fila.equivalencia === '' || fila.equivalencia === undefined ? 1 : parseFloat(fila.equivalencia)
+        });
+      }
+    });
+
+    const listaProductos = Object.values(productosPorId);
+
+    if (listaProductos.length === 0) {
+      mostrarToast('No se encontraron productos válidos en el archivo', 'error');
+      progresoImportacion.textContent = '';
+      return;
+    }
+
+    let exitosos = 0;
+    let fallidos = 0;
+
+    for (let i = 0; i < listaProductos.length; i++) {
+      const producto = listaProductos[i];
+      progresoImportacion.textContent = `Importando ${i + 1} de ${listaProductos.length}: ${producto.nombre}...`;
+
+      try {
+        await addDoc(collection(db, 'productos'), producto);
+        exitosos++;
+      } catch (err) {
+        console.error(`Error con ${producto.nombre}:`, err);
+        fallidos++;
+      }
+    }
+
+    progresoImportacion.textContent = `Importación terminada: ${exitosos} productos agregados, ${fallidos} fallidos.`;
+    mostrarToast(`${exitosos} productos importados correctamente`, 'exito');
+    inputCSV.value = '';
+
+  } catch (error) {
+    mostrarToast('Error leyendo el archivo: ' + error.message, 'error');
+    progresoImportacion.textContent = '';
+  }
+});
+
+btnDescargarPlantilla.addEventListener('click', () => {
+  const contenido =
+    'id_producto,nombre,descripcion,categoria,imagen,stock,presentacion,equivalencia,precio\n' +
+    '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,50,1/4 Litro,0.25,3000\n' +
+    '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,50,Litro,1,10000\n' +
+    '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,50,Kilo,1,8000\n' +
+    '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,50,Libra,0.5,4000\n';
+
+  const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = 'plantilla_productos.csv';
+  enlace.click();
+  URL.revokeObjectURL(url);
+});
 
 // ==========================================================
 // NOTIFICACIONES TOAST
