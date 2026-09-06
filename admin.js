@@ -32,19 +32,18 @@ let todosLosProductos = [];
 // PRESENTACIONES DINÁMICAS (agregar/quitar filas nombre + precio)
 // ==========================================================
 
-function crearFilaPresentacion(nombre = '', precio = '') {
+function crearFilaPresentacion(nombre = '', precio = '', stock = '') {
   const fila = document.createElement('div');
   fila.classList.add('fila-presentacion');
   fila.innerHTML = `
     <input type="text" class="presentacion-nombre" placeholder="Ej: 1/4 Litro" value="${nombre}" required>
     <input type="number" class="presentacion-precio" placeholder="Precio" min="0" value="${precio}" required>
+    <input type="number" class="presentacion-stock" placeholder="Stock (vacío = ilimitado)" min="0" value="${stock}">
     <button type="button" class="btn-quitar-presentacion"><i class="fa-solid fa-trash"></i></button>
   `;
   fila.querySelector('.btn-quitar-presentacion').addEventListener('click', () => fila.remove());
   listaPresentaciones.appendChild(fila);
 }
-
-btnAgregarPresentacion.addEventListener('click', () => crearFilaPresentacion());
 
 function obtenerPresentacionesDelFormulario() {
   const filas = listaPresentaciones.querySelectorAll('.fila-presentacion');
@@ -53,7 +52,9 @@ function obtenerPresentacionesDelFormulario() {
   filas.forEach(fila => {
     const nombre = fila.querySelector('.presentacion-nombre').value.trim();
     const precio = parseFloat(fila.querySelector('.presentacion-precio').value) || 0;
-    if (nombre) presentaciones.push({ nombre, precio });
+    const stockValor = fila.querySelector('.presentacion-stock').value;
+    const stock = stockValor === '' ? null : parseFloat(stockValor);
+    if (nombre) presentaciones.push({ nombre, precio, stock });
   });
 
   return presentaciones;
@@ -194,7 +195,7 @@ function editarProducto(id) {
   prodImagenInput.value = prod.imagen || '';
 
   listaPresentaciones.innerHTML = '';
-  (prod.presentaciones || []).forEach(p => crearFilaPresentacion(p.nombre, p.precio));
+  (prod.presentaciones || []).forEach(p => crearFilaPresentacion(p.nombre, p.precio, p.stock ?? ''));
 
   formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
   btnCancelarEdit.classList.remove('hidden');

@@ -47,21 +47,21 @@ async function cargarProductos() {
       div.classList.add('producto');
       div.dataset.categoria = producto.categoria || '';
       div.dataset.nombre = producto.nombre || '';
+      div.dataset.id = doc.id; 
 
       const presentaciones = producto.presentaciones || [];
       let selectorHTML = '';
 
       if (presentaciones.length === 1 && presentaciones[0].nombre === 'Unidad') {
-        // Producto de precio único (sin desplegable)
-        const precioNum = Number(presentaciones[0].precio) || 0;
-        div.dataset.precio = precioNum;
-        selectorHTML = `<span class="precio">$${precioNum.toLocaleString('es-CO')}</span>`;
+        div.dataset.precio = Number(presentaciones[0].precio) || 0;
+        div.dataset.stock = presentaciones[0].stock ?? '';
+        selectorHTML = `<span class="precio">$${(Number(presentaciones[0].precio) || 0).toLocaleString('es-CO')}</span>`;
       } else if (presentaciones.length > 0) {
-        // Producto con varias presentaciones (con desplegable)
         const opciones = presentaciones.map((p, i) => {
           const seleccionada = i === presentaciones.length - 1 ? 'selected' : '';
           const precioNum = Number(p.precio) || 0;
-          return `<option value="${p.nombre}" data-precio="${precioNum}" ${seleccionada}>${p.nombre} - $${precioNum.toLocaleString('es-CO')}</option>`;
+          const stockTxt = (p.stock === null || p.stock === undefined) ? '' : ` (${p.stock} disp.)`;
+          return `<option value="${p.nombre}" data-precio="${precioNum}" data-stock="${p.stock ?? ''}" ${seleccionada}>${p.nombre} - $${precioNum.toLocaleString('es-CO')}${stockTxt}</option>`;
         }).join('');
         selectorHTML = `<select class="presentacion">${opciones}</select>`;
       }
@@ -164,6 +164,18 @@ radiosEnvio.forEach(radio => {
 // ==========================================================
 // EVENTOS QUE DEPENDEN DE LOS PRODUCTOS (se re-conectan tras cargarlos)
 // ==========================================================
+function actualizarMaxCantidad(productoDiv) {
+  const select = productoDiv.querySelector('.presentacion, .talla');
+  const inputCantidad = productoDiv.querySelector('.cantidad');
+  const stock = select ? select.options[select.selectedIndex].dataset.stock : productoDiv.dataset.stock;
+
+  if (stock !== undefined && stock !== '') {
+    inputCantidad.max = stock;
+    if (parseInt(inputCantidad.value) > parseInt(stock)) inputCantidad.value = stock;
+  } else {
+    inputCantidad.removeAttribute('max');
+  }
+}
 
 function inicializarEventosProductos() {
   // Botones "Agregar al carrito"
@@ -175,29 +187,27 @@ function inicializarEventosProductos() {
       const cantidadInput = productoDiv.querySelector('.cantidad');
       const cantidad = parseInt(cantidadInput.value) || 1;
 
-      let nombre;
-      let precio;
+      let nombre, precio, presentacionNombre;
 
       if (selectPresentacion) {
         const opcionSeleccionada = selectPresentacion.options[selectPresentacion.selectedIndex];
         nombre = `${productoDiv.dataset.nombre} (${opcionSeleccionada.value})`;
         precio = parseInt(opcionSeleccionada.dataset.precio);
+        presentacionNombre = opcionSeleccionada.value;
       } else {
         nombre = productoDiv.dataset.nombre;
         precio = parseInt(productoDiv.dataset.precio);
+        presentacionNombre = 'Unidad';
       }
 
-      if (isNaN(precio)) {
-        console.error(`No se pudo obtener el precio para: ${nombre}`);
-        return;
-      }
+      const productoId = productoDiv.dataset.id;
 
       const productoExistente = carrito.find(item => item.nombre === nombre);
 
       if (productoExistente) {
         productoExistente.cantidad += cantidad;
       } else {
-        carrito.push({ nombre, precio, cantidad });
+        carrito.push({ nombre, precio, cantidad, presentacionNombre });
       }
 
       actualizarCarrito();
@@ -277,12 +287,51 @@ function actualizarCarrito() {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
+import { collection, getDocs, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+async function verificarYDescontarStock(itemsCarrito) {
+  // Fase 1: verificar que haya suficiente, sin modificar nada todavía
+  for (const item of itemsCarrito) {
+    if (!item.productoId) continue;
+    const refProducto = doc(db, 'productos', item.productoId);
+    const snap = await getDoc(refProducto);
+    if (!snap.exists()) continue;
+
+    const presentacion = (snap.data().presentaciones || []).find(p => p.nombre === item.presentacionNombre);
+    if (presentacion && presentacion.stock !== null && presentacion.stock !== undefined) {
+      if (presentacion.stock < item.cantidad) {
+        throw new Error(`Solo quedan ${presentacion.stock} unidades de "${item.nombre}". Ajusta la cantidad e intenta de nuevo.`);
+      }
+    }
+  }
+
+  // Fase 2: descontar de verdad
+  for (const item of itemsCarrito) {
+    if (!item.productoId) continue;
+    const refProducto = doc(db, 'productos', item.productoId);
+
+    await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(refProducto);
+      if (!snap.exists()) return;
+
+      const nuevasPresentaciones = (snap.data().presentaciones || []).map(p => {
+        if (p.nombre === item.presentacionNombre && p.stock !== null && p.stock !== undefined) {
+          return { ...p, stock: Math.max(0, p.stock - item.cantidad) };
+        }
+        return p;
+      });
+
+      transaction.update(refProducto, { presentaciones: nuevasPresentaciones });
+    });
+  }
+}
+
 // ==========================================================
 // ENVIAR A WHATSAPP
 // ==========================================================
 
 if (btnEnviarPedido) {
-  btnEnviarPedido.addEventListener('click', () => {
+  btnEnviarPedido.addEventListener('click', async() => {
     if (carrito.length === 0) {
       alert('Tu carrito está vacío. Agrega productos antes de enviar.');
       return;
@@ -292,6 +341,13 @@ if (btnEnviarPedido) {
 
     if (requiereDomicilio === 'Sí' && inputDireccion.value.trim() === '') {
       alert('Por favor escribe la dirección para el domicilio.');
+      return;
+    }
+
+    try{
+      await verificarYDescontarStock(carrito);
+    } catch (error) {
+      alert(error.message);
       return;
     }
 
