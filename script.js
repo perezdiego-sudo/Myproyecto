@@ -78,6 +78,7 @@ async function cargarProductos() {
     <input type="number" class="cantidad" value="1" min="1">
     <button class="btn-agregar-carrito">Agregar al carrito</button>
   </div>
+      `;
 
       contenedor.appendChild(div);
     });
