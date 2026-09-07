@@ -22,29 +22,25 @@ const prodDescripcionInput = document.getElementById('prod-descripcion');
 const prodCategoriaInput = document.getElementById('prod-categoria');
 const prodImagenInput = document.getElementById('prod-imagen');
 const prodStockInput = document.getElementById('prod-stock');
-const prodStockMinimoInput = document.getElementById('prod-stock-minimo');
 const unidadStockTxt = document.getElementById('unidad-stock-txt');
-const unidadStockMinimoTxt = document.getElementById('unidad-stock-minimo-txt');
 const listaPresentaciones = document.getElementById('lista-presentaciones');
 const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion');
 const btnCancelarEdit = document.getElementById('btn-cancelar-edit');
 const tablaBody = document.getElementById('tabla-productos-body');
 
 let todosLosProductos = [];
-const STOCK_MINIMO_POR_DEFECTO = 5;
 
 // ==========================================================
 // UNIDAD BASE SEGÚN CATEGORÍA
 // ==========================================================
 
 function obtenerUnidadStock(categoria) {
-  const unidades = { polvos: 'kg', liquidos: 'L', perfumeria: 'L', sabores: 'L', envases: 'unid.' };
+  const unidades = { polvos: 'kg', liquidos: 'L', perfumeria: 'L', envases: 'unid.' };
   return unidades[categoria] || 'unid.';
 }
 
 prodCategoriaInput.addEventListener('change', () => {
   unidadStockTxt.textContent = obtenerUnidadStock(prodCategoriaInput.value);
-  unidadStockMinimoTxt.textContent = obtenerUnidadStock(prodCategoriaInput.value);
 });
 
 // ==========================================================
@@ -146,22 +142,8 @@ function renderizarTabla(productos) {
     const stockTexto = tieneStock ? `${p.stock} ${unidad}` : 'Ilimitado';
     const stockColor = tieneStock && Number(p.stock) <= 0 ? '#c62828' : '#333';
 
-    // Determina la clase de la fila según el nivel de stock
-    let claseFila = '';
-    if (tieneStock) {
-      const stockMinimo = (p.stockMinimo === null || p.stockMinimo === undefined || p.stockMinimo === '')
-        ? STOCK_MINIMO_POR_DEFECTO
-        : Number(p.stockMinimo);
-
-      if (Number(p.stock) <= 0) {
-        claseFila = 'fila-agotado';
-      } else if (Number(p.stock) <= stockMinimo) {
-        claseFila = 'fila-stock-bajo';
-      }
-    }
-
     return `
-      <tr class="${claseFila}">
+      <tr>
         <td><strong>${p.nombre || ''}</strong></td>
         <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
         <td style="color:${stockColor}; font-weight:600;">${stockTexto}</td>
@@ -198,13 +180,7 @@ async function ajustarStockRapido(id, stockActual) {
   const nuevoValor = prompt('Nuevo stock total para este producto (deja vacío para ilimitado):', stockActual || '');
   if (nuevoValor === null) return; // canceló
 
-  const texto = nuevoValor.trim();
-  const stockNumerico = texto === '' ? null : parseFloat(texto);
-
-  if (stockNumerico !== null && (isNaN(stockNumerico) || stockNumerico < 0)) {
-    mostrarToast('Escribe un número válido (0 o mayor), o deja vacío para ilimitado', 'error');
-    return;
-  }
+  const stockNumerico = nuevoValor.trim() === '' ? null : parseFloat(nuevoValor);
 
   try {
     await updateDoc(doc(db, 'productos', id), { stock: stockNumerico });
@@ -231,9 +207,6 @@ formProducto.addEventListener('submit', async (e) => {
   const stockValor = prodStockInput.value;
   const stock = stockValor === '' ? null : parseFloat(stockValor);
 
-  const stockMinimoValor = prodStockMinimoInput.value;
-  const stockMinimo = stockMinimoValor === '' ? null : parseFloat(stockMinimoValor);
-
   const id = prodIdInput.value;
   const dataProducto = {
     nombre: prodNombreInput.value.trim(),
@@ -241,8 +214,7 @@ formProducto.addEventListener('submit', async (e) => {
     categoria: prodCategoriaInput.value,
     imagen: prodImagenInput.value.trim(),
     presentaciones: presentaciones,
-    stock: stock,
-    stockMinimo: stockMinimo
+    stock: stock
   };
 
   try {
@@ -273,9 +245,7 @@ function editarProducto(id) {
   prodCategoriaInput.value = prod.categoria || 'polvos';
   prodImagenInput.value = prod.imagen || '';
   prodStockInput.value = (prod.stock === null || prod.stock === undefined) ? '' : prod.stock;
-  prodStockMinimoInput.value = (prod.stockMinimo === null || prod.stockMinimo === undefined) ? '' : prod.stockMinimo;
   unidadStockTxt.textContent = obtenerUnidadStock(prod.categoria);
-  unidadStockMinimoTxt.textContent = obtenerUnidadStock(prod.categoria);
 
   listaPresentaciones.innerHTML = '';
   (prod.presentaciones || []).forEach(p => crearFilaPresentacion(p.nombre, p.precio, p.equivalencia ?? ''));
@@ -306,9 +276,7 @@ function limpiarFormulario() {
   formProducto.reset();
   prodIdInput.value = '';
   prodStockInput.value = '';
-  prodStockMinimoInput.value = '';
   unidadStockTxt.textContent = obtenerUnidadStock(prodCategoriaInput.value);
-  unidadStockMinimoTxt.textContent = obtenerUnidadStock(prodCategoriaInput.value);
   listaPresentaciones.innerHTML = '';
   crearFilaPresentacion();
   formTitle.innerHTML = `<i class="fa-solid fa-square-plus"></i> Registrar Producto`;
@@ -388,7 +356,6 @@ btnImportarCSV.addEventListener('click', async () => {
           categoria: fila.categoria || '',
           imagen: fila.imagen || '',
           stock: fila.stock === '' || fila.stock === undefined ? null : parseFloat(fila.stock),
-          stockMinimo: fila.stock_minimo === '' || fila.stock_minimo === undefined ? null : parseFloat(fila.stock_minimo),
           presentaciones: []
         };
       }
@@ -438,11 +405,11 @@ btnImportarCSV.addEventListener('click', async () => {
 
 btnDescargarPlantilla.addEventListener('click', () => {
   const contenido =
-    'id_producto,nombre,descripcion,categoria,imagen,stock,stock_minimo,presentacion,equivalencia,precio\n' +
-    '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,50,5,1/4 Litro,0.25,3000\n' +
-    '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,50,5,Litro,1,10000\n' +
-    '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,50,5,Kilo,1,8000\n' +
-    '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,50,5,Libra,0.5,4000\n';
+    'id_producto,nombre,descripcion,categoria,imagen,stock,presentacion,equivalencia,precio\n' +
+    '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,50,1/4 Litro,0.25,3000\n' +
+    '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,50,Litro,1,10000\n' +
+    '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,50,Kilo,1,8000\n' +
+    '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,50,Libra,0.5,4000\n';
 
   const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
