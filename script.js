@@ -23,7 +23,12 @@ const zoomImagenActual = document.getElementById('zoom-imagen-actual');
 const NUMERO_WHATSAPP = "573136375152";
 
 // Cargar carrito previo desde localStorage
-let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+let carrito = [];
+try {
+  carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+} catch (e) {
+  carrito = [];
+}
 
 // ==========================================================
 // CARGA DE PRODUCTOS DESDE FIREBASE
@@ -41,21 +46,19 @@ async function cargarProductos() {
       return;
     }
 
-    snapshot.forEach(doc => {
-      const producto = doc.data();
+    snapshot.forEach(docSnap => {
+      const producto = docSnap.data();
       const div = document.createElement('div');
       div.classList.add('producto');
       div.dataset.categoria = producto.categoria || '';
       div.dataset.nombre = producto.nombre || '';
-      div.dataset.id = doc.id; 
+      div.dataset.id = docSnap.id; 
 
       const presentaciones = producto.presentaciones || [];
       let selectorHTML = '';
 
-      const stockBase = producto.stock; // stock total del producto en su unidad base (null/undefined = ilimitado)
+      const stockBase = producto.stock; // stock total del producto
 
-      // Calcula cuántas unidades de una presentación concreta se pueden vender
-      // a partir del stock base del producto y la equivalencia de esa presentación.
       function calcularDisponible(equivalencia) {
         if (stockBase === null || stockBase === undefined || stockBase === '') return '';
         const equiv = Number(equivalencia) || 1;
@@ -71,8 +74,6 @@ async function cargarProductos() {
           ? `<span class="texto-agotado">Agotado</span>`
           : `<span class="precio">$${(Number(presentaciones[0].precio) || 0).toLocaleString('es-CO')}</span>`;
       } else if (presentaciones.length > 0) {
-        // Elegimos como opción por defecto la última presentación que SÍ tenga stock;
-        // si todas están agotadas, se deja la última (el producto completo se marcará agotado).
         let indiceDefecto = presentaciones.length - 1;
         for (let i = presentaciones.length - 1; i >= 0; i--) {
           const disp = calcularDisponible(presentaciones[i].equivalencia);
@@ -92,23 +93,23 @@ async function cargarProductos() {
       }
 
       div.innerHTML = `
-  <div class="producto-imagen-wrap">
-    <span class="badge-categoria badge-${producto.categoria}">${producto.categoria || ''}</span>
-    <img src="${producto.imagen || 'https://placehold.co/260x140?text=Sin+imagen'}" alt="${producto.nombre || ''}" class="producto-img" onerror="this.onerror=null;this.src='https://placehold.co/260x140?text=Sin+imagen';">
-  </div>
-  <h3>${producto.nombre || ''}</h3>
-  <p>${producto.descripcion || ''}</p>
-  ${selectorHTML}
-  <div class="control-cantidad">
-    <input type="number" class="cantidad" value="1" min="1">
-    <button class="btn-agregar-carrito">Agregar al carrito</button>
-  </div>
+        <div class="producto-imagen-wrap">
+          <span class="badge-categoria badge-${producto.categoria}">${producto.categoria || ''}</span>
+          <img src="${producto.imagen || 'https://placehold.co/260x140?text=Sin+imagen'}" alt="${producto.nombre || ''}" class="producto-img" onerror="this.onerror=null;this.src='https://placehold.co/260x140?text=Sin+imagen';">
+        </div>
+        <h3>${producto.nombre || ''}</h3>
+        <p>${producto.descripcion || ''}</p>
+        ${selectorHTML}
+        <div class="control-cantidad">
+          <input type="number" class="cantidad" value="1" min="1">
+          <button class="btn-agregar-carrito">Agregar al carrito</button>
+        </div>
       `;
 
       contenedor.appendChild(div);
     });
 
-    // Una vez creados los productos en el HTML, conectamos sus botones e imágenes
+    // Conectar eventos a los botones e imágenes
     inicializarEventosProductos();
 
   } catch (error) {
@@ -120,7 +121,6 @@ async function cargarProductos() {
 // ==========================================================
 // FILTROS DE CATEGORÍA
 // ==========================================================
-
 const botonesFiltro = document.querySelectorAll('.btn-filtro');
 
 botonesFiltro.forEach(boton => {
@@ -178,21 +178,25 @@ if (modalCarrito) {
 
 radiosEnvio.forEach(radio => {
   radio.addEventListener('change', () => {
-    if (radio.value === 'Sí' && radio.checked) {
-      inputDireccion.classList.remove('oculto');
-    } else if (radio.value === 'No' && radio.checked) {
-      inputDireccion.classList.add('oculto');
+    if (inputDireccion) {
+      if (radio.value === 'Sí' && radio.checked) {
+        inputDireccion.classList.remove('oculto');
+      } else if (radio.value === 'No' && radio.checked) {
+        inputDireccion.classList.add('oculto');
+      }
     }
   });
 });
 
 // ==========================================================
-// EVENTOS QUE DEPENDEN DE LOS PRODUCTOS (se re-conectan tras cargarlos)
+// EVENTOS DE PRODUCTOS Y AGREGAR AL CARRITO
 // ==========================================================
 function actualizarMaxCantidad(productoDiv) {
   const select = productoDiv.querySelector('.presentacion, .talla');
   const inputCantidad = productoDiv.querySelector('.cantidad');
-  const stock = select ? select.options[select.selectedIndex].dataset.stock : productoDiv.dataset.stock;
+  if (!inputCantidad) return;
+
+  const stock = select ? select.options[select.selectedIndex]?.dataset.stock : productoDiv.dataset.stock;
 
   if (stock !== undefined && stock !== '') {
     inputCantidad.max = stock;
@@ -227,19 +231,21 @@ function inicializarEventosProductos() {
 
       const selectPresentacion = productoDiv.querySelector('.presentacion, .talla');
       const cantidadInput = productoDiv.querySelector('.cantidad');
-      let cantidad = parseInt(cantidadInput.value) || 1;
+      const imagenEl = productoDiv.querySelector('.producto-img');
 
+      let cantidad = parseInt(cantidadInput ? cantidadInput.value : 1) || 1;
       let nombre, precio, presentacionNombre, stockDisponible;
+      let imagenUrl = imagenEl ? imagenEl.src : 'https://placehold.co/60x60?text=Sin+imagen';
 
-      if (selectPresentacion) {
+      if (selectPresentacion && selectPresentacion.options.length > 0) {
         const opcionSeleccionada = selectPresentacion.options[selectPresentacion.selectedIndex];
         nombre = `${productoDiv.dataset.nombre} (${opcionSeleccionada.value})`;
-        precio = parseInt(opcionSeleccionada.dataset.precio);
+        precio = parseInt(opcionSeleccionada.dataset.precio) || 0;
         presentacionNombre = opcionSeleccionada.value;
         stockDisponible = opcionSeleccionada.dataset.stock;
       } else {
-        nombre = productoDiv.dataset.nombre;
-        precio = parseInt(productoDiv.dataset.precio);
+        nombre = productoDiv.dataset.nombre || 'Producto';
+        precio = parseInt(productoDiv.dataset.precio) || 0;
         presentacionNombre = 'Unidad';
         stockDisponible = productoDiv.dataset.stock;
       }
@@ -253,29 +259,36 @@ function inicializarEventosProductos() {
         if (cantidad > stockNum) {
           alert(`Solo hay ${stockNum} disponibles. Se ajustó la cantidad.`);
           cantidad = stockNum;
-          cantidadInput.value = stockNum;
+          if (cantidadInput) cantidadInput.value = stockNum;
         }
       }
 
       const productoId = productoDiv.dataset.id;
-
       const productoExistente = carrito.find(item => item.nombre === nombre);
 
       if (productoExistente) {
         productoExistente.cantidad += cantidad;
       } else {
-        carrito.push({ nombre, precio, cantidad, presentacionNombre, productoId });
+        carrito.push({ nombre, precio, cantidad, presentacionNombre, productoId, imagen: imagenUrl });
       }
 
       actualizarCarrito();
+
+      // Confirmación visual efímera en el botón
+      const textoOriginal = boton.textContent;
+      boton.textContent = "¡Agregado! ✓";
+      boton.style.backgroundColor = "#16a34a";
+      setTimeout(() => {
+        boton.textContent = textoOriginal;
+        boton.style.backgroundColor = "";
+      }, 1000);
     });
   });
 
-  // Selector de presentación: actualiza el máximo permitido y si está agotada
+  // Selector de presentación
   document.querySelectorAll('.producto').forEach(productoDiv => {
     const select = productoDiv.querySelector('.presentacion, .talla');
 
-    // Estado inicial al cargar el producto
     actualizarMaxCantidad(productoDiv);
     actualizarEstadoAgotado(productoDiv);
 
@@ -287,7 +300,7 @@ function inicializarEventosProductos() {
     }
   });
 
-  // Zoom de imagen del producto
+  // Zoom de imagen
   document.querySelectorAll('.producto-img').forEach(imagen => {
     imagen.addEventListener('click', () => {
       if (modalZoom && zoomImagenActual) {
@@ -308,45 +321,57 @@ function actualizarCarrito() {
   listaCarrito.innerHTML = '';
   let total = 0;
 
-  carrito.forEach((item, index) => {
-    const subtotal = item.precio * item.cantidad;
-    total += subtotal;
+  if (carrito.length === 0) {
+    listaCarrito.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:15px 0;">El carrito está vacío</p>';
+  } else {
+    carrito.forEach((item, index) => {
+      const subtotal = item.precio * item.cantidad;
+      total += subtotal;
 
-    const li = document.createElement('li');
-    li.classList.add('item-carrito');
+      const li = document.createElement('li');
+      li.classList.add('item-carrito');
 
-    li.innerHTML = `
-      <div class="item-cantidad-control">
-        <button class="btn-restar" aria-label="Restar cantidad">−</button>
-        <span class="item-cantidad">${item.cantidad}</span>
-        <button class="btn-sumar" aria-label="Sumar cantidad">+</button>
-      </div>
-      <span class="item-nombre">${item.nombre}</span>
-      <span class="item-subtotal">$${subtotal.toLocaleString('es-CO')}</span>
-      <button class="btn-eliminar" aria-label="Eliminar producto">✕</button>
-    `;
+      li.innerHTML = `
+        <img src="${item.imagen || 'https://placehold.co/50x50'}" alt="${item.nombre}" class="item-carrito-img">
+        <div class="item-carrito-info">
+          <span class="item-nombre">${item.nombre}</span>
+          <span class="item-subtotal">$${subtotal.toLocaleString('es-CO')}</span>
+        </div>
+        <div class="item-cantidad-control">
+          <button class="btn-restar" aria-label="Restar cantidad">−</button>
+          <span class="item-cantidad">${item.cantidad}</span>
+          <button class="btn-sumar" aria-label="Sumar cantidad">+</button>
+        </div>
+        <button class="btn-eliminar" aria-label="Eliminar producto">✕</button>
+      `;
 
-    li.querySelector('.btn-eliminar').addEventListener('click', () => {
-      carrito.splice(index, 1);
-      actualizarCarrito();
-    });
-
-    li.querySelector('.btn-sumar').addEventListener('click', () => {
-      carrito[index].cantidad += 1;
-      actualizarCarrito();
-    });
-
-    li.querySelector('.btn-restar').addEventListener('click', () => {
-      if (carrito[index].cantidad > 1) {
-        carrito[index].cantidad -= 1;
-      } else {
+      li.querySelector('.btn-eliminar').addEventListener('click', () => {
         carrito.splice(index, 1);
-      }
-      actualizarCarrito();
-    });
+        actualizarCarrito();
+      });
 
-    listaCarrito.appendChild(li);
-  });
+      li.querySelector('.btn-sumar').addEventListener('click', () => {
+        carrito[index].cantidad += 1;
+        actualizarCarrito();
+      });
+
+      li.querySelector('.btn-restar').addEventListener('click', () => {
+        if (carrito[index].cantidad > 1) {
+          carrito[index].cantidad -= 1;
+        } else {
+          carrito.splice(index, 1);
+        }
+        actualizarCarrito();
+      });
+
+      listaCarrito.appendChild(li);
+    });
+  }
+
+  const elemSubtotal = document.getElementById('subtotal-carrito');
+  if (elemSubtotal) {
+    elemSubtotal.textContent = `Subtotal: $${total.toLocaleString('es-CO')}`;
+  }
 
   if (totalCarrito) {
     totalCarrito.textContent = `Total: $${total.toLocaleString('es-CO')}`;
@@ -360,10 +385,7 @@ function actualizarCarrito() {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-
-
 async function verificarYDescontarStock(itemsCarrito) {
-  // Fase 1: verificar que haya suficiente, sin modificar nada todavía
   for (const item of itemsCarrito) {
     if (!item.productoId) continue;
     const refProducto = doc(db, 'productos', item.productoId);
@@ -372,7 +394,7 @@ async function verificarYDescontarStock(itemsCarrito) {
 
     const datos = snap.data();
     const stockBase = datos.stock;
-    if (stockBase === null || stockBase === undefined) continue; // ilimitado
+    if (stockBase === null || stockBase === undefined || stockBase === '') continue;
 
     const presentacion = (datos.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
     const equivalencia = Number(presentacion?.equivalencia) || 1;
@@ -384,7 +406,6 @@ async function verificarYDescontarStock(itemsCarrito) {
     }
   }
 
-  // Fase 2: descontar de verdad, un producto a la vez y de forma transaccional
   for (const item of itemsCarrito) {
     if (!item.productoId) continue;
     const refProducto = doc(db, 'productos', item.productoId);
@@ -395,7 +416,7 @@ async function verificarYDescontarStock(itemsCarrito) {
 
       const datos = snap.data();
       const stockBase = datos.stock;
-      if (stockBase === null || stockBase === undefined) return; // ilimitado, no hay nada que descontar
+      if (stockBase === null || stockBase === undefined || stockBase === '') return;
 
       const presentacion = (datos.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
       const equivalencia = Number(presentacion?.equivalencia) || 1;
@@ -418,14 +439,15 @@ if (btnEnviarPedido) {
       return;
     }
 
-    const requiereDomicilio = document.querySelector('input[name="tipoEnvio"]:checked').value;
+    const radioChecked = document.querySelector('input[name="tipoEnvio"]:checked');
+    const requiereDomicilio = radioChecked ? radioChecked.value : 'Sí';
 
-    if (requiereDomicilio === 'Sí' && inputDireccion.value.trim() === '') {
+    if (requiereDomicilio === 'Sí' && inputDireccion && inputDireccion.value.trim() === '') {
       alert('Por favor escribe la dirección para el domicilio.');
       return;
     }
 
-    try{
+    try {
       await verificarYDescontarStock(carrito);
     } catch (error) {
       alert(error.message);
@@ -455,7 +477,7 @@ if (btnEnviarPedido) {
     mensaje += '\n```==============================```\n';
     mensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}\n`;
 
-    if (requiereDomicilio === 'Sí') {
+    if (requiereDomicilio === 'Sí' && inputDireccion) {
       const direccion = inputDireccion.value.trim();
       mensaje += `*Dirección:* ${direccion}\n`;
     }
@@ -480,7 +502,7 @@ if (modalZoom) {
 }
 
 // ==========================================================
-// INICIO: cargar productos y el carrito guardado
+// INICIO
 // ==========================================================
 
 cargarProductos();

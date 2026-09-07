@@ -43,40 +43,42 @@
 
   </section>
 
-  <!-- Modal del Carrito -->
-  <div id="modal-carrito" class="modal-carrito oculto-modal">
-    <div class="modal-contenido">
+<!-- Modal del Carrito -->
+<div id="modal-carrito" class="modal-carrito oculto-modal">
+  <div class="modal-contenido">
 
-      <div class="modal-header">
-        <h2>Tu Carrito</h2>
-        <div class="modal-header-acciones">
-          <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
-        </div>
+    <div class="modal-header">
+      <h2>Tu Carrito</h2>
+      <div class="modal-header-acciones">
+        <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
+        <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
       </div>
-
-      <div class="modal-body">
-        <ul id="lista-carrito"></ul>
-
-        <div class="opcion-domicilio">
-          <div class="domicilio-header">
-            <p class="titulo-domicilio">¿Requiere domicilio?</p>
-            <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
-          </div>
-
-          <div class="radio-group">
-            <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
-            <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
-          </div>
-
-          <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa">
-        </div>
-
-        <p id="total-carrito">Total: $0</p>
-        <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
-      </div>
-
     </div>
+
+    <div class="modal-body">
+      <ul id="lista-carrito"></ul>
+
+      <div class="opcion-domicilio">
+        <p class="titulo-domicilio">¿Requiere domicilio?</p>
+
+        <div class="radio-group">
+          <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
+          <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+        </div>
+
+        <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa (Ej: Calle 20 #15-30)">
+      </div>
+
+      <div class="resumen-precios">
+        <p id="subtotal-carrito">Subtotal: $0</p>
+        <p id="total-carrito" class="total-resaltado">Total: $0</p>
+      </div>
+
+      <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
+    </div>
+
   </div>
+</div>
 
   <footer class="footer">
     <div class="footer-contenido">
