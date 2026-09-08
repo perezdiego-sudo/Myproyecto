@@ -56,48 +56,38 @@ async function cargarProductos() {
       let inputHTML = '';
       const agotado = stockTotal !== null && stockTotal <= 0;
 
-      // Estas categorías siempre se venden a granel (nunca en kilo, libra
-      // ni media libra), sin importar cómo haya quedado guardado el
-      // producto anteriormente. Polvos se vende en gramos; el resto de
-      // categorías de granel (líquidos, perfumería, aromas y sabores) en
-      // mililitros.
       const esGranelPorCategoria = producto.categoria !== 'envases';
       const unidadGranel = producto.categoria === 'polvos' ? 'g' : 'ml';
-
-      // DETECCIÓN DEL NUEVO MODELO vs MODELO VIEJO (aplica solo a Envases)
-      // Si el producto tiene 'tipo_venta', es el modelo nuevo. Si no, usa tu lógica vieja (Legacy).
       const esNuevoModelo = producto.tipo_venta !== undefined;
 
       if (esGranelPorCategoria) {
-        // Polvos -> gramos. Líquidos, Perfumería, Aromas y Sabores -> mililitros
-        const precioNum = Number(producto.precio_base) || 0;
+        const presentaciones = producto.presentaciones || [];
+        const pres1000 = presentaciones.find(p => Number(p.equivalencia) === 1000);
+        const precioMil = pres1000 ? Number(pres1000.precio) : (Number(producto.precio_base) * 1000 || 0);
         const minCantidad = Number(producto.cantidad_minima) || 125;
 
-        div.dataset.tipoVenta = 'granel';
-        div.dataset.precio = precioNum;
-        div.dataset.unidadMedida = unidadGranel;
+        // Buscar si existe un precio fijo para la cantidad inicial (ej: 125g -> $4.000)
+        const presMin = presentaciones.find(p => Number(p.equivalencia) === minCantidad);
+        const subtotalInicial = presMin ? Number(presMin.precio) : Math.round((minCantidad / 1000) * precioMil);
 
-        // Solo se muestra como referencia el precio de los 1000 g/ml.
-        // El cliente escribe la cantidad exacta que quiere y el sistema
-        // calcula el subtotal automáticamente (nunca kilo, libra, litro
-        // ni onzas).
-        const precioMil = precioNum * 1000;
+        div.dataset.tipoVenta = 'granel';
+        div.dataset.precioMil = precioMil;
+        div.dataset.unidadMedida = unidadGranel;
+        div.dataset.presentaciones = JSON.stringify(presentaciones);
 
         selectorHTML = `
           <div class="info-precio-dinamico">
             <span class="precio-unitario">1000 ${unidadGranel}: $${precioMil.toLocaleString('es-CO')}</span>
             <div class="precio-total-dinamico" style="font-weight:bold; margin-top:5px; color:#2c3e50;">
-              Subtotal: $${(precioNum * minCantidad).toLocaleString('es-CO')}
+              Subtotal: $${subtotalInicial.toLocaleString('es-CO')}
             </div>
           </div>`;
 
         inputHTML = `
           <label class="label-cantidad-exacta">¿Cuántos ${unidadGranel} necesitas?</label>
-          <input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" placeholder="Ej: 1500" ${agotado ? 'disabled' : ''}>`;
-
+          <input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" placeholder="Ej: 125" ${agotado ? 'disabled' : ''}>`;
 
       } else if (esNuevoModelo) {
-        // Envases guardados con el modelo nuevo pero sin lógica de granel
         const precioNum = Number(producto.precio_base) || 0;
         const minCantidad = Number(producto.cantidad_minima) || 1;
 
@@ -109,7 +99,7 @@ async function cargarProductos() {
         inputHTML = `<input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" ${agotado ? 'disabled' : ''}>`;
 
       } else {
-        // LÓGICA LEGACY (Tus productos viejos siguen funcionando igual)
+        // LÓGICA LEGACY
         const presentaciones = producto.presentaciones || [];
         if (presentaciones.length === 1 && presentaciones[0].nombre === 'Unidad') {
           const precioNum = Number(presentaciones[0].precio) || 0;
@@ -248,9 +238,8 @@ function actualizarMaxCantidad(productoDiv) {
   let maxUnidades;
 
   if (productoDiv.dataset.tipoVenta === 'granel' || productoDiv.dataset.tipoVenta === 'unidad') {
-    maxUnidades = stockTotal; // 1 gramo = 1 unidad de stock
+    maxUnidades = stockTotal;
   } else {
-    // Legacy
     const select = productoDiv.querySelector('.presentacion, .talla');
     const equivalencia = select ? Number(select.options[select.selectedIndex].dataset.equivalencia) || 1 : Number(productoDiv.dataset.equivalencia) || 1;
     maxUnidades = Math.floor(stockTotal / equivalencia);
@@ -279,11 +268,27 @@ function inicializarEventosProductos() {
     // Efecto visual de calculadora para ventas a granel
     const inputCant = productoDiv.querySelector('.cantidad');
     const precioTotalDinamico = productoDiv.querySelector('.precio-total-dinamico');
+
     if (precioTotalDinamico && inputCant) {
       inputCant.addEventListener('input', () => {
-        let cant = parseInt(inputCant.value) || 0;
-        const precioUnidad = Number(productoDiv.dataset.precio) || 0;
-        precioTotalDinamico.textContent = `Subtotal: $${(cant * precioUnidad).toLocaleString('es-CO')}`;
+        const cant = parseInt(inputCant.value) || 0;
+        const precioMil = Number(productoDiv.dataset.precioMil) || 0;
+        let presentaciones = [];
+
+        try {
+          presentaciones = JSON.parse(productoDiv.dataset.presentaciones || '[]');
+        } catch (e) {}
+
+        const presExacta = presentaciones.find(p => Number(p.equivalencia) === cant);
+        let subtotal = 0;
+
+        if (presExacta) {
+          subtotal = Number(presExacta.precio);
+        } else {
+          subtotal = Math.round((cant / 1000) * precioMil);
+        }
+
+        precioTotalDinamico.textContent = `Subtotal: $${subtotal.toLocaleString('es-CO')}`;
       });
     }
   });
@@ -297,14 +302,35 @@ function inicializarEventosProductos() {
       let nombre = productoDiv.dataset.nombre;
       let precio, presentacionNombre, unidadMedida, tipoVenta;
 
-      // Evaluar si es el modelo nuevo o el viejo al agregarlo al carrito
-      if (productoDiv.dataset.tipoVenta !== undefined) {
+      if (productoDiv.dataset.tipoVenta === 'granel') {
+        tipoVenta = 'granel';
+        unidadMedida = productoDiv.dataset.unidadMedida;
+        presentacionNombre = 'Granel';
+
+        const precioMil = Number(productoDiv.dataset.precioMil) || 0;
+        let presentaciones = [];
+
+        try {
+          presentaciones = JSON.parse(productoDiv.dataset.presentaciones || '[]');
+        } catch (e) {}
+
+        const presExacta = presentaciones.find(p => Number(p.equivalencia) === cantidad);
+        let subtotalCalculado = 0;
+
+        if (presExacta) {
+          subtotalCalculado = Number(presExacta.precio);
+        } else {
+          subtotalCalculado = Math.round((cantidad / 1000) * precioMil);
+        }
+
+        precio = cantidad > 0 ? (subtotalCalculado / cantidad) : 0;
+
+      } else if (productoDiv.dataset.tipoVenta !== undefined) {
         tipoVenta = productoDiv.dataset.tipoVenta;
         precio = Number(productoDiv.dataset.precio);
         unidadMedida = productoDiv.dataset.unidadMedida;
-        presentacionNombre = tipoVenta === 'granel' ? 'Granel' : 'Unidad';
+        presentacionNombre = 'Unidad';
       } else {
-        // Lógica Legacy
         const selectPresentacion = productoDiv.querySelector('.presentacion, .talla');
         if (selectPresentacion) {
           const opcion = selectPresentacion.options[selectPresentacion.selectedIndex];
@@ -330,7 +356,6 @@ function inicializarEventosProductos() {
       if (productoExistente) {
         productoExistente.cantidad += cantidad;
       } else {
-        // Guardamos también el tipoVenta y unidadMedida en el carrito
         carrito.push({ nombre, precio, cantidad, productoId, presentacionNombre, unidadMedida, tipoVenta });
       }
 
@@ -359,13 +384,12 @@ function actualizarCarrito() {
   let total = 0;
 
   carrito.forEach((item, index) => {
-    const subtotal = item.precio * item.cantidad;
+    const subtotal = Math.round(item.precio * item.cantidad);
     total += subtotal;
 
     const li = document.createElement('li');
     li.classList.add('item-carrito');
 
-    // Añadimos la unidad de medida visualmente si existe, o 'und' por defecto
     const unidadVisual = item.unidadMedida ? item.unidadMedida : 'und';
 
     li.innerHTML = `
@@ -402,7 +426,7 @@ function actualizarCarrito() {
   });
 
   if (totalCarrito) {
-    totalCarrito.textContent = `Total: $${total.toLocaleString('es-CO')}`;
+    totalCarrito.textContent = `Total: $${Math.round(total).toLocaleString('es-CO')}`;
   }
 
   if (contadorCarrito) {
@@ -414,11 +438,10 @@ function actualizarCarrito() {
 }
 
 // ==========================================================
-// VERIFICAR Y DESCONTAR STOCK (unidad base por producto)
+// VERIFICAR Y DESCONTAR STOCK
 // ==========================================================
 
 async function verificarYDescontarStock(itemsCarrito) {
-  // Fase 1: verificar disponibilidad
   for (const item of itemsCarrito) {
     if (!item.productoId) continue;
     const snap = await getDoc(doc(db, 'productos', item.productoId));
@@ -429,7 +452,7 @@ async function verificarYDescontarStock(itemsCarrito) {
 
     let cantidadARestar = 0;
     if (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad') {
-      cantidadARestar = item.cantidad; // Resta directa (ej. 50g = 50 unidades de stock)
+      cantidadARestar = item.cantidad;
     } else {
       const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
       const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
@@ -441,7 +464,6 @@ async function verificarYDescontarStock(itemsCarrito) {
     }
   }
 
-  // Fase 2: descontar de verdad
   for (const item of itemsCarrito) {
     if (!item.productoId) continue;
     const refProducto = doc(db, 'productos', item.productoId);
@@ -504,13 +526,13 @@ if (btnEnviarPedido) {
     mensaje += 'Hola, quiero realizar el siguiente pedido:%0A%0A';
 
     carrito.forEach(item => {
-      const subtotal = item.precio * item.cantidad;
+      const subtotal = Math.round(item.precio * item.cantidad);
       const unidad = item.unidadMedida ? item.unidadMedida : 'und';
-      
+
       mensaje += `*${item.cantidad} ${unidad} x* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
     });
 
-    const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    const total = carrito.reduce((sum, item) => sum + Math.round(item.precio * item.cantidad), 0);
 
     mensaje += '%0A```==============================```%0A';
     mensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}%0A`;
@@ -527,10 +549,9 @@ if (btnEnviarPedido) {
     const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
     window.open(url, '_blank');
 
-    // El stock ya se descontó, así que el carrito se vacía para evitar descuentos dobles
     carrito = [];
     actualizarCarrito();
-    cargarProductos(); // recarga para reflejar el nuevo stock en pantalla
+    cargarProductos();
   });
 }
 
@@ -545,7 +566,7 @@ if (modalZoom) {
 }
 
 // ==========================================================
-// INICIO: cargar productos y el carrito guardado
+// INICIO
 // ==========================================================
 
 cargarProductos();

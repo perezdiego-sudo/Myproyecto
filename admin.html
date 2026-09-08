@@ -339,13 +339,35 @@
             <input type="number" id="prod-stock-minimo" step="0.01" min="0" placeholder="Ej: 5 (si no lo llenas, se usa 5 por defecto)">
           </div>
 
-          <div class="form-group">
-            <label>Presentaciones, precios y equivalencia:</label>
-            <div id="lista-presentaciones"></div>
-            <button type="button" class="btn-agregar-presentacion" id="btn-agregar-presentacion">
-              <i class="fa-solid fa-plus"></i> Agregar presentación
-            </button>
-          </div>
+          <div id="grupo-precio-granel" class="form-group">
+  <label><strong>Precios por cantidad a granel:</strong></label>
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+    <div>
+      <label for="precio-1000">1000 <span class="unidad-granel-txt">g</span>:</label>
+      <input type="number" id="precio-1000" placeholder="Ej: 68000">
+    </div>
+
+    <div>
+      <label for="precio-500">500 <span class="unidad-granel-txt">g</span>:</label>
+      <input type="number" id="precio-500" placeholder="Ej: 34000">
+    </div>
+
+    <div>
+      <label for="precio-250">250 <span class="unidad-granel-txt">g</span>:</label>
+      <input type="number" id="precio-250" placeholder="Ej: 17000">
+    </div>
+
+    <div>
+      <label for="precio-125">125 <span class="unidad-granel-txt">g</span>:</label>
+      <input type="number" id="precio-125" placeholder="Ej: 8500">
+    </div>
+  </div>
+
+  <small style="display: block; margin-top: 8px; color: #666;">
+    Al digitar el precio de 1000 <span class="unidad-granel-txt">g</span> los demás se calcularán automáticamente, pero puedes ajustar cada valor manualmente si lo deseas.
+  </small>
+</div>
 
           <button type="submit" class="btn-primary" id="btn-guardar-prod">
             <i class="fa-solid fa-floppy-disk"></i> Guardar Producto

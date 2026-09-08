@@ -1,12 +1,24 @@
 import { db, auth } from "./firebase_config.js";
 import {
-  signInWithEmailAndPassword, signOut, onAuthStateChanged
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
 import {
-  collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
+
+// ==========================================================
 // ELEMENTOS DEL DOM
+// ==========================================================
+
 const loginSection = document.getElementById('login-section');
 const panelSection = document.getElementById('panel-section');
 const userInfo = document.getElementById('user-info');
@@ -22,48 +34,195 @@ const prodDescripcionInput = document.getElementById('prod-descripcion');
 const prodCategoriaInput = document.getElementById('prod-categoria');
 const prodImagenInput = document.getElementById('prod-imagen');
 const prodStockInput = document.getElementById('prod-stock');
+const prodStockMinimoInput = document.getElementById('prod-stock-minimo');
 const unidadStockTxt = document.getElementById('unidad-stock-txt');
+const unidadStockMinimoTxt = document.getElementById('unidad-stock-minimo-txt');
 const listaPresentaciones = document.getElementById('lista-presentaciones');
 const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion');
 const btnCancelarEdit = document.getElementById('btn-cancelar-edit');
 const tablaBody = document.getElementById('tabla-productos-body');
 
+// Grupos que se muestran/ocultan según la categoría
+const grupoPresentaciones = document.getElementById('grupo-presentaciones');
+const grupoPrecioGranel = document.getElementById('grupo-precio-granel');
+const unidadGranelTxt = document.getElementById('unidad-granel-txt');
+
+// CAMPOS DE PRECIO A GRANEL (1000g, 500g, 250g, 125g)
+const inputPrecio1000 = document.getElementById('precio-1000');
+const inputPrecio500 = document.getElementById('precio-500');
+const inputPrecio250 = document.getElementById('precio-250');
+const inputPrecio125 = document.getElementById('precio-125');
+
 let todosLosProductos = [];
+
+const STOCK_MINIMO_POR_DEFECTO = 5;
+
 
 // ==========================================================
 // UNIDAD BASE SEGÚN CATEGORÍA
 // ==========================================================
 
 function obtenerUnidadStock(categoria) {
-  const unidades = { polvos: 'kg', liquidos: 'L', perfumeria: 'L', envases: 'unid.' };
+  const unidades = {
+    polvos: 'g',
+    liquidos: 'ml',
+    perfumeria: 'ml',
+    aromas: 'ml',
+    sabores: 'ml',
+    envases: 'unid.'
+  };
+
   return unidades[categoria] || 'unid.';
 }
 
-prodCategoriaInput.addEventListener('change', () => {
-  unidadStockTxt.textContent = obtenerUnidadStock(prodCategoriaInput.value);
-});
 
 // ==========================================================
-// PRESENTACIONES DINÁMICAS (nombre + precio + equivalencia)
+// ¿ESTA CATEGORÍA VENDE A GRANEL (por gramos/ml) O POR PRESENTACIONES?
 // ==========================================================
 
-function crearFilaPresentacion(nombre = '', precio = '', equivalencia = '') {
+function esCategoriaGranel(categoria) {
+  return categoria !== 'envases';
+}
+
+
+// ==========================================================
+// CÁLCULO AUTOMÁTICO EN EL PANEL AL ESCRIBIR EN 1000g
+// ==========================================================
+
+if (inputPrecio1000) {
+  inputPrecio1000.addEventListener('input', () => {
+    const p1000 = parseFloat(inputPrecio1000.value) || 0;
+    if (inputPrecio500) inputPrecio500.value = p1000 ? Math.round(p1000 * 0.5) : '';
+    if (inputPrecio250) inputPrecio250.value = p1000 ? Math.round(p1000 * 0.25) : '';
+    if (inputPrecio125) inputPrecio125.value = p1000 ? Math.round(p1000 * 0.125) : '';
+  });
+}
+
+
+// ==========================================================
+// MOSTRAR EL BLOQUE CORRECTO SEGÚN LA CATEGORÍA
+// ==========================================================
+
+function actualizarVisibilidadPorCategoria() {
+  const categoria = prodCategoriaInput ? prodCategoriaInput.value : 'polvos';
+  const unidad = obtenerUnidadStock(categoria);
+
+  if (unidadStockTxt) unidadStockTxt.textContent = unidad;
+  if (unidadStockMinimoTxt) unidadStockMinimoTxt.textContent = unidad;
+
+  document.querySelectorAll('.unidad-granel-txt').forEach(el => {
+    el.textContent = unidad;
+  });
+
+  if (esCategoriaGranel(categoria)) {
+    if (grupoPrecioGranel) grupoPrecioGranel.classList.remove('hidden');
+    if (grupoPresentaciones) grupoPresentaciones.classList.add('hidden');
+  } else {
+    if (grupoPrecioGranel) grupoPrecioGranel.classList.add('hidden');
+    if (grupoPresentaciones) grupoPresentaciones.classList.remove('hidden');
+
+    if (listaPresentaciones && listaPresentaciones.children.length === 0) {
+      crearFilaPresentacion();
+    }
+  }
+}
+
+
+// ==========================================================
+// ACTUALIZAR AL CAMBIAR CATEGORÍA
+// ==========================================================
+
+if (prodCategoriaInput) {
+  prodCategoriaInput.addEventListener('change', actualizarVisibilidadPorCategoria);
+}
+
+
+// ==========================================================
+// PRESENTACIONES DINÁMICAS (SOLO ENVASES)
+// ==========================================================
+
+function crearFilaPresentacion(
+  nombre = '',
+  precio = '',
+  equivalencia = ''
+) {
+  if (!listaPresentaciones) return;
+
   const fila = document.createElement('div');
   fila.classList.add('fila-presentacion');
+
   fila.innerHTML = `
-    <input type="text" class="presentacion-nombre" placeholder="Ej: 1/4 Litro" value="${nombre}" required>
-    <input type="number" class="presentacion-precio" placeholder="Precio" min="0" value="${precio}" required>
-    <input type="number" step="0.001" class="presentacion-equivalencia" placeholder="Equivale a" min="0" value="${equivalencia}">
-    <button type="button" class="btn-quitar-presentacion"><i class="fa-solid fa-trash"></i></button>
-    <small>Cuánto representa esta presentación de la unidad base (ej: Libra = 0.5 si la base es kg). Vacío = 1.</small>
+    <input
+      type="text"
+      class="presentacion-nombre"
+      placeholder="Ej: 250 g, 500 g, 1 litro"
+      value="${nombre}"
+    >
+
+    <input
+      type="number"
+      class="presentacion-precio"
+      placeholder="Precio"
+      min="0"
+      value="${precio}"
+    >
+
+    <input
+      type="number"
+      step="0.001"
+      class="presentacion-equivalencia"
+      placeholder="Equivale a"
+      min="0"
+      value="${equivalencia}"
+    >
+
+    <button
+      type="button"
+      class="btn-quitar-presentacion"
+    >
+      <i class="fa-solid fa-trash"></i>
+    </button>
+
+    <small>
+      Cuánto representa esta presentación de la unidad base.
+      Ej: 500 g = 500 si la base es gramos.
+      Ej: 250 ml = 250 si la base es mililitros.
+      Vacío = 1.
+    </small>
   `;
-  fila.querySelector('.btn-quitar-presentacion').addEventListener('click', () => fila.remove());
+
+  fila
+    .querySelector('.btn-quitar-presentacion')
+    .addEventListener('click', () => {
+      fila.remove();
+    });
+
   listaPresentaciones.appendChild(fila);
 }
 
-btnAgregarPresentacion.addEventListener('click', () => crearFilaPresentacion());
+
+// ==========================================================
+// AGREGAR PRESENTACIÓN
+// ==========================================================
+
+if (btnAgregarPresentacion) {
+  btnAgregarPresentacion.addEventListener('click', () => {
+    if (prodCategoriaInput && esCategoriaGranel(prodCategoriaInput.value)) {
+      prodCategoriaInput.value = 'envases';
+      actualizarVisibilidadPorCategoria();
+    }
+    crearFilaPresentacion();
+  });
+}
+
+
+// ==========================================================
+// OBTENER PRESENTACIONES DEL FORMULARIO (SOLO ENVASES)
+// ==========================================================
 
 function obtenerPresentacionesDelFormulario() {
+  if (!listaPresentaciones) return [];
+
   const filas = listaPresentaciones.querySelectorAll('.fila-presentacion');
   const presentaciones = [];
 
@@ -72,11 +231,51 @@ function obtenerPresentacionesDelFormulario() {
     const precio = parseFloat(fila.querySelector('.presentacion-precio').value) || 0;
     const equivaliaValor = fila.querySelector('.presentacion-equivalencia').value;
     const equivalencia = equivaliaValor === '' ? 1 : parseFloat(equivaliaValor);
-    if (nombre) presentaciones.push({ nombre, precio, equivalencia });
+
+    if (nombre) {
+      presentaciones.push({
+        nombre,
+        precio,
+        equivalencia
+      });
+    }
   });
 
   return presentaciones;
 }
+
+
+// ==========================================================
+// CONSTRUIR Y CARGAR PRESENTACIONES A GRANEL
+// ==========================================================
+
+function construirPresentacionGranel(categoria) {
+  const unidad = obtenerUnidadStock(categoria);
+  const p1000 = parseFloat(inputPrecio1000 ? inputPrecio1000.value : 0) || 0;
+  const p500 = parseFloat(inputPrecio500 ? inputPrecio500.value : 0) || Math.round(p1000 * 0.5);
+  const p250 = parseFloat(inputPrecio250 ? inputPrecio250.value : 0) || Math.round(p1000 * 0.25);
+  const p125 = parseFloat(inputPrecio125 ? inputPrecio125.value : 0) || Math.round(p1000 * 0.125);
+
+  return [
+    { nombre: `125 ${unidad}`, equivalencia: 125, precio: p125 },
+    { nombre: `250 ${unidad}`, equivalencia: 250, precio: p250 },
+    { nombre: `500 ${unidad}`, equivalencia: 500, precio: p500 },
+    { nombre: `1000 ${unidad}`, equivalencia: 1000, precio: p1000 }
+  ];
+}
+
+function cargarPreciosGranelEdicion(presentaciones) {
+  const buscarPrecio = (eq) => {
+    const p = presentaciones.find(item => Number(item.equivalencia) === eq);
+    return p ? p.precio : '';
+  };
+
+  if (inputPrecio1000) inputPrecio1000.value = buscarPrecio(1000);
+  if (inputPrecio500) inputPrecio500.value = buscarPrecio(500);
+  if (inputPrecio250) inputPrecio250.value = buscarPrecio(250);
+  if (inputPrecio125) inputPrecio125.value = buscarPrecio(125);
+}
+
 
 // ==========================================================
 // AUTENTICACIÓN
@@ -84,50 +283,84 @@ function obtenerPresentacionesDelFormulario() {
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    loginSection.classList.add('hidden');
-    panelSection.classList.remove('hidden');
-    userInfo.classList.remove('hidden');
-    userEmailSpan.textContent = user.email;
+    if (loginSection) loginSection.classList.add('hidden');
+    if (panelSection) panelSection.classList.remove('hidden');
+    if (userInfo) userInfo.classList.remove('hidden');
+    if (userEmailSpan) userEmailSpan.textContent = user.email;
+
     cargarProductos();
   } else {
-    loginSection.classList.remove('hidden');
-    panelSection.classList.add('hidden');
-    userInfo.classList.add('hidden');
+    if (loginSection) loginSection.classList.remove('hidden');
+    if (panelSection) panelSection.classList.add('hidden');
+    if (userInfo) userInfo.classList.add('hidden');
   }
 });
 
-formLogin.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    mostrarToast('Sesión iniciada con éxito', 'exito');
-  } catch (err) {
-    mostrarToast('Credenciales incorrectas: ' + err.message, 'error');
-  }
-});
-
-btnLogout.addEventListener('click', () => {
-  signOut(auth);
-  mostrarToast('Sesión cerrada', 'exito');
-});
 
 // ==========================================================
-// CARGAR PRODUCTOS DESDE FIRESTORE EN TIEMPO REAL
+// LOGIN
+// ==========================================================
+
+if (formLogin) {
+  formLogin.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      mostrarToast('Sesión iniciada con éxito', 'exito');
+    } catch (err) {
+      mostrarToast('Credenciales incorrectas: ' + err.message, 'error');
+    }
+  });
+}
+
+
+// ==========================================================
+// CERRAR SESIÓN
+// ==========================================================
+
+if (btnLogout) {
+  btnLogout.addEventListener('click', () => {
+    signOut(auth);
+    mostrarToast('Sesión cerrada', 'exito');
+  });
+}
+
+
+// ==========================================================
+// CARGAR PRODUCTOS DESDE FIRESTORE
 // ==========================================================
 
 function cargarProductos() {
   onSnapshot(collection(db, 'productos'), (snapshot) => {
-    todosLosProductos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    todosLosProductos = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
     renderizarTabla(todosLosProductos);
   });
 }
 
+
+// ==========================================================
+// RENDERIZAR TABLA
+// ==========================================================
+
 function renderizarTabla(productos) {
+  if (!tablaBody) return;
+
   if (productos.length === 0) {
-    tablaBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:16px; color:#888;">No hay productos registrados</td></tr>`;
+    tablaBody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center; padding:16px; color:#888;">
+          No hay productos registrados
+        </td>
+      </tr>
+    `;
     return;
   }
 
@@ -142,17 +375,36 @@ function renderizarTabla(productos) {
     const stockTexto = tieneStock ? `${p.stock} ${unidad}` : 'Ilimitado';
     const stockColor = tieneStock && Number(p.stock) <= 0 ? '#c62828' : '#333';
 
+    let claseFila = '';
+    if (tieneStock) {
+      const stockMinimo = (p.stockMinimo === null || p.stockMinimo === undefined || p.stockMinimo === '')
+        ? STOCK_MINIMO_POR_DEFECTO
+        : Number(p.stockMinimo);
+
+      if (Number(p.stock) <= 0) {
+        claseFila = 'fila-agotado';
+      } else if (Number(p.stock) <= stockMinimo) {
+        claseFila = 'fila-stock-bajo';
+      }
+    }
+
     return `
-      <tr>
+      <tr class="${claseFila}">
         <td><strong>${p.nombre || ''}</strong></td>
         <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
         <td style="color:${stockColor}; font-weight:600;">${stockTexto}</td>
         <td>${resumenPresentaciones || '—'}</td>
         <td>
           <div class="action-btns">
-            <button class="btn-sm btn-edit" data-id="${p.id}"><i class="fa-solid fa-pen"></i> Editar</button>
-            <button class="btn-sm btn-stock" data-id="${p.id}" data-stock="${tieneStock ? p.stock : ''}"><i class="fa-solid fa-cubes"></i> Ajustar</button>
-            <button class="btn-sm btn-delete" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn-sm btn-edit" data-id="${p.id}">
+              <i class="fa-solid fa-pen"></i> Editar
+            </button>
+            <button class="btn-sm btn-stock" data-id="${p.id}" data-stock="${tieneStock ? p.stock : ''}">
+              <i class="fa-solid fa-cubes"></i> Ajustar
+            </button>
+            <button class="btn-sm btn-delete" data-id="${p.id}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
           </div>
         </td>
       </tr>
@@ -172,64 +424,104 @@ function renderizarTabla(productos) {
   });
 }
 
+
 // ==========================================================
-// AJUSTE RÁPIDO DE STOCK (sin abrir el formulario completo)
+// AJUSTE RÁPIDO DE STOCK
 // ==========================================================
 
 async function ajustarStockRapido(id, stockActual) {
-  const nuevoValor = prompt('Nuevo stock total para este producto (deja vacío para ilimitado):', stockActual || '');
-  if (nuevoValor === null) return; // canceló
+  const producto = todosLosProductos.find(p => p.id === id);
+  const unidad = producto ? obtenerUnidadStock(producto.categoria) : 'unid.';
 
-  const stockNumerico = nuevoValor.trim() === '' ? null : parseFloat(nuevoValor);
+  const nuevoValor = prompt(
+    `Nuevo stock total en ${unidad} (deja vacío para ilimitado):`,
+    stockActual || ''
+  );
+
+  if (nuevoValor === null) return;
+
+  const texto = nuevoValor.trim();
+  const stockNumerico = texto === '' ? null : parseFloat(texto);
+
+  if (stockNumerico !== null && (isNaN(stockNumerico) || stockNumerico < 0)) {
+    mostrarToast('Escribe un número válido (0 o mayor), o deja vacío para ilimitado', 'error');
+    return;
+  }
 
   try {
     await updateDoc(doc(db, 'productos', id), { stock: stockNumerico });
-    mostrarToast('Stock actualizado', 'exito');
+    mostrarToast(`Stock actualizado en ${unidad}`, 'exito');
   } catch (err) {
     mostrarToast('Error al actualizar stock: ' + err.message, 'error');
   }
 }
 
+
 // ==========================================================
-// GUARDAR O ACTUALIZAR PRODUCTO
+// GUARDAR / ACTUALIZAR PRODUCTO
 // ==========================================================
 
-formProducto.addEventListener('submit', async (e) => {
-  e.preventDefault();
+if (formProducto) {
+  formProducto.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  const presentaciones = obtenerPresentacionesDelFormulario();
+    const categoria = prodCategoriaInput.value;
+    let presentaciones;
 
-  if (presentaciones.length === 0) {
-    mostrarToast('Agrega al menos una presentación con su precio', 'error');
-    return;
-  }
+    if (esCategoriaGranel(categoria)) {
+      const precio1000 = parseFloat(inputPrecio1000 ? inputPrecio1000.value : 0) || 0;
 
-  const stockValor = prodStockInput.value;
-  const stock = stockValor === '' ? null : parseFloat(stockValor);
+      if (precio1000 <= 0) {
+        mostrarToast('Escribe al menos el precio para 1000 g/ml', 'error');
+        return;
+      }
 
-  const id = prodIdInput.value;
-  const dataProducto = {
-    nombre: prodNombreInput.value.trim(),
-    descripcion: prodDescripcionInput.value.trim(),
-    categoria: prodCategoriaInput.value,
-    imagen: prodImagenInput.value.trim(),
-    presentaciones: presentaciones,
-    stock: stock
-  };
+      presentaciones = construirPresentacionGranel(categoria);
 
-  try {
-    if (id) {
-      await updateDoc(doc(db, 'productos', id), dataProducto);
-      mostrarToast('Producto actualizado', 'exito');
     } else {
-      await addDoc(collection(db, 'productos'), dataProducto);
-      mostrarToast('Producto registrado', 'exito');
+      presentaciones = obtenerPresentacionesDelFormulario();
+
+      if (presentaciones.length === 0) {
+        mostrarToast('Agrega al menos una presentación con su precio', 'error');
+        return;
+      }
     }
-    limpiarFormulario();
-  } catch (err) {
-    mostrarToast('Error al guardar: ' + err.message, 'error');
-  }
-});
+
+    const stockValor = prodStockInput.value;
+    const stock = stockValor === '' ? null : parseFloat(stockValor);
+
+    const stockMinimoValor = prodStockMinimoInput.value;
+    const stockMinimo = stockMinimoValor === '' ? null : parseFloat(stockMinimoValor);
+
+    const id = prodIdInput.value;
+
+    const dataProducto = {
+      nombre: prodNombreInput.value.trim(),
+      descripcion: prodDescripcionInput.value.trim(),
+      categoria: categoria,
+      imagen: prodImagenInput.value.trim(),
+      presentaciones: presentaciones,
+      stock: stock,
+      stockMinimo: stockMinimo
+    };
+
+    try {
+      if (id) {
+        await updateDoc(doc(db, 'productos', id), dataProducto);
+        mostrarToast('Producto actualizado', 'exito');
+      } else {
+        await addDoc(collection(db, 'productos'), dataProducto);
+        mostrarToast('Producto registrado', 'exito');
+      }
+
+      limpiarFormulario();
+
+    } catch (err) {
+      mostrarToast('Error al guardar: ' + err.message, 'error');
+    }
+  });
+}
+
 
 // ==========================================================
 // EDITAR PRODUCTO
@@ -244,16 +536,45 @@ function editarProducto(id) {
   prodDescripcionInput.value = prod.descripcion || '';
   prodCategoriaInput.value = prod.categoria || 'polvos';
   prodImagenInput.value = prod.imagen || '';
+
   prodStockInput.value = (prod.stock === null || prod.stock === undefined) ? '' : prod.stock;
-  unidadStockTxt.textContent = obtenerUnidadStock(prod.categoria);
+  prodStockMinimoInput.value = (prod.stockMinimo === null || prod.stockMinimo === undefined) ? '' : prod.stockMinimo;
 
-  listaPresentaciones.innerHTML = '';
-  (prod.presentaciones || []).forEach(p => crearFilaPresentacion(p.nombre, p.precio, p.equivalencia ?? ''));
+  actualizarVisibilidadPorCategoria();
 
-  formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
-  btnCancelarEdit.classList.remove('hidden');
+  const presentacionesGuardadas = prod.presentaciones || [];
+
+  if (esCategoriaGranel(prod.categoria)) {
+    cargarPreciosGranelEdicion(presentacionesGuardadas);
+    if (listaPresentaciones) listaPresentaciones.innerHTML = '';
+  } else {
+    if (inputPrecio1000) inputPrecio1000.value = '';
+    if (inputPrecio500) inputPrecio500.value = '';
+    if (inputPrecio250) inputPrecio250.value = '';
+    if (inputPrecio125) inputPrecio125.value = '';
+
+    if (listaPresentaciones) listaPresentaciones.innerHTML = '';
+
+    presentacionesGuardadas.forEach(p => {
+      crearFilaPresentacion(p.nombre, p.precio, p.equivalencia ?? '');
+    });
+
+    if (presentacionesGuardadas.length === 0) {
+      crearFilaPresentacion();
+    }
+  }
+
+  if (formTitle) {
+    formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Producto`;
+  }
+
+  if (btnCancelarEdit) {
+    btnCancelarEdit.classList.remove('hidden');
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 
 // ==========================================================
 // ELIMINAR PRODUCTO
@@ -270,30 +591,62 @@ async function eliminarProducto(id) {
   }
 }
 
-btnCancelarEdit.addEventListener('click', limpiarFormulario);
-
-function limpiarFormulario() {
-  formProducto.reset();
-  prodIdInput.value = '';
-  prodStockInput.value = '';
-  unidadStockTxt.textContent = obtenerUnidadStock(prodCategoriaInput.value);
-  listaPresentaciones.innerHTML = '';
-  crearFilaPresentacion();
-  formTitle.innerHTML = `<i class="fa-solid fa-square-plus"></i> Registrar Producto`;
-  btnCancelarEdit.classList.add('hidden');
-}
-
-// Arranca con una fila de presentación vacía lista para llenar
-crearFilaPresentacion();
 
 // ==========================================================
-// IMPORTACIÓN MASIVA DESDE CSV
+// CANCELAR EDICIÓN
+// ==========================================================
+
+if (btnCancelarEdit) {
+  btnCancelarEdit.addEventListener('click', limpiarFormulario);
+}
+
+
+// ==========================================================
+// LIMPIAR FORMULARIO
+// ==========================================================
+
+function limpiarFormulario() {
+  if (formProducto) formProducto.reset();
+
+  prodIdInput.value = '';
+  prodStockInput.value = '';
+  prodStockMinimoInput.value = '';
+
+  if (inputPrecio1000) inputPrecio1000.value = '';
+  if (inputPrecio500) inputPrecio500.value = '';
+  if (inputPrecio250) inputPrecio250.value = '';
+  if (inputPrecio125) inputPrecio125.value = '';
+
+  actualizarVisibilidadPorCategoria();
+
+  if (listaPresentaciones) listaPresentaciones.innerHTML = '';
+
+  if (formTitle) {
+    formTitle.innerHTML = `<i class="fa-solid fa-square-plus"></i> Registrar Producto`;
+  }
+
+  if (btnCancelarEdit) {
+    btnCancelarEdit.classList.add('hidden');
+  }
+}
+
+
+// ==========================================================
+// INICIAR ESTADO DEL FORMULARIO
+// ==========================================================
+
+actualizarVisibilidadPorCategoria();
+
+
+// ==========================================================
+// IMPORTACIÓN MASIVA CSV
 // ==========================================================
 
 const inputCSV = document.getElementById('input-csv');
 const btnImportarCSV = document.getElementById('btn-importar-csv');
 const btnDescargarPlantilla = document.getElementById('btn-descargar-plantilla');
 const progresoImportacion = document.getElementById('progreso-importacion');
+
 
 function dividirLineaCSV(linea) {
   const resultado = [];
@@ -302,6 +655,7 @@ function dividirLineaCSV(linea) {
 
   for (let i = 0; i < linea.length; i++) {
     const car = linea[i];
+
     if (car === '"') {
       dentroDeComillas = !dentroDeComillas;
     } else if (car === ',' && !dentroDeComillas) {
@@ -311,114 +665,129 @@ function dividirLineaCSV(linea) {
       actual += car;
     }
   }
+
   resultado.push(actual);
   return resultado;
 }
 
+
 function parsearCSV(texto) {
   const lineas = texto.split(/\r?\n/).filter(l => l.trim() !== '');
+  if (lineas.length === 0) return [];
+
   const encabezados = dividirLineaCSV(lineas[0]).map(h => h.trim());
 
   return lineas.slice(1).map(linea => {
     const valores = dividirLineaCSV(linea);
     const fila = {};
+
     encabezados.forEach((encabezado, i) => {
       fila[encabezado] = (valores[i] || '').trim();
     });
+
     return fila;
   });
 }
 
-btnImportarCSV.addEventListener('click', async () => {
-  const archivo = inputCSV.files[0];
 
-  if (!archivo) {
-    mostrarToast('Selecciona un archivo CSV primero', 'error');
-    return;
-  }
+if (btnImportarCSV) {
+  btnImportarCSV.addEventListener('click', async () => {
+    const archivo = inputCSV.files[0];
 
-  progresoImportacion.textContent = 'Leyendo archivo...';
-
-  try {
-    const texto = await archivo.text();
-    const filas = parsearCSV(texto);
-
-    const productosPorId = {};
-
-    filas.forEach(fila => {
-      const id = fila.id_producto;
-      if (!id) return;
-
-      if (!productosPorId[id]) {
-        productosPorId[id] = {
-          nombre: fila.nombre || '',
-          descripcion: fila.descripcion || '',
-          categoria: fila.categoria || '',
-          imagen: fila.imagen || '',
-          stock: fila.stock === '' || fila.stock === undefined ? null : parseFloat(fila.stock),
-          presentaciones: []
-        };
-      }
-
-      if (fila.presentacion) {
-        productosPorId[id].presentaciones.push({
-          nombre: fila.presentacion,
-          precio: parseFloat(fila.precio) || 0,
-          equivalencia: fila.equivalencia === '' || fila.equivalencia === undefined ? 1 : parseFloat(fila.equivalencia)
-        });
-      }
-    });
-
-    const listaProductos = Object.values(productosPorId);
-
-    if (listaProductos.length === 0) {
-      mostrarToast('No se encontraron productos válidos en el archivo', 'error');
-      progresoImportacion.textContent = '';
+    if (!archivo) {
+      mostrarToast('Selecciona un archivo CSV primero', 'error');
       return;
     }
 
-    let exitosos = 0;
-    let fallidos = 0;
+    progresoImportacion.textContent = 'Leyendo archivo...';
 
-    for (let i = 0; i < listaProductos.length; i++) {
-      const producto = listaProductos[i];
-      progresoImportacion.textContent = `Importando ${i + 1} de ${listaProductos.length}: ${producto.nombre}...`;
+    try {
+      const texto = await archivo.text();
+      const filas = parsearCSV(texto);
+      const productosPorId = {};
 
-      try {
-        await addDoc(collection(db, 'productos'), producto);
-        exitosos++;
-      } catch (err) {
-        console.error(`Error con ${producto.nombre}:`, err);
-        fallidos++;
+      filas.forEach(fila => {
+        const id = fila.id_producto;
+        if (!id) return;
+
+        if (!productosPorId[id]) {
+          productosPorId[id] = {
+            nombre: fila.nombre || '',
+            descripcion: fila.descripcion || '',
+            categoria: fila.categoria || '',
+            imagen: fila.imagen || '',
+            stock: (fila.stock === '' || fila.stock === undefined) ? null : parseFloat(fila.stock),
+            stockMinimo: (fila.stock_minimo === '' || fila.stock_minimo === undefined) ? null : parseFloat(fila.stock_minimo),
+            presentaciones: []
+          };
+        }
+
+        if (fila.presentacion) {
+          productosPorId[id].presentaciones.push({
+            nombre: fila.presentacion,
+            precio: parseFloat(fila.precio) || 0,
+            equivalencia: (fila.equivalencia === '' || fila.equivalencia === undefined) ? 1 : parseFloat(fila.equivalencia)
+          });
+        }
+      });
+
+      const listaProductos = Object.values(productosPorId);
+
+      if (listaProductos.length === 0) {
+        mostrarToast('No se encontraron productos válidos en el archivo', 'error');
+        progresoImportacion.textContent = '';
+        return;
       }
+
+      let exitosos = 0;
+      let fallidos = 0;
+
+      for (let i = 0; i < listaProductos.length; i++) {
+        const producto = listaProductos[i];
+        progresoImportacion.textContent = `Importando ${i + 1} de ${listaProductos.length}: ${producto.nombre}...`;
+
+        try {
+          await addDoc(collection(db, 'productos'), producto);
+          exitosos++;
+        } catch (err) {
+          console.error(`Error con ${producto.nombre}:`, err);
+          fallidos++;
+        }
+      }
+
+      progresoImportacion.textContent = `Importación terminada: ${exitosos} productos agregados, ${fallidos} fallidos.`;
+      mostrarToast(`${exitosos} productos importados correctamente`, 'exito');
+      inputCSV.value = '';
+
+    } catch (error) {
+      mostrarToast('Error leyendo el archivo: ' + error.message, 'error');
+      progresoImportacion.textContent = '';
     }
+  });
+}
 
-    progresoImportacion.textContent = `Importación terminada: ${exitosos} productos agregados, ${fallidos} fallidos.`;
-    mostrarToast(`${exitosos} productos importados correctamente`, 'exito');
-    inputCSV.value = '';
 
-  } catch (error) {
-    mostrarToast('Error leyendo el archivo: ' + error.message, 'error');
-    progresoImportacion.textContent = '';
-  }
-});
+if (btnDescargarPlantilla) {
+  btnDescargarPlantilla.addEventListener('click', () => {
+    const contenido =
+      'id_producto,nombre,descripcion,categoria,imagen,stock,stock_minimo,presentacion,equivalencia,precio\n' +
+      '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,5000,500,1000 ml,1000,10000\n' +
+      '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,5000,500,1000 g,1000,8000\n' +
+      '3,Envase plástico 500 ml,Envase reutilizable,envases,imagenes/envase.jpg,200,20,250 ml,250,1000\n' +
+      '3,Envase plástico 500 ml,Envase reutilizable,envases,imagenes/envase.jpg,200,20,500 ml,500,1800\n';
 
-btnDescargarPlantilla.addEventListener('click', () => {
-  const contenido =
-    'id_producto,nombre,descripcion,categoria,imagen,stock,presentacion,equivalencia,precio\n' +
-    '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,50,1/4 Litro,0.25,3000\n' +
-    '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,50,Litro,1,10000\n' +
-    '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,50,Kilo,1,8000\n' +
-    '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,50,Libra,0.5,4000\n';
+    const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement('a');
 
-  const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const enlace = document.createElement('a');
-  enlace.href = url;
-  enlace.download = 'plantilla_productos.csv';
-  enlace.click();
-  URL.revokeObjectURL(url);
-});
+    enlace.href = url;
+    enlace.download = 'plantilla_productos.csv';
+    enlace.click();
+
+    URL.revokeObjectURL(url);
+  });
+}
+
 
 // ==========================================================
 // NOTIFICACIONES TOAST
@@ -427,9 +796,15 @@ btnDescargarPlantilla.addEventListener('click', () => {
 function mostrarToast(msj, tipo) {
   const toastContainer = document.getElementById('toast-container');
   if (!toastContainer) return;
+
   const toast = document.createElement('div');
   toast.className = `toast ${tipo}`;
-  toast.innerHTML = `<i class="fa-solid ${tipo === 'exito' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${msj}`;
+  toast.innerHTML = `
+    <i class="fa-solid ${tipo === 'exito' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
+    ${msj}
+  `;
+
   toastContainer.appendChild(toast);
+
   setTimeout(() => toast.remove(), 3000);
 }
