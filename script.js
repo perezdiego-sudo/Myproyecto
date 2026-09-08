@@ -52,48 +52,105 @@ async function cargarProductos() {
       const stockTotal = (producto.stock === null || producto.stock === undefined) ? null : Number(producto.stock);
       div.dataset.stock = stockTotal === null ? '' : stockTotal;
 
-      const presentaciones = producto.presentaciones || [];
       let selectorHTML = '';
+      let inputHTML = '';
       const agotado = stockTotal !== null && stockTotal <= 0;
 
-      if (presentaciones.length === 1 && presentaciones[0].nombre === 'Unidad') {
-        const precioNum = Number(presentaciones[0].precio) || 0;
-        const equivalencia = Number(presentaciones[0].equivalencia) || 1;
+      // Estas categorías siempre se venden a granel (nunca en kilo, libra
+      // ni media libra), sin importar cómo haya quedado guardado el
+      // producto anteriormente. Polvos se vende en gramos; el resto de
+      // categorías de granel (líquidos, perfumería, aromas y sabores) en
+      // mililitros.
+      const esGranelPorCategoria = producto.categoria !== 'envases';
+      const unidadGranel = producto.categoria === 'polvos' ? 'g' : 'ml';
+
+      // DETECCIÓN DEL NUEVO MODELO vs MODELO VIEJO (aplica solo a Envases)
+      // Si el producto tiene 'tipo_venta', es el modelo nuevo. Si no, usa tu lógica vieja (Legacy).
+      const esNuevoModelo = producto.tipo_venta !== undefined;
+
+      if (esGranelPorCategoria) {
+        // Polvos -> gramos. Líquidos, Perfumería, Aromas y Sabores -> mililitros
+        const precioNum = Number(producto.precio_base) || 0;
+        const minCantidad = Number(producto.cantidad_minima) || 125;
+
+        div.dataset.tipoVenta = 'granel';
         div.dataset.precio = precioNum;
-        div.dataset.equivalencia = equivalencia;
+        div.dataset.unidadMedida = unidadGranel;
+
+        // Solo se muestra como referencia el precio de los 1000 g/ml.
+        // El cliente escribe la cantidad exacta que quiere y el sistema
+        // calcula el subtotal automáticamente (nunca kilo, libra, litro
+        // ni onzas).
+        const precioMil = precioNum * 1000;
+
+        selectorHTML = `
+          <div class="info-precio-dinamico">
+            <span class="precio-unitario">1000 ${unidadGranel}: $${precioMil.toLocaleString('es-CO')}</span>
+            <div class="precio-total-dinamico" style="font-weight:bold; margin-top:5px; color:#2c3e50;">
+              Subtotal: $${(precioNum * minCantidad).toLocaleString('es-CO')}
+            </div>
+          </div>`;
+
+        inputHTML = `
+          <label class="label-cantidad-exacta">¿Cuántos ${unidadGranel} necesitas?</label>
+          <input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" placeholder="Ej: 1500" ${agotado ? 'disabled' : ''}>`;
+
+
+      } else if (esNuevoModelo) {
+        // Envases guardados con el modelo nuevo pero sin lógica de granel
+        const precioNum = Number(producto.precio_base) || 0;
+        const minCantidad = Number(producto.cantidad_minima) || 1;
+
+        div.dataset.tipoVenta = producto.tipo_venta;
+        div.dataset.precio = precioNum;
+        div.dataset.unidadMedida = 'und';
+
         selectorHTML = `<span class="precio">$${precioNum.toLocaleString('es-CO')}</span>`;
-      } else if (presentaciones.length > 0) {
-        const opciones = presentaciones.map((p, i) => {
-          const seleccionada = i === presentaciones.length - 1 ? 'selected' : '';
-          const precioNum = Number(p.precio) || 0;
-          const equivalencia = Number(p.equivalencia) || 1;
-          let sufijo = '';
-          if (stockTotal !== null) {
-            const disponiblesEnEstaPresentacion = Math.floor(stockTotal / equivalencia);
-            sufijo = ` (${disponiblesEnEstaPresentacion} disp.)`;
-          }
-          return `<option value="${p.nombre}" data-precio="${precioNum}" data-equivalencia="${equivalencia}" ${seleccionada}>${p.nombre} - $${precioNum.toLocaleString('es-CO')}${sufijo}</option>`;
-        }).join('');
-        selectorHTML = `<select class="presentacion">${opciones}</select>`;
+        inputHTML = `<input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" ${agotado ? 'disabled' : ''}>`;
+
+      } else {
+        // LÓGICA LEGACY (Tus productos viejos siguen funcionando igual)
+        const presentaciones = producto.presentaciones || [];
+        if (presentaciones.length === 1 && presentaciones[0].nombre === 'Unidad') {
+          const precioNum = Number(presentaciones[0].precio) || 0;
+          div.dataset.precio = precioNum;
+          div.dataset.equivalencia = Number(presentaciones[0].equivalencia) || 1;
+          selectorHTML = `<span class="precio">$${precioNum.toLocaleString('es-CO')}</span>`;
+        } else if (presentaciones.length > 0) {
+          const opciones = presentaciones.map((p, i) => {
+            const seleccionada = i === presentaciones.length - 1 ? 'selected' : '';
+            const precioNum = Number(p.precio) || 0;
+            const equivalencia = Number(p.equivalencia) || 1;
+            let sufijo = '';
+            if (stockTotal !== null) {
+              const disp = Math.floor(stockTotal / equivalencia);
+              sufijo = ` (${disp} disp.)`;
+            }
+            return `<option value="${p.nombre}" data-precio="${precioNum}" data-equivalencia="${equivalencia}" ${seleccionada}>${p.nombre} - $${precioNum.toLocaleString('es-CO')}${sufijo}</option>`;
+          }).join('');
+          selectorHTML = `<select class="presentacion">${opciones}</select>`;
+        }
+        inputHTML = `<input type="number" class="cantidad" value="1" min="1" ${agotado ? 'disabled' : ''}>`;
       }
 
       div.innerHTML = `
         <div class="producto-imagen-wrap">
           <span class="badge-categoria badge-${producto.categoria}">${producto.categoria || ''}</span>
           ${agotado ? '<span class="badge-agotado">Agotado</span>' : ''}
-          <img src="${producto.imagen || ''}" alt="${producto.nombre || ''}" class="producto-img">
+          ${producto.imagen
+            ? `<img src="${producto.imagen}" alt="${producto.nombre || ''}" class="producto-img" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'producto-img producto-img-placeholder',innerHTML:'📦'}));">`
+            : `<div class="producto-img producto-img-placeholder">📦</div>`}
         </div>
         <h3>${producto.nombre || ''}</h3>
         <p>${producto.descripcion || ''}</p>
         ${selectorHTML}
         <div class="control-cantidad">
-          <input type="number" class="cantidad" value="1" min="1" ${agotado ? 'disabled' : ''}>
+          ${inputHTML}
           <button class="btn-agregar-carrito" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Agregar al carrito'}</button>
         </div>
       `;
 
       if (agotado) div.classList.add('agotado');
-
       contenedor.appendChild(div);
     });
 
@@ -179,7 +236,6 @@ radiosEnvio.forEach(radio => {
 // ==========================================================
 
 function actualizarMaxCantidad(productoDiv) {
-  const select = productoDiv.querySelector('.presentacion, .talla');
   const inputCantidad = productoDiv.querySelector('.cantidad');
   const stockTotalTxt = productoDiv.dataset.stock;
 
@@ -189,14 +245,21 @@ function actualizarMaxCantidad(productoDiv) {
   }
 
   const stockTotal = Number(stockTotalTxt);
-  const equivalencia = select
-    ? Number(select.options[select.selectedIndex].dataset.equivalencia) || 1
-    : Number(productoDiv.dataset.equivalencia) || 1;
+  let maxUnidades;
 
-  const maxUnidades = Math.floor(stockTotal / equivalencia);
+  if (productoDiv.dataset.tipoVenta === 'granel' || productoDiv.dataset.tipoVenta === 'unidad') {
+    maxUnidades = stockTotal; // 1 gramo = 1 unidad de stock
+  } else {
+    // Legacy
+    const select = productoDiv.querySelector('.presentacion, .talla');
+    const equivalencia = select ? Number(select.options[select.selectedIndex].dataset.equivalencia) || 1 : Number(productoDiv.dataset.equivalencia) || 1;
+    maxUnidades = Math.floor(stockTotal / equivalencia);
+  }
+
   inputCantidad.max = maxUnidades;
+  const minPermitido = Number(inputCantidad.min) || 1;
   if (parseInt(inputCantidad.value) > maxUnidades) {
-    inputCantidad.value = maxUnidades > 0 ? maxUnidades : 1;
+    inputCantidad.value = maxUnidades >= minPermitido ? maxUnidades : minPermitido;
   }
 }
 
@@ -212,27 +275,48 @@ function inicializarEventosProductos() {
     if (select) {
       select.addEventListener('change', () => actualizarMaxCantidad(productoDiv));
     }
+
+    // Efecto visual de calculadora para ventas a granel
+    const inputCant = productoDiv.querySelector('.cantidad');
+    const precioTotalDinamico = productoDiv.querySelector('.precio-total-dinamico');
+    if (precioTotalDinamico && inputCant) {
+      inputCant.addEventListener('input', () => {
+        let cant = parseInt(inputCant.value) || 0;
+        const precioUnidad = Number(productoDiv.dataset.precio) || 0;
+        precioTotalDinamico.textContent = `Subtotal: $${(cant * precioUnidad).toLocaleString('es-CO')}`;
+      });
+    }
   });
 
   document.querySelectorAll('.btn-agregar-carrito').forEach(boton => {
     boton.addEventListener('click', () => {
       const productoDiv = boton.closest('.producto');
-
-      const selectPresentacion = productoDiv.querySelector('.presentacion, .talla');
       const cantidadInput = productoDiv.querySelector('.cantidad');
       const cantidad = parseInt(cantidadInput.value) || 1;
 
-      let nombre, precio, presentacionNombre;
+      let nombre = productoDiv.dataset.nombre;
+      let precio, presentacionNombre, unidadMedida, tipoVenta;
 
-      if (selectPresentacion) {
-        const opcionSeleccionada = selectPresentacion.options[selectPresentacion.selectedIndex];
-        nombre = `${productoDiv.dataset.nombre} (${opcionSeleccionada.value})`;
-        precio = parseInt(opcionSeleccionada.dataset.precio);
-        presentacionNombre = opcionSeleccionada.value;
+      // Evaluar si es el modelo nuevo o el viejo al agregarlo al carrito
+      if (productoDiv.dataset.tipoVenta !== undefined) {
+        tipoVenta = productoDiv.dataset.tipoVenta;
+        precio = Number(productoDiv.dataset.precio);
+        unidadMedida = productoDiv.dataset.unidadMedida;
+        presentacionNombre = tipoVenta === 'granel' ? 'Granel' : 'Unidad';
       } else {
-        nombre = productoDiv.dataset.nombre;
-        precio = parseInt(productoDiv.dataset.precio);
-        presentacionNombre = 'Unidad';
+        // Lógica Legacy
+        const selectPresentacion = productoDiv.querySelector('.presentacion, .talla');
+        if (selectPresentacion) {
+          const opcion = selectPresentacion.options[selectPresentacion.selectedIndex];
+          nombre = `${productoDiv.dataset.nombre} (${opcion.value})`;
+          precio = parseInt(opcion.dataset.precio);
+          presentacionNombre = opcion.value;
+        } else {
+          precio = parseInt(productoDiv.dataset.precio);
+          presentacionNombre = 'Unidad';
+        }
+        unidadMedida = 'und';
+        tipoVenta = 'legacy';
       }
 
       if (isNaN(precio)) {
@@ -246,7 +330,8 @@ function inicializarEventosProductos() {
       if (productoExistente) {
         productoExistente.cantidad += cantidad;
       } else {
-        carrito.push({ nombre, precio, cantidad, productoId, presentacionNombre });
+        // Guardamos también el tipoVenta y unidadMedida en el carrito
+        carrito.push({ nombre, precio, cantidad, productoId, presentacionNombre, unidadMedida, tipoVenta });
       }
 
       actualizarCarrito();
@@ -280,10 +365,13 @@ function actualizarCarrito() {
     const li = document.createElement('li');
     li.classList.add('item-carrito');
 
+    // Añadimos la unidad de medida visualmente si existe, o 'und' por defecto
+    const unidadVisual = item.unidadMedida ? item.unidadMedida : 'und';
+
     li.innerHTML = `
       <div class="item-cantidad-control">
         <button class="btn-restar" aria-label="Restar cantidad">−</button>
-        <span class="item-cantidad">${item.cantidad}</span>
+        <span class="item-cantidad">${item.cantidad} ${unidadVisual}</span>
         <button class="btn-sumar" aria-label="Sumar cantidad">+</button>
       </div>
       <span class="item-nombre">${item.nombre}</span>
@@ -330,30 +418,32 @@ function actualizarCarrito() {
 // ==========================================================
 
 async function verificarYDescontarStock(itemsCarrito) {
-  // Fase 1: verificar disponibilidad sin modificar nada
+  // Fase 1: verificar disponibilidad
   for (const item of itemsCarrito) {
     if (!item.productoId) continue;
-
-    const refProducto = doc(db, 'productos', item.productoId);
-    const snap = await getDoc(refProducto);
+    const snap = await getDoc(doc(db, 'productos', item.productoId));
     if (!snap.exists()) continue;
 
     const data = snap.data();
-    if (data.stock === null || data.stock === undefined) continue; // stock ilimitado
+    if (data.stock === null || data.stock === undefined) continue;
 
-    const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
-    const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
-    const cantidadEnUnidadBase = item.cantidad * equivalencia;
+    let cantidadARestar = 0;
+    if (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad') {
+      cantidadARestar = item.cantidad; // Resta directa (ej. 50g = 50 unidades de stock)
+    } else {
+      const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
+      const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
+      cantidadARestar = item.cantidad * equivalencia;
+    }
 
-    if (Number(data.stock) < cantidadEnUnidadBase) {
-      throw new Error(`No hay suficiente stock de "${item.nombre}". Ajusta la cantidad e intenta de nuevo.`);
+    if (Number(data.stock) < cantidadARestar) {
+      throw new Error(`No hay suficiente stock de "${item.nombre}". Ajusta la cantidad.`);
     }
   }
 
-  // Fase 2: descontar de verdad, un producto a la vez
+  // Fase 2: descontar de verdad
   for (const item of itemsCarrito) {
     if (!item.productoId) continue;
-
     const refProducto = doc(db, 'productos', item.productoId);
 
     await runTransaction(db, async (transaction) => {
@@ -361,13 +451,18 @@ async function verificarYDescontarStock(itemsCarrito) {
       if (!snap.exists()) return;
 
       const data = snap.data();
-      if (data.stock === null || data.stock === undefined) return; // ilimitado, no se descuenta
+      if (data.stock === null || data.stock === undefined) return;
 
-      const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
-      const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
-      const cantidadEnUnidadBase = item.cantidad * equivalencia;
+      let cantidadARestar = 0;
+      if (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad') {
+        cantidadARestar = item.cantidad;
+      } else {
+        const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
+        const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
+        cantidadARestar = item.cantidad * equivalencia;
+      }
 
-      const nuevoStock = Math.max(0, Number(data.stock) - cantidadEnUnidadBase);
+      const nuevoStock = Math.max(0, Number(data.stock) - cantidadARestar);
       transaction.update(refProducto, { stock: nuevoStock });
     });
   }
@@ -410,10 +505,9 @@ if (btnEnviarPedido) {
 
     carrito.forEach(item => {
       const subtotal = item.precio * item.cantidad;
-      const esEnvase = item.nombre.toLowerCase().includes('envase');
-      const prefijoCantidad = esEnvase ? `${item.cantidad} und x` : `${item.cantidad}x`;
-
-      mensaje += `*${prefijoCantidad}* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
+      const unidad = item.unidadMedida ? item.unidadMedida : 'und';
+      
+      mensaje += `*${item.cantidad} ${unidad} x* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
     });
 
     const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
