@@ -45,9 +45,8 @@ const tablaBody = document.getElementById('tabla-productos-body');
 // Grupos que se muestran/ocultan según la categoría
 const grupoPresentaciones = document.getElementById('grupo-presentaciones');
 const grupoPrecioGranel = document.getElementById('grupo-precio-granel');
-const unidadGranelTxt = document.getElementById('unidad-granel-txt');
 
-// CAMPOS DE PRECIO A GRANEL (1000g, 500g, 250g, 125g)
+// CAMPOS DE PRECIO A GRANEL (1000, 500, 250, 125)
 const inputPrecio1000 = document.getElementById('precio-1000');
 const inputPrecio500 = document.getElementById('precio-500');
 const inputPrecio250 = document.getElementById('precio-250');
@@ -59,34 +58,33 @@ const STOCK_MINIMO_POR_DEFECTO = 5;
 
 
 // ==========================================================
-// UNIDAD BASE SEGÚN CATEGORÍA
+// UNIDAD BASE Y VERIFICACIÓN DE CATEGORÍA
 // ==========================================================
 
+function esCategoriaGranel(categoria) {
+  const cat = (categoria || '').trim().toLowerCase();
+  // Retorna false si la categoría es envases o envase
+  return cat !== 'envases' && cat !== 'envase';
+}
+
 function obtenerUnidadStock(categoria) {
+  const catLower = (categoria || '').trim().toLowerCase();
   const unidades = {
     polvos: 'g',
     liquidos: 'ml',
     perfumeria: 'ml',
     aromas: 'ml',
     sabores: 'ml',
-    envases: 'unid.'
+    envases: 'unid.',
+    envase: 'unid.'
   };
 
-  return unidades[categoria] || 'unid.';
+  return unidades[catLower] || 'unid.';
 }
 
 
 // ==========================================================
-// ¿ESTA CATEGORÍA VENDE A GRANEL (por gramos/ml) O POR PRESENTACIONES?
-// ==========================================================
-
-function esCategoriaGranel(categoria) {
-  return categoria !== 'envases';
-}
-
-
-// ==========================================================
-// CÁLCULO AUTOMÁTICO EN EL PANEL AL ESCRIBIR EN 1000g
+// CÁLCULO AUTOMÁTICO EN EL PANEL AL ESCRIBIR EN 1000g/ml
 // ==========================================================
 
 if (inputPrecio1000) {
@@ -118,11 +116,13 @@ function actualizarVisibilidadPorCategoria() {
     if (grupoPrecioGranel) grupoPrecioGranel.classList.remove('hidden');
     if (grupoPresentaciones) grupoPresentaciones.classList.add('hidden');
   } else {
+    // Es categoría ENVASE / ENVASES
     if (grupoPrecioGranel) grupoPrecioGranel.classList.add('hidden');
     if (grupoPresentaciones) grupoPresentaciones.classList.remove('hidden');
 
+    // Si no hay filas de precio, crea una por defecto con 'Unidad'
     if (listaPresentaciones && listaPresentaciones.children.length === 0) {
-      crearFilaPresentacion();
+      crearFilaPresentacion('Unidad', '', '1');
     }
   }
 }
@@ -144,7 +144,7 @@ if (prodCategoriaInput) {
 function crearFilaPresentacion(
   nombre = '',
   precio = '',
-  equivalencia = ''
+  equivalencia = '1'
 ) {
   if (!listaPresentaciones) return;
 
@@ -155,14 +155,14 @@ function crearFilaPresentacion(
     <input
       type="text"
       class="presentacion-nombre"
-      placeholder="Ej: 250 g, 500 g, 1 litro"
+      placeholder="Ej: Unidad, Caja x 10, Paquete"
       value="${nombre}"
     >
 
     <input
       type="number"
       class="presentacion-precio"
-      placeholder="Precio"
+      placeholder="Precio ($)"
       min="0"
       value="${precio}"
     >
@@ -171,7 +171,7 @@ function crearFilaPresentacion(
       type="number"
       step="0.001"
       class="presentacion-equivalencia"
-      placeholder="Equivale a"
+      placeholder="Equivale a (unid)"
       min="0"
       value="${equivalencia}"
     >
@@ -179,16 +179,10 @@ function crearFilaPresentacion(
     <button
       type="button"
       class="btn-quitar-presentacion"
+      title="Eliminar opción"
     >
       <i class="fa-solid fa-trash"></i>
     </button>
-
-    <small>
-      Cuánto representa esta presentación de la unidad base.
-      Ej: 500 g = 500 si la base es gramos.
-      Ej: 250 ml = 250 si la base es mililitros.
-      Vacío = 1.
-    </small>
   `;
 
   fila
@@ -392,7 +386,7 @@ function renderizarTabla(productos) {
       <tr class="${claseFila}">
         <td><strong>${p.nombre || ''}</strong></td>
         <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
-        <td style="color:${stockColor}; font-weight:600;">${stockTexto}</td>
+        <td><span style="color:${stockColor}; font-weight:600;">${stockTexto}</span></td>
         <td>${resumenPresentaciones || '—'}</td>
         <td>
           <div class="action-btns">
@@ -472,7 +466,7 @@ if (formProducto) {
       const precio1000 = parseFloat(inputPrecio1000 ? inputPrecio1000.value : 0) || 0;
 
       if (precio1000 <= 0) {
-        mostrarToast('Escribe al menos el precio para 1000 g/ml', 'error');
+        mostrarToast(`Escribe al menos el precio para 1000 ${obtenerUnidadStock(categoria)}`, 'error');
         return;
       }
 
@@ -482,7 +476,7 @@ if (formProducto) {
       presentaciones = obtenerPresentacionesDelFormulario();
 
       if (presentaciones.length === 0) {
-        mostrarToast('Agrega al menos una presentación con su precio', 'error');
+        mostrarToast('Agrega al menos un precio para el envase', 'error');
         return;
       }
     }
@@ -556,11 +550,11 @@ function editarProducto(id) {
     if (listaPresentaciones) listaPresentaciones.innerHTML = '';
 
     presentacionesGuardadas.forEach(p => {
-      crearFilaPresentacion(p.nombre, p.precio, p.equivalencia ?? '');
+      crearFilaPresentacion(p.nombre, p.precio, p.equivalencia ?? '1');
     });
 
     if (presentacionesGuardadas.length === 0) {
-      crearFilaPresentacion();
+      crearFilaPresentacion('Unidad', '', '1');
     }
   }
 
@@ -617,9 +611,9 @@ function limpiarFormulario() {
   if (inputPrecio250) inputPrecio250.value = '';
   if (inputPrecio125) inputPrecio125.value = '';
 
-  actualizarVisibilidadPorCategoria();
-
   if (listaPresentaciones) listaPresentaciones.innerHTML = '';
+
+  actualizarVisibilidadPorCategoria();
 
   if (formTitle) {
     formTitle.innerHTML = `<i class="fa-solid fa-square-plus"></i> Registrar Producto`;
@@ -773,8 +767,7 @@ if (btnDescargarPlantilla) {
       'id_producto,nombre,descripcion,categoria,imagen,stock,stock_minimo,presentacion,equivalencia,precio\n' +
       '1,Alcohol al 96%,Alcohol de alta pureza para limpieza,liquidos,imagenes/alcohol.jpg,5000,500,1000 ml,1000,10000\n' +
       '2,Bicarbonato de Sodio,Polvo multiusos,polvos,imagenes/bicarbonato.jpg,5000,500,1000 g,1000,8000\n' +
-      '3,Envase plástico 500 ml,Envase reutilizable,envases,imagenes/envase.jpg,200,20,250 ml,250,1000\n' +
-      '3,Envase plástico 500 ml,Envase reutilizable,envases,imagenes/envase.jpg,200,20,500 ml,500,1800\n';
+      '3,Envase plástico 500 ml,Envase reutilizable,envases,imagenes/envase.jpg,200,20,Unidad,1,1000\n';
 
     const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);

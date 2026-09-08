@@ -137,8 +137,6 @@
       font-size: 0.85rem;
     }
 
-    .fila-presentacion small { grid-column: 1 / -1; color: #888; font-size: 0.75rem; margin-top: -6px; }
-
     .btn-quitar-presentacion {
       background: #ffebee; color: var(--danger-color);
       border: none; border-radius: 6px;
@@ -208,7 +206,7 @@
     @media (max-width: 600px) {
       header { padding: 12px 16px; }
       .brand { font-size: 1.05rem; max-width: 60vw; }
-      .brand span { display: none; } /* en celular solo se ve el logo Qpc para no chocar con el resto */
+      .brand span { display: none; }
 
       main { margin: 16px auto; padding: 0 12px; }
 
@@ -317,6 +315,7 @@
               <option value="liquidos">Líquidos</option>
               <option value="perfumeria">Perfumería</option>
               <option value="envases">Envases</option>
+              <option value="sabores">Sabores</option>
             </select>
           </div>
 
@@ -325,49 +324,59 @@
             <input type="text" id="prod-imagen" placeholder="imagenes/producto.jpg o link de internet">
           </div>
 
+          <!-- BLOQUE DE PRECIOS A GRANEL -->
+          <div id="grupo-precio-granel" class="form-group">
+            <label><strong>Precios por cantidad (Gramos / Mililitros):</strong></label>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+              <div>
+                <label for="precio-1000">1000 <span class="unidad-granel-txt">g</span>:</label>
+                <input type="number" id="precio-1000" placeholder="Ej: 68000">
+              </div>
+
+              <div>
+                <label for="precio-500">500 <span class="unidad-granel-txt">g</span>:</label>
+                <input type="number" id="precio-500" placeholder="Ej: 34000">
+              </div>
+
+              <div>
+                <label for="precio-250">250 <span class="unidad-granel-txt">g</span>:</label>
+                <input type="number" id="precio-250" placeholder="Ej: 17000">
+              </div>
+
+              <div>
+                <label for="precio-125">125 <span class="unidad-granel-txt">g</span>:</label>
+                <input type="number" id="precio-125" placeholder="Ej: 8500">
+              </div>
+            </div>
+
+            <small style="display: block; margin-top: 8px; color: #666;">
+              Al digitar el precio de 1000 <span class="unidad-granel-txt">g</span> los demás se calcularán automáticamente, pero puedes ajustar cada valor manualmente si lo deseas.
+            </small>
+          </div>
+
+          <!-- BLOQUE DE PRECIO UNITARIO / ENVASES (AHORA INDEPENDIENTE) -->
+          <div id="grupo-presentaciones" class="form-group hidden">
+            <label><strong>Precio Unitario / Presentaciones:</strong></label>
+            <div id="lista-presentaciones"></div>
+            <button type="button" id="btn-agregar-presentacion" class="btn-sm">
+              + Agregar otra presentación
+            </button>
+          </div>
+
           <div class="form-group">
             <label for="prod-stock">
-              <i class="fa-solid fa-cubes"></i> Stock total (<span id="unidad-stock-txt">kg</span>) — vacío = ilimitado:
+              <i class="fa-solid fa-cubes"></i> Stock total (<span id="unidad-stock-txt">unid.</span>) — vacío = ilimitado:
             </label>
             <input type="number" id="prod-stock" step="0.01" min="0" placeholder="Ej: 50">
           </div>
 
           <div class="form-group">
             <label for="prod-stock-minimo">
-              <i class="fa-solid fa-triangle-exclamation"></i> Stock mínimo de alerta (<span id="unidad-stock-minimo-txt">kg</span>) — opcional:
+              <i class="fa-solid fa-triangle-exclamation"></i> Stock mínimo de alerta (<span id="unidad-stock-minimo-txt">unid.</span>) — opcional:
             </label>
             <input type="number" id="prod-stock-minimo" step="0.01" min="0" placeholder="Ej: 5 (si no lo llenas, se usa 5 por defecto)">
           </div>
-
-          <div id="grupo-precio-granel" class="form-group">
-  <label><strong>Precios por cantidad a granel:</strong></label>
-  
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
-    <div>
-      <label for="precio-1000">1000 <span class="unidad-granel-txt">g</span>:</label>
-      <input type="number" id="precio-1000" placeholder="Ej: 68000">
-    </div>
-
-    <div>
-      <label for="precio-500">500 <span class="unidad-granel-txt">g</span>:</label>
-      <input type="number" id="precio-500" placeholder="Ej: 34000">
-    </div>
-
-    <div>
-      <label for="precio-250">250 <span class="unidad-granel-txt">g</span>:</label>
-      <input type="number" id="precio-250" placeholder="Ej: 17000">
-    </div>
-
-    <div>
-      <label for="precio-125">125 <span class="unidad-granel-txt">g</span>:</label>
-      <input type="number" id="precio-125" placeholder="Ej: 8500">
-    </div>
-  </div>
-
-  <small style="display: block; margin-top: 8px; color: #666;">
-    Al digitar el precio de 1000 <span class="unidad-granel-txt">g</span> los demás se calcularán automáticamente, pero puedes ajustar cada valor manualmente si lo deseas.
-  </small>
-</div>
 
           <button type="submit" class="btn-primary" id="btn-guardar-prod">
             <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
