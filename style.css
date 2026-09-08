@@ -916,3 +916,19 @@ section h2 {
     gap: 25px;
   }
 }
+
+/* ==========================================================
+   DESACTIVAR ZOOM AUTOMÁTICO Y DESBORDAMIENTO EN MOVILES
+   ========================================================== */
+.control-cantidad .cantidad,
+.producto input,
+.producto select {
+  font-size: 16px !important; /* Tamaño mínimo para evitar que el celular haga zoom al escribir */
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.control-cantidad {
+  width: 100%;
+  max-width: 100%;
+}
