@@ -44,6 +44,11 @@ body {
   min-height: 100vh;
 }
 
+/* Clases de Utilidad */
+.hidden, .oculto {
+  display: none !important;
+}
+
 /* ==========================================================
    2. PÁGINA DE INICIO / HERO
    ========================================================== */
@@ -293,34 +298,51 @@ section h2 {
 }
 
 /* ==========================================================
-   5. TARJETAS DE PRODUCTO (DISEÑO PERFECTO Y ALINEADO)
+   5. TARJETAS DE PRODUCTO (DISEÑO Y ALINEACIÓN) — MEJORADO
    ========================================================== */
 .productos {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Fuerza 4 columnas por fila */
-  gap: 15px; /* Reduce ligeramente el espacio entre tarjetas */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
   align-items: stretch;
 }
+
 .producto {
   background-color: var(--color-bg-card);
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 14px;
+  padding: 14px;
   border: 1px solid var(--border-dark);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 20px rgba(0,0,0,0.04);
   animation: fadeInUp 0.5s ease forwards;
   opacity: 0;
   display: flex;
   flex-direction: column;
   height: 100%;
   box-sizing: border-box;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Franja superior sutil de acento, aparece al hacer hover */
+.producto::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .producto:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  transform: translateY(-8px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06), 0 20px 30px rgba(0, 51, 153, 0.12);
+  border-color: rgba(0, 51, 153, 0.25);
 }
+
+.producto:hover::before { opacity: 1; }
 
 .producto.oculto { display: none; }
 
@@ -331,19 +353,20 @@ section h2 {
 .producto:nth-child(5) { animation-delay: 0.25s; }
 .producto:nth-child(6) { animation-delay: 0.3s; }
 
-/* Wrapper de la Imagen & Badges */
+/* Wrapper de Imagen & Badges */
 .producto-imagen-wrap {
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #f4f7f9 0%, #eef2f5 100%);
 }
 
 .producto-img {
   width: 100%;
-  height: 140px;
+  height: 100px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
   background-color: #f0f0f0;
   transition: transform 0.3s ease;
   display: block;
@@ -357,63 +380,71 @@ section h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
+  font-size: 30px;
   color: #b0bec5;
-  border: 1px dashed var(--border-dark);
-  height: 140px;
-  border-radius: 8px;
+  border: none;
+  height: 100px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f4f7f9 0%, #eef2f5 100%);
 }
 
 .badge-categoria {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  padding: 4px 10px;
+  top: 10px;
+  left: 10px;
+  padding: 5px 12px;
   border-radius: 20px;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: capitalize;
+  letter-spacing: 0.3px;
   z-index: 2;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  backdrop-filter: blur(2px);
 }
 
- .badge-polvos { background: #fff7ed; color: #c2410c; }
- .badge-liquidos { background: #eff6ff; color: #1d4ed8; }
- .badge-perfumeria { background: #f5f3ff; color: #6d28d9; }
- .badge-aromas { background: #fefce8; color: #a16207; }
- .badge-sabores { background: #fff1f2; color: #be123c; }
- .badge-envases { background: #f0fdf4; color: #15803d; }
+.badge-polvos { background: #fff7ed; color: #c2410c; }
+.badge-liquidos { background: #eff6ff; color: #1d4ed8; }
+.badge-perfumeria { background: #f5f3ff; color: #6d28d9; }
+.badge-aromas { background: #fefce8; color: #a16207; }
+.badge-sabores { background: #fff1f2; color: #be123c; }
+.badge-envases, .badge-envase { background: #f0fdf4; color: #15803d; }
 
-/* Título de la tarjeta */
+/* Título y Descripción */
 .producto h3 { 
   color: var(--color-primary); 
-  margin-bottom: 8px; 
-  font-size: 1.1rem;
+  margin-bottom: 4px; 
+  font-size: 1rem;
   font-weight: 700;
-  min-height: 2.8em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Descripción */
 .producto p {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
-  flex: 1 1 auto;
-  margin-bottom: 12px;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Caja gris de Subtotal dinamico */
+/* Subtotal Dinámico — punto focal de la tarjeta */
 .info-precio-dinamico {
-  background-color: var(--color-bg-input);
+  background: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
   border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 10px;
+  padding: 6px 12px;
   margin-top: auto;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   text-align: center;
-  min-height: 60px;
+  min-height: 44px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -421,15 +452,17 @@ section h2 {
 
 .precio-unitario {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.2px;
   color: var(--color-text-muted);
 }
 
 .precio-total-dinamico {
-  font-size: 1.1rem !important;
+  font-size: 1.3rem !important;
   color: var(--color-primary) !important;
   margin-top: 2px !important;
-  font-weight: bold;
+  font-weight: 800;
+  letter-spacing: -0.3px;
 }
 
 .precio {
@@ -440,66 +473,118 @@ section h2 {
   color: var(--color-primary);
 }
 
-/* Controles de cantidad e Insumos */
+/* Controles de cantidad */
 .control-cantidad {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  max-width: 100%;
 }
 
 .label-cantidad-exacta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-basis: 100%;
   text-align: center;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  margin-bottom: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #94a3b8;
+  margin-top: 8px;
+  margin-bottom: 6px;
+}
+
+/* Líneas decorativas a los lados del texto */
+.label-cantidad-exacta::before,
+.label-cantidad-exacta::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #e2e8f0;
 }
 
 .control-cantidad .cantidad {
-  width: 60px;
-  padding: 6px;
-  border: 1px solid var(--border-input);
+  width: 84px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border-input);
   border-radius: 8px;
   text-align: center;
-  border-color:var(--color-primary);
+  background-color: var(--color-bg-input);
+  color: var(--color-text-main);
   font-weight: 700;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.control-cantidad .cantidad:hover {
+  border-color: var(--color-primary);
+}
+
+.control-cantidad .cantidad:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 51, 153, 0.12);
+}
+
+/* Quita las flechitas del input number en algunos navegadores para un look más limpio */
+.control-cantidad .cantidad::-webkit-outer-spin-button,
+.control-cantidad .cantidad::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.control-cantidad .cantidad[type="number"] {
+  -moz-appearance: textfield;
 }
 
 .btn-agregar-carrito, #btn-enviar-pedido {
   background-color: var(--color-primary);
   color: #ffffff;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 9px 14px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.2s;
+  font-size: 0.88rem;
+  letter-spacing: 0.2px;
+  box-shadow: 0 4px 10px rgba(0, 51, 153, 0.18);
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 
-.btn-agregar-carrito:hover, #btn-enviar-pedido:hover {
+.btn-agregar-carrito:hover:not(:disabled), #btn-enviar-pedido:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
+  box-shadow: 0 6px 14px rgba(0, 51, 153, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn-agregar-carrito:active:not(:disabled), #btn-enviar-pedido:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn-agregar-carrito:disabled {
   background-color: #b0bec5;
   color: #eceff1;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .producto select.presentacion,
 .producto select.talla {
   width: 100%;
   padding: 8px 32px 8px 12px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--color-text-main);
   background-color: var(--color-bg-input);
   border: 1px solid var(--border-input);
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  margin: 8px 0 12px 0;
+  margin: 6px 0 8px 0;
   appearance: none;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23003399' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
   background-repeat: no-repeat;
@@ -516,6 +601,46 @@ section h2 {
   color: #c62828;
   font-weight: bold;
   font-size: 0.95rem;
+}
+
+/* Contenedor de botones predefinidos */
+.contenedor-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+  justify-content: center;
+}
+
+/* Estilo base de los botones de presets */
+.btn-preset {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-preset:hover:not(:disabled) {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+/* Estado cuando un botón está seleccionado */
+.btn-preset.activo {
+  background-color: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 2px 5px rgba(2, 132, 199, 0.3);
+}
+
+.btn-preset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ==========================================================
@@ -773,7 +898,170 @@ section h2 {
 .modal-zoom img { max-width: 90%; max-height: 90%; object-fit: contain; }
 
 /* ==========================================================
-   7. FOOTER
+   7. PANEL DE ADMINISTRACIÓN & NOTIFICACIONES (ADMIN.JS)
+   ========================================================== */
+/* Contenedor de Notificaciones Toast */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeInUp 0.3s ease;
+}
+
+.toast.exito { background-color: #2e7d32; }
+.toast.error { background-color: var(--color-danger); }
+
+/* Filas de la Tabla por Estado de Stock */
+.fila-agotado { background-color: #ffebee !important; }
+.fila-stock-bajo { background-color: #fffde7 !important; }
+
+/* Badges de Categoría en Admin */
+.badge-cat {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.badge-cat.cat-polvos { background: #fff7ed; color: #c2410c; }
+.badge-cat.cat-liquidos { background: #eff6ff; color: #1d4ed8; }
+.badge-cat.cat-perfumeria { background: #f5f3ff; color: #6d28d9; }
+.badge-cat.cat-aromas { background: #fefce8; color: #a16207; }
+.badge-cat.cat-sabores { background: #fff1f2; color: #be123c; }
+.badge-cat.cat-envases, .badge-cat.cat-envase { background: #f0fdf4; color: #15803d; }
+
+/* Botones de Acción en Tabla */
+.action-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-sm:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-edit { background-color: var(--color-primary); color: #fff; }
+.btn-stock { background-color: #0284c7; color: #fff; }
+.btn-delete { background-color: var(--color-danger); color: #fff; }
+
+/* Filas de Presentaciones Dinámicas */
+.fila-presentacion {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.fila-presentacion input {
+  padding: 8px 10px;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.btn-quitar-presentacion {
+  background: var(--color-danger);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ==========================================================
+   8. ESTRUCTURA DE TABLA & FORMATO DE DATOS
+   ========================================================== */
+.num-producto {
+  color: #888;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.tabla-productos, table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+table td, table th {
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+table th:nth-child(1) { width: 25%; } /* Producto */
+table th:nth-child(2) { width: 12%; } /* Categoría */
+table th:nth-child(3) { width: 13%; } /* Stock */
+table th:nth-child(4) { width: 32%; } /* Presentaciones */
+table th:nth-child(5) { width: 18%; } /* Acciones */
+
+.presentaciones-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.tag-precio {
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.contenedor-presentaciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.chip-precio {
+  background-color: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.chip-precio b { color: #0f172a; }
+
+/* ==========================================================
+   9. FOOTER
    ========================================================== */
 .footer {
   background-color: #002266;
@@ -833,7 +1121,7 @@ section h2 {
 }
 
 /* ==========================================================
-   8. ANIMACIONES
+   10. ANIMACIONES
    ========================================================== */
 @keyframes fadeInUp {
   from {
@@ -847,7 +1135,7 @@ section h2 {
 }
 
 /* ==========================================================
-   9. MEDIA QUERIES (ADAPTACIONES RESPONSIVAS LIMPIAS)
+   11. MEDIA QUERIES (RESPONSIVIDAD Y OPTIMIZACIONES)
    ========================================================== */
 
 /* Ajustes para pantalla mediana/alta */
@@ -860,10 +1148,11 @@ section h2 {
 @media (max-width: 1024px) {
   .productos {
     grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
   }
 }
 
-/* Tablets (2 columnas y ajustes de navegación) */
+/* Tablets */
 @media (max-width: 768px) {
   section { padding: 30px 15px; }
   .header { padding: 12px 15px; text-align: center; justify-content: center; }
@@ -871,6 +1160,7 @@ section h2 {
 
   .productos {
     grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 
   .btn-carrito-flotante {
@@ -888,7 +1178,7 @@ section h2 {
   .info-card:nth-child(3) { grid-column: span 1; }
 }
 
-/* Teléfonos móviles (1 columna y controles ajustados) */
+/* Teléfonos móviles */
 @media (max-width: 480px) {
   .productos {
     grid-template-columns: 1fr;
@@ -916,90 +1206,15 @@ section h2 {
   }
 }
 
-.num-producto {
-  color: #888;
-  font-weight: 600;
-  margin-right: 4px;
-}
-
-/* 1. Forzar a la tabla a mantener anchos fijos de columna */
-.tabla-productos, table {
-  table-layout: fixed;
-  width: 100%;
-}
-
-/* 2. Centrar verticalmente todos los elementos de la tabla */
-table td, table th {
-  vertical-align: middle;
-  word-wrap: break-word;
-}
-
-/* 3. Definir el ancho porcentual exacto de cada columna */
-table th:nth-child(1) { width: 25%; } /* Producto */
-table th:nth-child(2) { width: 12%; } /* Categoría */
-table th:nth-child(3) { width: 13%; } /* Stock */
-table th:nth-child(4) { width: 32%; } /* Presentaciones */
-table th:nth-child(5) { width: 18%; } /* Acciones */
-
-/* 4. Mostrar presentaciones en horizontal (chips) para ahorrar espacio vertical */
-.presentaciones-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.tag-precio {
-  background-color: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #334155;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-/* Contenedor que acomoda las etiquetas dinámicamente */
-.contenedor-presentaciones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
-
-/* Tarjeta individual para cada presentación */
-.chip-precio {
-  background-color: #f8fafc;
-  color: #334155;
-  border: 1px solid #cbd5e1;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  white-space: nowrap;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-}
-
-.chip-precio b {
-  color: #0f172a;
-}
-
-/* ==========================================================
-   DESACTIVAR ZOOM AUTOMÁTICO Y DESBORDAMIENTO EN MOVILES
-   ========================================================== */
+/* Desactivar zoom automático en campos al hacer focus en dispositivos móviles */
 .control-cantidad .cantidad,
 .producto input,
 .producto select {
-  font-size: 16px !important; /* Tamaño mínimo para evitar que el celular haga zoom al escribir */
+  font-size: 16px !important;
   max-width: 100%;
   box-sizing: border-box;
 }
 
-.control-cantidad {
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Previene el zoom automático al enfocar campos en móviles */
 @media screen and (max-width: 768px) {
   input[type="text"],
   input[type="number"],

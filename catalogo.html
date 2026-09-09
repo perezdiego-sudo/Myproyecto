@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quimiaseo y perfumeria del caribe - Catálogo</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quimiaseo y Perfumería del Caribe - Catálogo</title>
+  
+  <!-- Tipografía Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Hoja de estilos -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- ENCABEZADO -->
   <header class="header">
     <a href="index.html" class="logo">
       <div class="logo-circulo-header">Qpc</div>
       <span>QUIMIASEO Y PERFUMERIA DEL CARIBE</span>
-      </a>
-
+    </a>
   </header>
 
+  <!-- SECCIÓN CATÁLOGO -->
   <section id="catalogo" class="catalogo">
     <h2>Nuestro Catálogo</h2>
 
+    <!-- Filtros por categoría -->
     <div class="filtros">
       <button class="btn-filtro activo" data-categoria="todos">Todos</button>
       <button class="btn-filtro" data-categoria="envases">Envases Plásticos</button>
@@ -32,54 +38,62 @@
       <button class="btn-filtro" data-categoria="polvos">Polvos</button>
     </div>
 
+    <!-- Contenedor dinámico de productos -->
     <div class="productos" id="productos-container">
       <p style="color:#ccc; text-align:center;">Cargando productos...</p>
     </div>
 
     <!-- Botón flotante del carrito para celular -->
-    <button id="btn-abrir-carrito" class="btn-carrito-flotante">
+    <button id="btn-abrir-carrito" class="btn-carrito-flotante" aria-label="Abrir carrito">
       🛒 <span id="contador-carrito">0</span>
     </button>
-
   </section>
 
-<!-- Modal del Carrito -->
-<div id="modal-carrito" class="modal-carrito oculto-modal">
-  <div class="modal-contenido">
+  <!-- MODAL DEL CARRITO -->
+  <div id="modal-carrito" class="modal-carrito oculto-modal">
+    <div class="modal-contenido">
 
-    <div class="modal-header">
-      <h2>Tu Carrito</h2>
-      <div class="modal-header-acciones">
-        <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
-        <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
+      <div class="modal-header">
+        <h2>Tu Carrito</h2>
+        <div class="modal-header-acciones">
+          <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
+          <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
+        </div>
       </div>
-    </div>
 
-    <div class="modal-body">
-      <ul id="lista-carrito"></ul>
+      <div class="modal-body">
+        <ul id="lista-carrito"></ul>
 
-      <div class="opcion-domicilio">
-        <p class="titulo-domicilio">¿Requiere domicilio?</p>
+        <!-- Opciones de envío/domicilio -->
+        <div class="opcion-domicilio">
+          <p class="titulo-domicilio">¿Requiere domicilio?</p>
 
-        <div class="radio-group">
-          <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
-          <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+          <div class="radio-group">
+            <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
+            <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+          </div>
+
+          <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa (Ej: Calle 20 #15-30)">
         </div>
 
-        <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa (Ej: Calle 20 #15-30)">
+        <!-- Resumen del total -->
+        <div class="resumen-precios">
+          <p id="subtotal-carrito">Subtotal: $0</p>
+          <p id="total-carrito" class="total-resaltado">Total: $0</p>
+        </div>
+
+        <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
       </div>
 
-      <div class="resumen-precios">
-        <p id="subtotal-carrito">Subtotal: $0</p>
-        <p id="total-carrito" class="total-resaltado">Total: $0</p>
-      </div>
-
-      <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
     </div>
-
   </div>
-</div>
 
+  <!-- MODAL ZOOM DE IMAGEN -->
+  <div id="modal-zoom" class="modal-zoom oculto-modal">
+    <img id="zoom-imagen-actual" src="" alt="Imagen ampliada">
+  </div>
+
+  <!-- PIE DE PÁGINA -->
   <footer class="footer">
     <div class="footer-contenido">
       <div class="footer-columna">
@@ -102,10 +116,7 @@
     </div>
   </footer>
 
-  <div id="modal-zoom" class="modal-zoom oculto-modal">
-    <img id="zoom-imagen-actual" src="" alt="Imagen ampliada">
-  </div>
-
+  <!-- Script principal JS -->
   <script type="module" src="script.js"></script>
 </body>
 </html>

@@ -15,6 +15,7 @@ const contadorCarrito = document.getElementById('contador-carrito');
 const inputDireccion = document.getElementById('input-direccion');
 const radiosEnvio = document.querySelectorAll('input[name="tipoEnvio"]');
 const listaCarrito = document.getElementById('lista-carrito');
+const subtotalCarrito = document.getElementById('subtotal-carrito');
 const totalCarrito = document.getElementById('total-carrito');
 const btnEnviarPedido = document.getElementById('btn-enviar-pedido');
 
@@ -52,8 +53,7 @@ async function cargarProductos() {
       const stockTotal = (producto.stock === null || producto.stock === undefined) ? null : Number(producto.stock);
       div.dataset.stock = stockTotal === null ? '' : stockTotal;
 
-      let selectorHTML = '';
-      let inputHTML = '';
+      let cuerpoTarjetaHTML = '';
       const agotado = stockTotal !== null && stockTotal <= 0;
 
       const esGranelPorCategoria = producto.categoria !== 'envases';
@@ -66,7 +66,6 @@ async function cargarProductos() {
         const precioMil = pres1000 ? Number(pres1000.precio) : (Number(producto.precio_base) * 1000 || 0);
         const minCantidad = Number(producto.cantidad_minima) || 125;
 
-        // Buscar si existe un precio fijo para la cantidad inicial (ej: 125g -> $4.000)
         const presMin = presentaciones.find(p => Number(p.equivalencia) === minCantidad);
         const subtotalInicial = presMin ? Number(presMin.precio) : Math.round((minCantidad / 1000) * precioMil);
 
@@ -75,17 +74,37 @@ async function cargarProductos() {
         div.dataset.unidadMedida = unidadGranel;
         div.dataset.presentaciones = JSON.stringify(presentaciones);
 
-        selectorHTML = `
-          <div class="info-precio-dinamico">
-            <span class="precio-unitario">1000 ${unidadGranel}: $${precioMil.toLocaleString('es-CO')}</span>
-            <div class="precio-total-dinamico" style="font-weight:bold; margin-top:5px; color:#2c3e50;">
-              Subtotal: $${subtotalInicial.toLocaleString('es-CO')}
-            </div>
-          </div>`;
+        const opcionesPreset = [1000, 500, 250, 125].filter(val => val >= minCantidad);
+        const botonesPresetsHTML = opcionesPreset.map(val => `
+          <button type="button" class="btn-preset ${val === minCantidad ? 'activo' : ''}" data-valor="${val}" ${agotado ? 'disabled' : ''}>
+            ${val}${unidadGranel}
+          </button>
+        `).join('');
 
-        inputHTML = `
-          <label class="label-cantidad-exacta">¿Cuántos ${unidadGranel} necesitas?</label>
-          <input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" placeholder="Ej: 125" ${agotado ? 'disabled' : ''}>`;
+        cuerpoTarjetaHTML = `
+          <div class="precio-referencia">
+            <span>Precio base: <strong>1000 ${unidadGranel} = $${precioMil.toLocaleString('es-CO')}</strong></span>
+          </div>
+
+          <div class="seccion-seleccion-granel">
+            <label class="label-seccion">Selecciona la cantidad:</label>
+            <div class="contenedor-presets">
+              ${botonesPresetsHTML}
+            </div>
+            
+            <div class="input-custom-group">
+              <label for="cant-${docSnap.id}">O escribe otra cantidad (${unidadGranel}):</label>
+              <input type="number" id="cant-${docSnap.id}" class="cantidad" value="${minCantidad}" min="1" step="1" placeholder="Ej: 100" ${agotado ? 'disabled' : ''}>
+            </div>
+          </div>
+
+          <div class="subtotal-card-box">
+            <span class="subtotal-label">Subtotal a pagar</span>
+            <div class="precio-total-dinamico">$${subtotalInicial.toLocaleString('es-CO')}</div>
+          </div>
+
+          <button class="btn-agregar-carrito" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Agregar al carrito'}</button>
+        `;
 
       } else if (esNuevoModelo) {
         const precioNum = Number(producto.precio_base) || 0;
@@ -95,32 +114,79 @@ async function cargarProductos() {
         div.dataset.precio = precioNum;
         div.dataset.unidadMedida = 'und';
 
-        selectorHTML = `<span class="precio">$${precioNum.toLocaleString('es-CO')}</span>`;
-        inputHTML = `<input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" ${agotado ? 'disabled' : ''}>`;
+        cuerpoTarjetaHTML = `
+          <div class="precio-referencia">
+            <span>Precio unitario: <strong>$${precioNum.toLocaleString('es-CO')}</strong></span>
+          </div>
+
+          <div class="input-custom-group margin-v">
+            <label>Cantidad (Unidades):</label>
+            <input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" ${agotado ? 'disabled' : ''}>
+          </div>
+
+          <div class="subtotal-card-box">
+            <span class="subtotal-label">Subtotal a pagar</span>
+            <div class="precio-total-dinamico">$${(precioNum * minCantidad).toLocaleString('es-CO')}</div>
+          </div>
+
+          <button class="btn-agregar-carrito" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Agregar al carrito'}</button>
+        `;
 
       } else {
-        // LÓGICA LEGACY
         const presentaciones = producto.presentaciones || [];
         if (presentaciones.length === 1 && presentaciones[0].nombre === 'Unidad') {
           const precioNum = Number(presentaciones[0].precio) || 0;
           div.dataset.precio = precioNum;
           div.dataset.equivalencia = Number(presentaciones[0].equivalencia) || 1;
-          selectorHTML = `<span class="precio">$${precioNum.toLocaleString('es-CO')}</span>`;
-        } else if (presentaciones.length > 0) {
+
+          cuerpoTarjetaHTML = `
+            <div class="precio-referencia">
+              <span>Precio: <strong>$${precioNum.toLocaleString('es-CO')}</strong></span>
+            </div>
+
+            <div class="input-custom-group margin-v">
+              <label>Cantidad:</label>
+              <input type="number" class="cantidad" value="1" min="1" ${agotado ? 'disabled' : ''}>
+            </div>
+
+            <div class="subtotal-card-box">
+              <span class="subtotal-label">Subtotal a pagar</span>
+              <div class="precio-total-dinamico">$${precioNum.toLocaleString('es-CO')}</div>
+            </div>
+
+            <button class="btn-agregar-carrito" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Agregar al carrito'}</button>
+          `;
+        } else {
           const opciones = presentaciones.map((p, i) => {
             const seleccionada = i === presentaciones.length - 1 ? 'selected' : '';
             const precioNum = Number(p.precio) || 0;
             const equivalencia = Number(p.equivalencia) || 1;
-            let sufijo = '';
-            if (stockTotal !== null) {
-              const disp = Math.floor(stockTotal / equivalencia);
-              sufijo = ` (${disp} disp.)`;
-            }
+            let sufijo = stockTotal !== null ? ` (${Math.floor(stockTotal / equivalencia)} disp.)` : '';
             return `<option value="${p.nombre}" data-precio="${precioNum}" data-equivalencia="${equivalencia}" ${seleccionada}>${p.nombre} - $${precioNum.toLocaleString('es-CO')}${sufijo}</option>`;
           }).join('');
-          selectorHTML = `<select class="presentacion">${opciones}</select>`;
+
+          const ultimaPres = presentaciones[presentaciones.length - 1];
+          const precioInicial = Number(ultimaPres?.precio) || 0;
+
+          cuerpoTarjetaHTML = `
+            <div class="input-custom-group margin-v">
+              <label>Presentación:</label>
+              <select class="presentacion select-estilizado">${opciones}</select>
+            </div>
+
+            <div class="input-custom-group margin-v">
+              <label>Cantidad:</label>
+              <input type="number" class="cantidad" value="1" min="1" ${agotado ? 'disabled' : ''}>
+            </div>
+
+            <div class="subtotal-card-box">
+              <span class="subtotal-label">Subtotal a pagar</span>
+              <div class="precio-total-dinamico">$${precioInicial.toLocaleString('es-CO')}</div>
+            </div>
+
+            <button class="btn-agregar-carrito" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Agregar al carrito'}</button>
+          `;
         }
-        inputHTML = `<input type="number" class="cantidad" value="1" min="1" ${agotado ? 'disabled' : ''}>`;
       }
 
       div.innerHTML = `
@@ -132,12 +198,8 @@ async function cargarProductos() {
             : `<div class="producto-img producto-img-placeholder">📦</div>`}
         </div>
         <h3>${producto.nombre || ''}</h3>
-        <p>${producto.descripcion || ''}</p>
-        ${selectorHTML}
-        <div class="control-cantidad">
-          ${inputHTML}
-          <button class="btn-agregar-carrito" ${agotado ? 'disabled' : ''}>${agotado ? 'Agotado' : 'Agregar al carrito'}</button>
-        </div>
+        <p class="producto-descripcion">${producto.descripcion || ''}</p>
+        ${cuerpoTarjetaHTML}
       `;
 
       if (agotado) div.classList.add('agotado');
@@ -181,21 +243,16 @@ botonesFiltro.forEach(boton => {
 // ==========================================================
 
 if (btnAbrirCarrito) {
-  btnAbrirCarrito.addEventListener('click', () => {
-    modalCarrito.classList.remove('oculto-modal');
-  });
+  btnAbrirCarrito.addEventListener('click', () => modalCarrito.classList.remove('oculto-modal'));
 }
 
 if (btnCerrarCarrito) {
-  btnCerrarCarrito.addEventListener('click', () => {
-    modalCarrito.classList.add('oculto-modal');
-  });
+  btnCerrarCarrito.addEventListener('click', () => modalCarrito.classList.add('oculto-modal'));
 }
 
 if (btnVaciarCarrito) {
   btnVaciarCarrito.addEventListener('click', () => {
     if (carrito.length === 0) return;
-
     if (confirm('¿Estás seguro de que deseas vaciar todo el carrito?')) {
       carrito = [];
       actualizarCarrito();
@@ -205,9 +262,7 @@ if (btnVaciarCarrito) {
 
 if (modalCarrito) {
   modalCarrito.addEventListener('click', (e) => {
-    if (e.target === modalCarrito) {
-      modalCarrito.classList.add('oculto-modal');
-    }
+    if (e.target === modalCarrito) modalCarrito.classList.add('oculto-modal');
   });
 }
 
@@ -222,11 +277,13 @@ radiosEnvio.forEach(radio => {
 });
 
 // ==========================================================
-// LÍMITE DE CANTIDAD SEGÚN STOCK DISPONIBLE
+// LÍMITE DE CANTIDAD Y ACTUALIZACIÓN DINÁMICA
 // ==========================================================
 
 function actualizarMaxCantidad(productoDiv) {
   const inputCantidad = productoDiv.querySelector('.cantidad');
+  if (!inputCantidad) return;
+
   const stockTotalTxt = productoDiv.dataset.stock;
 
   if (stockTotalTxt === '' || stockTotalTxt === undefined) {
@@ -240,8 +297,8 @@ function actualizarMaxCantidad(productoDiv) {
   if (productoDiv.dataset.tipoVenta === 'granel' || productoDiv.dataset.tipoVenta === 'unidad') {
     maxUnidades = stockTotal;
   } else {
-    const select = productoDiv.querySelector('.presentacion, .talla');
-    const equivalencia = select ? Number(select.options[select.selectedIndex].dataset.equivalencia) || 1 : Number(productoDiv.dataset.equivalencia) || 1;
+    const select = productoDiv.querySelector('.presentacion');
+    const equivalencia = select ? Number(select.options[select.selectedIndex]?.dataset.equivalencia) || 1 : Number(productoDiv.dataset.equivalencia) || 1;
     maxUnidades = Math.floor(stockTotal / equivalencia);
   }
 
@@ -252,43 +309,84 @@ function actualizarMaxCantidad(productoDiv) {
   }
 }
 
+function recalcularSubtotalTarjeta(productoDiv) {
+  const precioTotalDinamico = productoDiv.querySelector('.precio-total-dinamico');
+  const inputCant = productoDiv.querySelector('.cantidad');
+  if (!precioTotalDinamico || !inputCant) return;
+
+  const cant = Math.max(0, parseInt(inputCant.value) || 0);
+
+  if (productoDiv.dataset.tipoVenta === 'granel') {
+    const precioMil = Number(productoDiv.dataset.precioMil) || 0;
+    let presentaciones = [];
+
+    try {
+      presentaciones = JSON.parse(productoDiv.dataset.presentaciones || '[]');
+    } catch (e) {}
+
+    const presExacta = presentaciones.find(p => Number(p.equivalencia) === cant);
+    let subtotal = presExacta ? Number(presExacta.precio) : Math.round((cant / 1000) * precioMil);
+    precioTotalDinamico.textContent = `$${subtotal.toLocaleString('es-CO')}`;
+
+  } else {
+    const selectPresentacion = productoDiv.querySelector('.presentacion');
+    let precioUnitario = selectPresentacion
+      ? Number(selectPresentacion.options[selectPresentacion.selectedIndex]?.dataset.precio) || 0
+      : Number(productoDiv.dataset.precio) || 0;
+
+    const subtotal = Math.round(precioUnitario * cant);
+    precioTotalDinamico.textContent = `$${subtotal.toLocaleString('es-CO')}`;
+  }
+}
+
 // ==========================================================
-// EVENTOS QUE DEPENDEN DE LOS PRODUCTOS
+// EVENTOS DE BOTONES Y CAMPO DE TEXTO
 // ==========================================================
 
 function inicializarEventosProductos() {
   document.querySelectorAll('.producto').forEach(productoDiv => {
     actualizarMaxCantidad(productoDiv);
 
-    const select = productoDiv.querySelector('.presentacion, .talla');
+    const select = productoDiv.querySelector('.presentacion');
     if (select) {
-      select.addEventListener('change', () => actualizarMaxCantidad(productoDiv));
+      select.addEventListener('change', () => {
+        actualizarMaxCantidad(productoDiv);
+        recalcularSubtotalTarjeta(productoDiv);
+      });
     }
 
-    // Efecto visual de calculadora para ventas a granel
     const inputCant = productoDiv.querySelector('.cantidad');
-    const precioTotalDinamico = productoDiv.querySelector('.precio-total-dinamico');
+    const botonesPreset = productoDiv.querySelectorAll('.btn-preset');
 
-    if (precioTotalDinamico && inputCant) {
+    if (botonesPreset.length > 0 && inputCant) {
+      botonesPreset.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const valor = btn.dataset.valor;
+          inputCant.value = valor;
+
+          botonesPreset.forEach(b => b.classList.remove('activo'));
+          btn.classList.add('activo');
+
+          recalcularSubtotalTarjeta(productoDiv);
+        });
+      });
+    }
+
+    if (inputCant) {
       inputCant.addEventListener('input', () => {
-        const cant = parseInt(inputCant.value) || 0;
-        const precioMil = Number(productoDiv.dataset.precioMil) || 0;
-        let presentaciones = [];
+        const valIngresado = Number(inputCant.value);
 
-        try {
-          presentaciones = JSON.parse(productoDiv.dataset.presentaciones || '[]');
-        } catch (e) {}
-
-        const presExacta = presentaciones.find(p => Number(p.equivalencia) === cant);
-        let subtotal = 0;
-
-        if (presExacta) {
-          subtotal = Number(presExacta.precio);
-        } else {
-          subtotal = Math.round((cant / 1000) * precioMil);
+        if (botonesPreset.length > 0) {
+          botonesPreset.forEach(btn => {
+            if (Number(btn.dataset.valor) === valIngresado) {
+              btn.classList.add('activo');
+            } else {
+              btn.classList.remove('activo');
+            }
+          });
         }
 
-        precioTotalDinamico.textContent = `Subtotal: $${subtotal.toLocaleString('es-CO')}`;
+        recalcularSubtotalTarjeta(productoDiv);
       });
     }
   });
@@ -315,23 +413,17 @@ function inicializarEventosProductos() {
         } catch (e) {}
 
         const presExacta = presentaciones.find(p => Number(p.equivalencia) === cantidad);
-        let subtotalCalculado = 0;
-
-        if (presExacta) {
-          subtotalCalculado = Number(presExacta.precio);
-        } else {
-          subtotalCalculado = Math.round((cantidad / 1000) * precioMil);
-        }
+        let subtotalCalculado = presExacta ? Number(presExacta.precio) : Math.round((cantidad / 1000) * precioMil);
 
         precio = cantidad > 0 ? (subtotalCalculado / cantidad) : 0;
 
       } else if (productoDiv.dataset.tipoVenta !== undefined) {
         tipoVenta = productoDiv.dataset.tipoVenta;
         precio = Number(productoDiv.dataset.precio);
-        unidadMedida = productoDiv.dataset.unidadMedida;
+        unidadMedida = 'und';
         presentacionNombre = 'Unidad';
       } else {
-        const selectPresentacion = productoDiv.querySelector('.presentacion, .talla');
+        const selectPresentacion = productoDiv.querySelector('.presentacion');
         if (selectPresentacion) {
           const opcion = selectPresentacion.options[selectPresentacion.selectedIndex];
           nombre = `${productoDiv.dataset.nombre} (${opcion.value})`;
@@ -389,7 +481,6 @@ function actualizarCarrito() {
 
     const li = document.createElement('li');
     li.classList.add('item-carrito');
-
     const unidadVisual = item.unidadMedida ? item.unidadMedida : 'und';
 
     li.innerHTML = `
@@ -425,6 +516,10 @@ function actualizarCarrito() {
     listaCarrito.appendChild(li);
   });
 
+  if (subtotalCarrito) {
+    subtotalCarrito.textContent = `Subtotal: $${Math.round(total).toLocaleString('es-CO')}`;
+  }
+
   if (totalCarrito) {
     totalCarrito.textContent = `Total: $${Math.round(total).toLocaleString('es-CO')}`;
   }
@@ -450,14 +545,9 @@ async function verificarYDescontarStock(itemsCarrito) {
     const data = snap.data();
     if (data.stock === null || data.stock === undefined) continue;
 
-    let cantidadARestar = 0;
-    if (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad') {
-      cantidadARestar = item.cantidad;
-    } else {
-      const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
-      const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
-      cantidadARestar = item.cantidad * equivalencia;
-    }
+    let cantidadARestar = (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad')
+      ? item.cantidad
+      : item.cantidad * ((data.presentaciones || []).find(p => p.nombre === item.presentacionNombre)?.equivalencia || 1);
 
     if (Number(data.stock) < cantidadARestar) {
       throw new Error(`No hay suficiente stock de "${item.nombre}". Ajusta la cantidad.`);
@@ -475,14 +565,9 @@ async function verificarYDescontarStock(itemsCarrito) {
       const data = snap.data();
       if (data.stock === null || data.stock === undefined) return;
 
-      let cantidadARestar = 0;
-      if (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad') {
-        cantidadARestar = item.cantidad;
-      } else {
-        const presentacion = (data.presentaciones || []).find(p => p.nombre === item.presentacionNombre);
-        const equivalencia = presentacion ? (Number(presentacion.equivalencia) || 1) : 1;
-        cantidadARestar = item.cantidad * equivalencia;
-      }
+      let cantidadARestar = (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad')
+        ? item.cantidad
+        : item.cantidad * ((data.presentaciones || []).find(p => p.nombre === item.presentacionNombre)?.equivalencia || 1);
 
       const nuevoStock = Math.max(0, Number(data.stock) - cantidadARestar);
       transaction.update(refProducto, { stock: nuevoStock });
@@ -528,7 +613,6 @@ if (btnEnviarPedido) {
     carrito.forEach(item => {
       const subtotal = Math.round(item.precio * item.cantidad);
       const unidad = item.unidadMedida ? item.unidadMedida : 'und';
-
       mensaje += `*${item.cantidad} ${unidad} x* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
     });
 
@@ -538,16 +622,14 @@ if (btnEnviarPedido) {
     mensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}%0A`;
 
     if (requiereDomicilio === 'Sí') {
-      const direccion = inputDireccion.value.trim();
-      mensaje += `*Dirección:* ${direccion}%0A`;
+      mensaje += `*Dirección:* ${inputDireccion.value.trim()}%0A`;
     }
 
     mensaje += `*TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}%0A`;
     mensaje += '```==============================```%0A';
     mensaje += '_(El valor final con domicilio será confirmado por el vendedor)_';
 
-    const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
-    window.open(url, '_blank');
+    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`, '_blank');
 
     carrito = [];
     actualizarCarrito();
@@ -556,18 +638,12 @@ if (btnEnviarPedido) {
 }
 
 // ==========================================================
-// ZOOM DE IMAGEN
+// ZOOM Y CARGA INICIAL
 // ==========================================================
 
 if (modalZoom) {
-  modalZoom.addEventListener('click', () => {
-    modalZoom.classList.add('oculto-modal');
-  });
+  modalZoom.addEventListener('click', () => modalZoom.classList.add('oculto-modal'));
 }
-
-// ==========================================================
-// INICIO
-// ==========================================================
 
 cargarProductos();
 actualizarCarrito();

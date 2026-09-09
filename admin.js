@@ -138,7 +138,25 @@ if (prodCategoriaInput) {
 
 
 // ==========================================================
-// PRESENTACIONES DINÁMICAS (SOLO ENVASES)
+// BOTONES RÁPIDOS DE UNIDADES PRESELECCIONADAS (PRESETS)
+// ==========================================================
+
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('btn-preset')) {
+    const valorPreset = e.target.getAttribute('data-value');
+    const inputNombre = document.getElementById('pres-nombre-input');
+    const inputPrecio = document.getElementById('pres-precio-input');
+    
+    if (inputNombre) {
+      inputNombre.value = valorPreset;
+      if (inputPrecio) inputPrecio.focus();
+    }
+  }
+});
+
+
+// ==========================================================
+// PRESENTACIONES DINÁMICAS (SOLO ENVASES / MANUAL)
 // ==========================================================
 
 function crearFilaPresentacion(nombre = '', precio = '', equivalencia = '1') {
@@ -327,7 +345,13 @@ function renderizarTabla(productos) {
     return coincideNombre && coincideCategoria;
   });
 
-  // 2. Ordenar por categoría y luego alfabéticamente por nombre
+  // 2. Actualizar el contador dinámico en el título
+  const totalSpan = document.getElementById('total-productos');
+  if (totalSpan) {
+    totalSpan.textContent = `(${productosFiltrados.length})`;
+  }
+
+  // 3. Ordenar por categoría y luego alfabéticamente por nombre
   productosFiltrados.sort((a, b) => {
     const catA = (a.categoria || '').toLowerCase();
     const catB = (b.categoria || '').toLowerCase();
@@ -350,14 +374,17 @@ function renderizarTabla(productos) {
 
   tablaBody.innerHTML = productosFiltrados.map((p, index) => {
     const presentaciones = p.presentaciones || [];
+    
+    // Generación de chips con estilos en línea directos para garantizar legibilidad
     const resumenPresentaciones = presentaciones
-  .map(pr => `<span class="chip-precio"><b>${pr.nombre}:</b> $${(Number(pr.precio) || 0).toLocaleString('es-CO')}</span>`)
-  .join('');
+      .map(pr => `<span style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 3px 8px; margin: 2px 4px 2px 0; border-radius: 6px; font-size: 0.82rem; white-space: nowrap; color: #334155;"><b style="color: #0f172a;">${pr.nombre}:</b> $${(Number(pr.precio) || 0).toLocaleString('es-CO')}</span>`)
+      .join(' ');
 
     const tieneStock = p.stock !== null && p.stock !== undefined && p.stock !== '';
     const unidad = obtenerUnidadStock(p.categoria);
     const stockTexto = tieneStock ? `${p.stock} ${unidad}` : 'Ilimitado';
     const stockColor = tieneStock && Number(p.stock) <= 0 ? '#c62828' : '#333';
+    const catLower = (p.categoria || '').toLowerCase();
 
     let claseFila = '';
     if (tieneStock) {
@@ -375,12 +402,12 @@ function renderizarTabla(productos) {
     return `
       <tr class="${claseFila}">
         <td>
-  <span class="num-producto">${index + 1}.</span> 
-  <strong>${p.nombre || ''}</strong>
-</td>
-        <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
+          <span class="num-producto" style="color: #888; font-weight: 600; margin-right: 4px;">${index + 1}.</span> 
+          <strong>${p.nombre || ''}</strong>
+        </td>
+        <td><span class="badge-cat cat-${catLower}">${p.categoria || ''}</span></td>
         <td><span style="color:${stockColor}; font-weight:600;">${stockTexto}</span></td>
-        <td><div class="presentaciones-list">${resumenPresentaciones || '—'}</div></td>
+        <td><div class="presentaciones-list" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">${resumenPresentaciones || '—'}</div></td>
         <td>
           <div class="action-btns">
             <button class="btn-sm btn-edit" data-id="${p.id}">
