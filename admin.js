@@ -348,11 +348,11 @@ function renderizarTabla(productos) {
     return;
   }
 
-  tablaBody.innerHTML = productosFiltrados.map(p => {
+  tablaBody.innerHTML = productosFiltrados.map((p, index) => {
     const presentaciones = p.presentaciones || [];
     const resumenPresentaciones = presentaciones
-      .map(pr => `${pr.nombre}: $${(Number(pr.precio) || 0).toLocaleString('es-CO')}`)
-      .join('<br>');
+  .map(pr => `<span class="chip-precio"><b>${pr.nombre}:</b> $${(Number(pr.precio) || 0).toLocaleString('es-CO')}</span>`)
+  .join('');
 
     const tieneStock = p.stock !== null && p.stock !== undefined && p.stock !== '';
     const unidad = obtenerUnidadStock(p.categoria);
@@ -372,15 +372,15 @@ function renderizarTabla(productos) {
       }
     }
 
-    // Convertimos la categoría a minúsculas y sin espacios para que coincida con la clase CSS
-    const catClase = (p.categoria || '').toLowerCase().trim();
-
     return `
       <tr class="${claseFila}">
-        <td><strong>${p.nombre || ''}</strong></td>
-        <td><span class="badge-cat cat-${catClase}">${p.categoria || ''}</span></td>
+        <td>
+  <span class="num-producto">${index + 1}.</span> 
+  <strong>${p.nombre || ''}</strong>
+</td>
+        <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
         <td><span style="color:${stockColor}; font-weight:600;">${stockTexto}</span></td>
-        <td>${resumenPresentaciones || '—'}</td>
+        <td><div class="presentaciones-list">${resumenPresentaciones || '—'}</div></td>
         <td>
           <div class="action-btns">
             <button class="btn-sm btn-edit" data-id="${p.id}">

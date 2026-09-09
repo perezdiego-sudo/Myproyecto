@@ -916,6 +916,73 @@ section h2 {
   }
 }
 
+.num-producto {
+  color: #888;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+/* 1. Forzar a la tabla a mantener anchos fijos de columna */
+.tabla-productos, table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* 2. Centrar verticalmente todos los elementos de la tabla */
+table td, table th {
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+/* 3. Definir el ancho porcentual exacto de cada columna */
+table th:nth-child(1) { width: 25%; } /* Producto */
+table th:nth-child(2) { width: 12%; } /* Categoría */
+table th:nth-child(3) { width: 13%; } /* Stock */
+table th:nth-child(4) { width: 32%; } /* Presentaciones */
+table th:nth-child(5) { width: 18%; } /* Acciones */
+
+/* 4. Mostrar presentaciones en horizontal (chips) para ahorrar espacio vertical */
+.presentaciones-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-precio {
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Contenedor que acomoda las etiquetas dinámicamente */
+.contenedor-presentaciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Tarjeta individual para cada presentación */
+.chip-precio {
+  background-color: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.chip-precio b {
+  color: #0f172a;
+}
+
 /* ==========================================================
    DESACTIVAR ZOOM AUTOMÁTICO Y DESBORDAMIENTO EN MOVILES
    ========================================================== */
