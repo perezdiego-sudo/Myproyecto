@@ -637,7 +637,7 @@ async function verificarYDescontarStock(itemsCarrito) {
 }
 
 // ==========================================================
-// ENVIAR A WHATSAPP
+// ENVIAR A WHATSAPP (CORREGIDO)
 // ==========================================================
 
 if (btnEnviarPedido) {
@@ -647,13 +647,15 @@ if (btnEnviarPedido) {
       return;
     }
 
-    const requiereDomicilio = document.querySelector('input[name="tipoEnvio"]:checked').value;
+    const radioSeleccionado = document.querySelector('input[name="tipoEnvio"]:checked');
+    const requiereDomicilio = radioSeleccionado ? radioSeleccionado.value : 'No';
 
     if (requiereDomicilio === 'Sí' && inputDireccion.value.trim() === '') {
       alert('Por favor escribe la dirección para el domicilio.');
       return;
     }
 
+    // 1. Verificación y descuento de stock
     try {
       await verificarYDescontarStock(carrito);
     } catch (error) {
@@ -661,43 +663,48 @@ if (btnEnviarPedido) {
       return;
     }
 
+    // 2. Construcción del mensaje con saltos de línea estándar
     const fecha = new Date().toLocaleDateString('es-CO');
     const hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
-    let mensaje = '```==============================```%0A';
-    mensaje += '*QUIMIASEO Y PERFUMERIA DEL CARIBE*%0A';
-    mensaje += '```    COMPROBANTE DE PEDIDO     ```%0A';
-    mensaje += `\`\`\`Fecha: ${fecha} | ${hora}\`\`\`%0A`;
-    mensaje += '```==============================```%0A%0A';
-    mensaje += 'Hola, quiero realizar el siguiente pedido:%0A%0A';
+    let textoMensaje = `==============================\n`;
+    textoMensaje += `*QUIMIASEO Y PERFUMERIA DEL CARIBE*\n`;
+    textoMensaje += `COMPROBANTE DE PEDIDO\n`;
+    textoMensaje += `Fecha: ${fecha} | ${hora}\n`;
+    textoMensaje += `==============================\n\n`;
+    textoMensaje += `Hola, quiero realizar el siguiente pedido:\n\n`;
 
     carrito.forEach(item => {
       const subtotal = Math.round(item.precio * item.cantidad);
       const unidad = item.unidadMedida ? item.unidadMedida : 'und';
-      mensaje += `*${item.cantidad} ${unidad} x* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*%0A`;
+      textoMensaje += `*${item.cantidad} ${unidad} x* ${item.nombre} - *$${subtotal.toLocaleString('es-CO')}*\n`;
     });
 
     const total = carrito.reduce((sum, item) => sum + Math.round(item.precio * item.cantidad), 0);
 
-    mensaje += '%0A```==============================```%0A';
-    mensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}%0A`;
+    textoMensaje += `\n==============================\n`;
+    textoMensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}\n`;
 
     if (requiereDomicilio === 'Sí') {
-      mensaje += `*Dirección:* ${inputDireccion.value.trim()}%0A`;
+      textoMensaje += `*Dirección:* ${inputDireccion.value.trim()}\n`;
     }
 
-    mensaje += `*TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}%0A`;
-    mensaje += '```==============================```%0A';
-    mensaje += '_(El valor final con domicilio será confirmado por el vendedor)_';
+    textoMensaje += `*TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}\n`;
+    textoMensaje += `==============================\n`;
+    textoMensaje += `_(El valor final con domicilio será confirmado por el vendedor)_`;
 
-    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`, '_blank');
+    // 3. Formateo seguro de la URL para WhatsApp
+    const urlWhatsApp = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP}&text=${encodeURIComponent(textoMensaje)}`;
 
+    // 4. Vaciar carrito y recargar interfaz
     carrito = [];
     actualizarCarrito();
     cargarProductos();
+
+    // 5. Redirección directa para evitar bloqueos del navegador
+    window.location.href = urlWhatsApp;
   });
 }
-
 // ==========================================================
 // ZOOM Y CARGA INICIAL
 // ==========================================================
