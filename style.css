@@ -315,6 +315,7 @@ body {
   font-size: 0.95rem !important;
   color: var(--color-text-main);
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .input-cantidad-group input::-webkit-outer-spin-button,
