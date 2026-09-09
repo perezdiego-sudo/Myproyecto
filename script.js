@@ -87,14 +87,26 @@ async function cargarProductos() {
           </div>
 
           <div class="seccion-seleccion-granel">
-            <label class="label-seccion">Selecciona la cantidad:</label>
+            <span class="label-seccion">Selecciona la cantidad:</span>
             <div class="contenedor-presets">
               ${botonesPresetsHTML}
             </div>
+
+            <div class="separador-cantidad">o escribe la cantidad</div>
             
-            <div class="input-custom-group">
-              <label for="cant-${docSnap.id}">O escribe otra cantidad (${unidadGranel}):</label>
-              <input type="number" id="cant-${docSnap.id}" class="cantidad" value="${minCantidad}" min="1" step="1" placeholder="Ej: 100" ${agotado ? 'disabled' : ''}>
+            <div class="input-cantidad-group">
+              <input 
+                type="number" 
+                id="cant-${docSnap.id}" 
+                class="cantidad input-gramos" 
+                value="${minCantidad}" 
+                min="1" 
+                step="1" 
+                placeholder="0" 
+                ${agotado ? 'disabled' : ''}
+                aria-label="Cantidad en ${unidadGranel}"
+              >
+              <span class="unidad">${unidadGranel}</span>
             </div>
           </div>
 
@@ -119,9 +131,20 @@ async function cargarProductos() {
             <span>Precio unitario: <strong>$${precioNum.toLocaleString('es-CO')}</strong></span>
           </div>
 
-          <div class="input-custom-group margin-v">
-            <label>Cantidad (Unidades):</label>
-            <input type="number" class="cantidad" value="${minCantidad}" min="${minCantidad}" step="1" ${agotado ? 'disabled' : ''}>
+          <div class="seccion-seleccion-granel">
+            <span class="label-seccion">Cantidad (Unidades):</span>
+            <div class="input-cantidad-group">
+              <input 
+                type="number" 
+                class="cantidad input-gramos" 
+                value="${minCantidad}" 
+                min="${minCantidad}" 
+                step="1" 
+                placeholder="0"
+                ${agotado ? 'disabled' : ''}
+              >
+              <span class="unidad">und</span>
+            </div>
           </div>
 
           <div class="subtotal-card-box">
@@ -144,9 +167,18 @@ async function cargarProductos() {
               <span>Precio: <strong>$${precioNum.toLocaleString('es-CO')}</strong></span>
             </div>
 
-            <div class="input-custom-group margin-v">
-              <label>Cantidad:</label>
-              <input type="number" class="cantidad" value="1" min="1" ${agotado ? 'disabled' : ''}>
+            <div class="seccion-seleccion-granel">
+              <span class="label-seccion">Cantidad:</span>
+              <div class="input-cantidad-group">
+                <input 
+                  type="number" 
+                  class="cantidad input-gramos" 
+                  value="1" 
+                  min="1" 
+                  ${agotado ? 'disabled' : ''}
+                >
+                <span class="unidad">und</span>
+              </div>
             </div>
 
             <div class="subtotal-card-box">
@@ -170,13 +202,22 @@ async function cargarProductos() {
 
           cuerpoTarjetaHTML = `
             <div class="input-custom-group margin-v">
-              <label>Presentación:</label>
+              <label class="label-seccion">Presentación:</label>
               <select class="presentacion select-estilizado">${opciones}</select>
             </div>
 
-            <div class="input-custom-group margin-v">
-              <label>Cantidad:</label>
-              <input type="number" class="cantidad" value="1" min="1" ${agotado ? 'disabled' : ''}>
+            <div class="seccion-seleccion-granel">
+              <span class="label-seccion">Cantidad:</span>
+              <div class="input-cantidad-group">
+                <input 
+                  type="number" 
+                  class="cantidad input-gramos" 
+                  value="1" 
+                  min="1" 
+                  ${agotado ? 'disabled' : ''}
+                >
+                <span class="unidad">und</span>
+              </div>
             </div>
 
             <div class="subtotal-card-box">
