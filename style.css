@@ -861,6 +861,45 @@ a.btn-catalogo {
 }
 
 /* ==========================================================
+   BUSCADOR DE PRODUCTOS
+   ========================================================== */
+.contenedor-buscador {
+  max-width: 500px;
+  margin: 0 auto 1.25rem auto;
+  width: 100%;
+}
+
+#input-busqueda {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: 1.5px solid var(--color-border);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  color: var(--color-text-main);
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+#input-busqueda:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 51, 153, 0.15);
+}
+
+@media (max-width: 768px) {
+  #input-busqueda {
+    font-size: 16px !important; /* Evita zoom automático en móviles */
+  }
+}
+
+/* Evitar zoom automático en el buscador para celulares */
+#input-busqueda {
+  font-size: 16px !important;
+}
+
+/* ==========================================================
    MEDIA QUERIES PARA RESPONSIVIDAD MÓVIL
    ========================================================== */
 @media (max-width: 600px) {

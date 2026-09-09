@@ -7,6 +7,7 @@ import {
 // REFERENCIAS A ELEMENTOS DEL DOM
 // ==========================================================
 const contenedor = document.getElementById('productos-container');
+const inputBusqueda = document.getElementById('input-busqueda');
 const modalCarrito = document.getElementById('modal-carrito');
 const btnAbrirCarrito = document.getElementById('btn-abrir-carrito');
 const btnCerrarCarrito = document.getElementById('btn-cerrar-carrito');
@@ -248,6 +249,7 @@ async function cargarProductos() {
     });
 
     inicializarEventosProductos();
+    filtrarProductos();
 
   } catch (error) {
     contenedor.innerHTML = `<p style="color:red; text-align:center;">Error cargando productos: ${error.message}</p>`;
@@ -256,26 +258,44 @@ async function cargarProductos() {
 }
 
 // ==========================================================
-// FILTROS DE CATEGORÍA
+// FILTROS Y BÚSQUEDA DE PRODUCTOS
 // ==========================================================
 
-const botonesFiltro = document.querySelectorAll('.btn-filtro');
+function filtrarProductos() {
+  const categoriaActiva = document.querySelector('.btn-filtro.activo')?.dataset.categoria || 'todos';
+  const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : '';
 
+  const productos = document.querySelectorAll('.producto');
+
+  productos.forEach(producto => {
+    const coincideCategoria = (categoriaActiva === 'todos' || producto.dataset.categoria === categoriaActiva);
+    
+    const nombreProducto = producto.dataset.nombre 
+      ? producto.dataset.nombre.toLowerCase() 
+      : producto.querySelector('h3')?.textContent.toLowerCase() || '';
+    
+    const coincideBusqueda = nombreProducto.includes(textoBusqueda);
+
+    if (coincideCategoria && coincideBusqueda) {
+      producto.classList.remove('oculto');
+    } else {
+      producto.classList.add('oculto');
+    }
+  });
+}
+
+// Evento para el campo de búsqueda
+if (inputBusqueda) {
+  inputBusqueda.addEventListener('input', filtrarProductos);
+}
+
+// Evento para los botones de categorías
+const botonesFiltro = document.querySelectorAll('.btn-filtro');
 botonesFiltro.forEach(boton => {
   boton.addEventListener('click', () => {
     botonesFiltro.forEach(b => b.classList.remove('activo'));
     boton.classList.add('activo');
-
-    const categoria = boton.dataset.categoria;
-    const productos = document.querySelectorAll('.producto');
-
-    productos.forEach(producto => {
-      if (categoria === 'todos' || producto.dataset.categoria === categoria) {
-        producto.classList.remove('oculto');
-      } else {
-        producto.classList.add('oculto');
-      }
-    });
+    filtrarProductos();
   });
 });
 
