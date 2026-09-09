@@ -4,46 +4,73 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QUIMIASEO Y PERFUMERIA DEL CARIBE</title>
+  
+  <!-- Tipografía Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Archivo de Estilos CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="body-inicio">
 
-  <main class="contenedor-inicio">
-    <!-- Logo principal estilizado -->
-    <div class="logo-circulo-inicio">
-      <span>Qpc</span>
-    </div>
+  <!-- Encabezado con Logo Qpc -->
+  <header class="header">
+    <a href="index.html" class="logo">
+      <div class="logo-circulo-header">Qpc</div>
+      <span>QUIMIASEO Y PERFUMERIA DEL CARIBE</span>
+    </a>
+  </header>
 
-    <!-- Título y subtítulo -->
-    <h1 class="titulo-inicio">QUIMIASEO Y PERFUMERIA DEL CARIBE</h1>
-    <p class="subtitulo-inicio">
-      Venta de Materias primas, Aromas, Saborizantes, Perfumes, Aceites, Jabón Líquido, Desinfectantes y Plásticos en General.
-      <br><strong>Ventas al por mayor y detal</strong>
-    </p>
+  <!-- Seccion Principal -->
+  <main class="hero-inicio">
+    <div class="hero-card">
+      <span class="badge-tag">Ventas al por mayor y detal</span>
+      
+      <h1>QUIMIASEO Y PERFUMERIA DEL CARIBE</h1>
+      
+      <p class="hero-descripcion">
+        Venta de Materias primas, Aromas, Saborizantes, Perfumes, Aceites, Jabón Líquido, Desinfectantes y Plásticos en General.
+      </p>
 
-    <!-- Botón principal con resplandor -->
-    <a href="catalogo.html" class="btn-inicio-glow">Ver Catálogo</a>
+      <a href="catalogo.html" class="btn-catalogo">Ver Catálogo</a>
 
-    <div class="info-inicio">
-      <!-- Administrador -->
-      <div class="info-card">
-        <span class="info-icono">👤</span>
-        <div class="info-texto">
-          <span class="info-label">Administrador</span>
-          <span class="info-valor">Jarold Bolaño</span>
+      <!-- Tarjetas Informativas -->
+      <div class="grid-info-inicio">
+        <div class="card-info">
+          <span class="card-info-titulo">👤 Administrador</span>
+          <span class="card-info-valor">Jarold Bolaño</span>
         </div>
-      </div>
-
-      <!-- Ubicación Actualizada -->
-      <div class="info-card">
-        <span class="info-icono">📍</span>
-        <div class="info-texto">
-          <span class="info-label">Ubicación</span>
-          <span class="info-valor">Calle 21 No. 23 - 72 Centro, Sincelejo - Sucre</span>
+        
+        <div class="card-info">
+          <span class="card-info-titulo">📍 Ubicación</span>
+          <span class="card-info-valor">Calle 21 No. 23 - 72 Centro, Sincelejo - Sucre</span>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- Pie de Página -->
+  <footer class="footer">
+    <div class="footer-contenido">
+      <div>
+        <div class="footer-logo">
+          <div class="logo-circulo-header">Qpc</div>
+          <span>QUIMIASEO</span>
+        </div>
+        <p class="footer-texto">Tu aliado en materias primas y productos de aseo.</p>
+      </div>
+      <div class="footer-columna">
+        <h4>Contacto</h4>
+        <p>👤 Jarold Bolaño</p>
+        <p>📍 Calle 21 No. 23 - 72 Centro, Sincelejo - Sucre</p>
+      </div>
+    </div>
+    <div class="footer-derechos">
+      <p>&copy; QUIMIASEO Y PERFUMERIA DEL CARIBE. Todos los derechos reservados.</p>
+    </div>
+  </footer>
 
 </body>
 </html>

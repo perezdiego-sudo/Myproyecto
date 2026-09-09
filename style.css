@@ -15,13 +15,15 @@
   --font-main: 'Poppins', sans-serif;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
+html, body {
+  width: 100%;
+  overflow-x: hidden;
   font-family: var(--font-main);
   background-color: var(--color-bg);
   color: var(--color-text-main);
@@ -29,15 +31,16 @@ body {
 }
 
 /* ==========================================================
-   ENCABEZADO
+   ENCABEZADO GLOBAL
    ========================================================== */
 .header {
   background-color: var(--color-primary);
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
+  width: 100%;
 }
 
 .logo {
@@ -51,49 +54,207 @@ body {
 }
 
 .logo-circulo-header {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  background-color: #ffffff;
+  color: var(--color-primary); /* Azul principal #003399 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-main);
+  font-weight: 800; /* Extra negrita */
+  font-size: 1.05rem;
+  letter-spacing: -0.5px; /* Ajuste entre letras similar a la imagen */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+/* Logo Central Destacado de Inicio */
+.logo-hero {
+  width: 90px;
+  height: 90px;
   background-color: #ffffff;
   color: var(--color-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 0.9rem;
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: -1px;
+  box-shadow: 0 6px 20px rgba(0, 51, 153, 0.15);
+  margin-bottom: 1.5rem;
+  border: 3px solid var(--color-primary);
+}
+
+.logo-hero-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 1.5rem;
 }
 
 /* ==========================================================
-   CATÁLOGO Y FILTROS
+   PÁGINA DE INICIO (INDEX / HERO SECTION)
+   ========================================================== */
+.body-inicio {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.hero-inicio {
+  max-width: 1100px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  padding: 3.5rem 2rem;
+  box-shadow: 0 10px 30px rgba(0, 51, 153, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.badge-tag {
+  display: inline-block;
+  background-color: #e0f2fe;
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hero-inicio h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  max-width: 800px;
+}
+
+.hero-descripcion {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  max-width: 700px;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* Botón principal */
+.btn-catalogo, 
+a.btn-catalogo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--color-primary);
+  color: #ffffff !important;
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 51, 153, 0.3);
+  transition: all 0.25 ease;
+  margin-bottom: 2.5rem;
+}
+
+.btn-catalogo:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 51, 153, 0.4);
+}
+
+/* Tarjetas Informativas de Inicio */
+.grid-info-inicio {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.card-info {
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: left;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-info-titulo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-info-valor {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+/* ==========================================================
+   CATÁLOGO Y FILTROS (MÓVIL SLIDER)
    ========================================================== */
 .catalogo {
   max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+  width: 100%;
 }
 
 .catalogo h2 {
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: var(--color-primary);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .filtros {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  justify-content: flex-start;
   gap: 8px;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.filtros::-webkit-scrollbar {
+  display: none;
 }
 
 .btn-filtro {
+  flex-shrink: 0;
+  white-space: nowrap;
   background-color: #ffffff;
   border: 1px solid var(--color-border);
   padding: 8px 16px;
   border-radius: 20px;
   font-family: var(--font-main);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: var(--color-text-muted);
   cursor: pointer;
@@ -112,20 +273,23 @@ body {
    ========================================================== */
 .productos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  width: 100%;
 }
 
 .producto {
   background-color: var(--color-card-bg);
   border-radius: 16px;
-  padding: 1.25rem;
+  padding: 1rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
+  min-width: 0;
+  width: 100%;
 }
 
 .producto:hover {
@@ -149,7 +313,7 @@ body {
   border-radius: 12px;
   overflow: hidden;
   background-color: #f1f5f9;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .producto-img {
@@ -202,35 +366,37 @@ body {
 
 /* Títulos y Contenido */
 .producto h3 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: var(--color-text-main);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   line-height: 1.3;
+  word-break: break-word;
 }
 
 .producto-descripcion {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--color-text-muted);
-  margin-bottom: 12px;
-  min-height: 38px;
+  margin-bottom: 10px;
+  min-height: 36px;
 }
 
 .precio-referencia {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--color-text-main);
   background-color: #f8fafc;
   padding: 6px 10px;
   border-radius: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
-/* Selección de Cantidades y Presets */
+/* Selección de Cantidades y Presets Adaptables */
 .seccion-seleccion-granel {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  width: 100%;
 }
 
 .label-seccion {
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   font-weight: 600;
   color: var(--color-text-muted);
   margin-bottom: 6px;
@@ -239,21 +405,26 @@ body {
 
 .contenedor-presets {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 .btn-preset {
   background-color: #f1f5f9;
   border: 1px solid var(--color-border);
-  padding: 6px 0;
+  padding: 6px 2px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--color-text-main);
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: all 0.2s ease;
+  text-align: center;
 }
 
 .btn-preset:hover,
@@ -269,11 +440,11 @@ body {
   align-items: center;
   text-align: center;
   color: #94a3b8;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin: 8px 0;
+  margin: 6px 0;
 }
 
 .separador-cantidad::before,
@@ -295,6 +466,7 @@ body {
   border-radius: 10px;
   overflow: hidden;
   transition: all 0.2s ease-in-out;
+  width: 100%;
 }
 
 .input-cantidad-group:focus-within {
@@ -306,10 +478,11 @@ body {
 .input-cantidad-group input {
   flex: 1;
   width: 100%;
+  min-width: 0;
   border: none !important;
   outline: none !important;
   background: transparent !important;
-  padding: 8px 10px;
+  padding: 8px;
   text-align: center;
   font-weight: 700;
   font-size: 0.95rem !important;
@@ -325,18 +498,19 @@ body {
 }
 
 .input-cantidad-group .unidad {
-  padding: 8px 12px;
+  padding: 8px 10px;
   background-color: #e2e8f0;
   color: #475569;
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   border-left: 1px solid #cbd5e1;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .select-estilizado {
   width: 100%;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border-radius: 10px;
   border: 1.5px solid #cbd5e1;
   background-color: #f8fafc;
@@ -352,13 +526,13 @@ body {
 .subtotal-card-box {
   background-color: #eff6ff;
   border-radius: 10px;
-  padding: 10px;
+  padding: 8px;
   text-align: center;
-  margin: 10px 0 14px 0;
+  margin: 8px 0 12px 0;
 }
 
 .subtotal-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -366,7 +540,7 @@ body {
 }
 
 .precio-total-dinamico {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: var(--color-primary);
 }
@@ -376,10 +550,10 @@ body {
   background-color: var(--color-primary);
   color: #ffffff;
   border: none;
-  padding: 12px;
+  padding: 11px;
   border-radius: 10px;
   font-family: var(--font-main);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -404,10 +578,10 @@ body {
   background-color: var(--color-primary);
   color: #ffffff;
   border: none;
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   cursor: pointer;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   display: flex;
@@ -418,13 +592,13 @@ body {
 
 #contador-carrito {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -2px;
+  right: -2px;
   background-color: var(--color-danger);
   color: #ffffff;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 10px;
 }
 
@@ -442,6 +616,7 @@ body {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.3s ease;
+  padding: 1rem;
 }
 
 .oculto-modal, .oculto {
@@ -453,8 +628,8 @@ body {
 
 .modal-contenido {
   background-color: #ffffff;
-  width: 90%;
-  max-width: 500px;
+  width: 100%;
+  max-width: 480px;
   max-height: 85vh;
   border-radius: 20px;
   display: flex;
@@ -464,7 +639,7 @@ body {
 }
 
 .modal-header {
-  padding: 1.2rem;
+  padding: 1rem 1.2rem;
   background-color: var(--color-primary);
   color: #ffffff;
   display: flex;
@@ -473,7 +648,7 @@ body {
 }
 
 .modal-header h2 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .modal-header-acciones {
@@ -527,6 +702,7 @@ body {
   background-color: #f1f5f9;
   padding: 4px 8px;
   border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .item-cantidad-control button {
@@ -539,14 +715,16 @@ body {
 
 .item-nombre {
   flex: 1;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
+  word-break: break-word;
 }
 
 .item-subtotal {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--color-primary);
+  flex-shrink: 0;
 }
 
 .btn-eliminar {
@@ -555,6 +733,7 @@ body {
   color: var(--color-danger);
   font-weight: 700;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 /* Domicilio y Resumen */
@@ -573,9 +752,10 @@ body {
 
 .radio-group {
   display: flex;
-  gap: 15px;
-  font-size: 0.82rem;
+  gap: 12px;
+  font-size: 0.8rem;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .input-direccion {
@@ -593,12 +773,12 @@ body {
 }
 
 #subtotal-carrito {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
 }
 
 .total-resaltado {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--color-primary);
 }
@@ -612,7 +792,7 @@ body {
   border-radius: 12px;
   font-family: var(--font-main);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
@@ -634,64 +814,115 @@ body {
 .footer {
   background-color: #0f172a;
   color: #ffffff;
-  padding: 3rem 1.5rem 1rem;
-  margin-top: 4rem;
+  padding: 2.5rem 1rem 1rem;
+  margin-top: auto;
+  width: 100%;
 }
 
 .footer-contenido {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .footer-logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   font-weight: 700;
 }
 
 .footer-texto {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #94a3b8;
 }
 
 .footer-columna h4 {
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   color: var(--color-secondary);
 }
 
 .footer-columna p {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #cbd5e1;
   margin-bottom: 6px;
 }
 
 .footer-derechos {
   text-align: center;
-  padding-top: 1.5rem;
+  padding-top: 1.2rem;
   border-top: 1px solid #334155;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: #64748b;
 }
 
 /* ==========================================================
-   RESPONSIVE
+   MEDIA QUERIES PARA RESPONSIVIDAD MÓVIL
    ========================================================== */
 @media (max-width: 600px) {
   .header {
-    padding: 0.8rem 1rem;
+    padding: 0.75rem 1rem;
   }
 
   .logo span {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  .logo-circulo-header {
+    width: 34px;
+    height: 34px;
+    font-size: 0.8rem;
+  }
+
+  .hero-inicio {
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+
+  .hero-card {
+    padding: 2rem 1.25rem;
+  }
+
+  .hero-inicio h1 {
+    font-size: 1.6rem;
+  }
+
+  .hero-descripcion {
+    font-size: 0.92rem;
+  }
+
+  .catalogo {
+    margin: 1rem auto;
+    padding: 0 0.75rem;
+  }
+
+  .catalogo h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .productos {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .producto {
+    padding: 0.88rem;
+  }
+
+  .producto-imagen-wrap {
+    height: 160px;
+  }
+
+  .btn-carrito-flotante {
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.1rem;
   }
 }
