@@ -106,8 +106,11 @@
     }
     .btn-primary:hover { background-color: var(--primary-dark); }
 
-    .dashboard-grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 25px; }
-    @media (max-width: 850px) { .dashboard-grid { grid-template-columns: minmax(0, 1fr); } }
+    .dashboard-grid { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 25px; 
+}
 
     .card {
       background: var(--card-bg); border-radius: 10px; padding: 22px;
@@ -269,147 +272,175 @@
       </form>
     </section>
 
-    <!-- SECCIÓN PANEL DE ADMINISTRACIÓN -->
-    <section id="panel-section" class="dashboard-grid hidden">
+   <!-- SECCIÓN PANEL DE ADMINISTRACIÓN -->
+<section id="panel-section" class="dashboard-grid hidden">
 
-      <!-- Importación masiva -->
-      <div class="card" style="grid-column: 1 / -1;">
-        <h2 class="card-title"><i class="fa-solid fa-file-csv"></i> Importar productos desde CSV</h2>
-        <p style="margin-bottom: 14px; color: #666; font-size: 0.9rem;">
-          Sube un archivo CSV con varios productos a la vez. Cada presentación va en su propia fila, agrupada por el mismo número de producto.
-        </p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-          <input type="file" id="input-csv" accept=".csv">
-          <button type="button" class="btn-primary" id="btn-importar-csv" style="width: auto; padding: 10px 20px;">
-            <i class="fa-solid fa-upload"></i> Importar
-          </button>
-          <button type="button" class="btn-primary" id="btn-descargar-plantilla" style="width: auto; padding: 10px 20px; background-color: #78909c;">
-            <i class="fa-solid fa-download"></i> Descargar plantilla
-          </button>
+  <!-- 1. IMPORTAR CSV -->
+  <div class="card">
+    <h2 class="card-title"><i class="fa-solid fa-file-csv"></i> Importar productos desde CSV</h2>
+    <p style="margin-bottom: 14px; color: #666; font-size: 0.9rem;">
+      Sube un archivo CSV con varios productos a la vez. Cada presentación va en su propia fila, agrupada por el mismo número de producto.
+    </p>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <input type="file" id="input-csv" accept=".csv">
+      <button type="button" class="btn-primary" id="btn-importar-csv" style="width: auto; padding: 10px 20px;">
+        <i class="fa-solid fa-upload"></i> Importar
+      </button>
+      <button type="button" class="btn-primary" id="btn-descargar-plantilla" style="width: auto; padding: 10px 20px; background-color: #78909c;">
+        <i class="fa-solid fa-download"></i> Descargar plantilla
+      </button>
+    </div>
+    <p id="progreso-importacion" style="margin-top: 12px; font-size: 0.88rem; color: #444;"></p>
+  </div>
+
+  <!-- 2. REGISTRAR PRODUCTO -->
+  <div class="card">
+    <h2 class="card-title" id="form-title">
+      <i class="fa-solid fa-square-plus"></i> Registrar Producto
+    </h2>
+    <form id="form-producto">
+      <input type="hidden" id="prod-id">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prod-nombre">Nombre del Producto:</label>
+          <input type="text" id="prod-nombre" placeholder="Ej: Alcohol al 96%" required>
         </div>
-        <p id="progreso-importacion" style="margin-top: 12px; font-size: 0.88rem; color: #444;"></p>
-      </div>
 
-      <!-- Columna Izquierda: Formulario -->
-      <div class="card">
-        <h2 class="card-title" id="form-title">
-          <i class="fa-solid fa-square-plus"></i> Registrar Producto
-        </h2>
-        <form id="form-producto">
-          <input type="hidden" id="prod-id">
-
-          <div class="form-group">
-            <label for="prod-nombre">Nombre del Producto:</label>
-            <input type="text" id="prod-nombre" placeholder="Ej: Alcohol al 96%" required>
-          </div>
-
-          <div class="form-group">
-            <label for="prod-descripcion">Descripción:</label>
-            <textarea id="prod-descripcion" rows="2" placeholder="Ej: Alcohol de alta pureza..." required></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="prod-categoria">Categoría:</label>
-            <select id="prod-categoria" required>
-              <option value="polvos">Polvos</option>
-              <option value="liquidos">Líquidos</option>
-              <option value="perfumeria">Perfumería</option>
-              <option value="envases">Envases</option>
-              <option value="sabores">Sabores</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="prod-imagen">Link de la imagen (URL):</label>
-            <input type="text" id="prod-imagen" placeholder="imagenes/producto.jpg o link de internet">
-          </div>
-
-          <!-- BLOQUE DE PRECIOS A GRANEL -->
-          <div id="grupo-precio-granel" class="form-group">
-            <label><strong>Precios por cantidad (Gramos / Mililitros):</strong></label>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
-              <div>
-                <label for="precio-1000">1000 <span class="unidad-granel-txt">g</span>:</label>
-                <input type="number" id="precio-1000" placeholder="Ej: 68000">
-              </div>
-
-              <div>
-                <label for="precio-500">500 <span class="unidad-granel-txt">g</span>:</label>
-                <input type="number" id="precio-500" placeholder="Ej: 34000">
-              </div>
-
-              <div>
-                <label for="precio-250">250 <span class="unidad-granel-txt">g</span>:</label>
-                <input type="number" id="precio-250" placeholder="Ej: 17000">
-              </div>
-
-              <div>
-                <label for="precio-125">125 <span class="unidad-granel-txt">g</span>:</label>
-                <input type="number" id="precio-125" placeholder="Ej: 8500">
-              </div>
-            </div>
-
-            <small style="display: block; margin-top: 8px; color: #666;">
-              Al digitar el precio de 1000 <span class="unidad-granel-txt">g</span> los demás se calcularán automáticamente, pero puedes ajustar cada valor manualmente si lo deseas.
-            </small>
-          </div>
-
-          <!-- BLOQUE DE PRECIO UNITARIO / ENVASES (AHORA INDEPENDIENTE) -->
-          <div id="grupo-presentaciones" class="form-group hidden">
-            <label><strong>Precio Unitario / Presentaciones:</strong></label>
-            <div id="lista-presentaciones"></div>
-            <button type="button" id="btn-agregar-presentacion" class="btn-sm">
-              + Agregar otra presentación
-            </button>
-          </div>
-
-          <div class="form-group">
-            <label for="prod-stock">
-              <i class="fa-solid fa-cubes"></i> Stock total (<span id="unidad-stock-txt">unid.</span>) — vacío = ilimitado:
-            </label>
-            <input type="number" id="prod-stock" step="0.01" min="0" placeholder="Ej: 50">
-          </div>
-
-          <div class="form-group">
-            <label for="prod-stock-minimo">
-              <i class="fa-solid fa-triangle-exclamation"></i> Stock mínimo de alerta (<span id="unidad-stock-minimo-txt">unid.</span>) — opcional:
-            </label>
-            <input type="number" id="prod-stock-minimo" step="0.01" min="0" placeholder="Ej: 5 (si no lo llenas, se usa 5 por defecto)">
-          </div>
-
-          <button type="submit" class="btn-primary" id="btn-guardar-prod">
-            <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
-          </button>
-
-          <button type="button" class="btn-primary hidden" id="btn-cancelar-edit" style="background-color: #78909c; margin-top: 8px;">
-            <i class="fa-solid fa-xmark"></i> Cancelar Edición
-          </button>
-        </form>
-      </div>
-
-      <!-- Columna Derecha: Tabla -->
-      <div class="card">
-        <h2 class="card-title"><i class="fa-solid fa-boxes-stacked"></i> Inventario de Productos</h2>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>Categoría</th>
-                <th>Stock</th>
-                <th>Presentaciones</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-productos-body">
-              <tr><td colspan="5" style="text-align: center; color: #888;">Cargando inventario...</td></tr>
-            </tbody>
-          </table>
+        <div class="form-group">
+          <label for="prod-categoria">Categoría:</label>
+          <select id="prod-categoria" required>
+            <option value="polvos">Polvos</option>
+            <option value="liquidos">Líquidos</option>
+            <option value="perfumeria">Perfumería</option>
+            <option value="aromas">Aromas</option>
+            <option value="sabores">Sabores</option>
+            <option value="envases">Envases</option>
+          </select>
         </div>
       </div>
 
-    </section>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prod-descripcion">Descripción:</label>
+          <textarea id="prod-descripcion" rows="2" placeholder="Ej: Alcohol de alta pureza..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="prod-imagen">Link de la imagen (URL):</label>
+          <input type="text" id="prod-imagen" placeholder="imagenes/producto.jpg o link de internet">
+        </div>
+      </div>
+
+      <!-- PRECIOS A GRANEL -->
+      <div id="grupo-precio-granel" class="form-group">
+        <label><strong>Precios por cantidad (Gramos / Mililitros):</strong></label>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;">
+          <div>
+            <label for="precio-1000">1000 <span class="unidad-granel-txt">g</span>:</label>
+            <input type="number" id="precio-1000" placeholder="Ej: 68000">
+          </div>
+
+          <div>
+            <label for="precio-500">500 <span class="unidad-granel-txt">g</span>:</label>
+            <input type="number" id="precio-500" placeholder="Ej: 34000">
+          </div>
+
+          <div>
+            <label for="precio-250">250 <span class="unidad-granel-txt">g</span>:</label>
+            <input type="number" id="precio-250" placeholder="Ej: 17000">
+          </div>
+
+          <div>
+            <label for="precio-125">125 <span class="unidad-granel-txt">g</span>:</label>
+            <input type="number" id="precio-125" placeholder="Ej: 8500">
+          </div>
+        </div>
+
+        <small style="display: block; margin-top: 8px; color: #666;">
+          Al digitar el precio de 1000 <span class="unidad-granel-txt">g</span> los demás se calcularán automáticamente, pero puedes ajustar cada valor manualmente si lo deseas.
+        </small>
+      </div>
+
+      <!-- PRECIO UNITARIO / ENVASES -->
+      <div id="grupo-presentaciones" class="form-group hidden">
+        <label><strong>Precio Unitario / Presentaciones:</strong></label>
+        <div id="lista-presentaciones"></div>
+        <button type="button" id="btn-agregar-presentacion" class="btn-sm">
+          + Agregar otra presentación
+        </button>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prod-stock">
+            <i class="fa-solid fa-cubes"></i> Stock total (<span id="unidad-stock-txt">unid.</span>) — vacío = ilimitado:
+          </label>
+          <input type="number" id="prod-stock" step="0.01" min="0" placeholder="Ej: 50">
+        </div>
+
+        <div class="form-group">
+          <label for="prod-stock-minimo">
+            <i class="fa-solid fa-triangle-exclamation"></i> Stock mínimo de alerta (<span id="unidad-stock-minimo-txt">unid.</span>) — opcional:
+          </label>
+          <input type="number" id="prod-stock-minimo" step="0.01" min="0" placeholder="Ej: 5 (si no lo llenas, se usa 5 por defecto)">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button type="submit" class="btn-primary" id="btn-guardar-prod">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
+        </button>
+
+        <button type="button" class="btn-primary hidden" id="btn-cancelar-edit" style="background-color: #78909c;">
+          <i class="fa-solid fa-xmark"></i> Cancelar Edición
+        </button>
+      </div>
+    </form>
+  </div>
+
+<!-- 3. INVENTARIO DE PRODUCTOS -->
+  <div class="card">
+    <h2 class="card-title"><i class="fa-solid fa-boxes-stacked"></i> Inventario de Productos</h2>
+    
+    <!-- NUEVO: Controles de Filtro y Búsqueda -->
+    <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 220px;">
+        <input type="text" id="filtro-buscar" placeholder="🔍 Buscar producto por nombre..." style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem;">
+      </div>
+      <div>
+        <select id="filtro-categoria" style="padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; background-color: #f9fbfd; font-size: 0.9rem;">
+          <option value="">Todas las categorías</option>
+          <option value="polvos">Polvos</option>
+          <option value="liquidos">Líquidos</option>
+          <option value="perfumeria">Perfumería</option>
+          <option value="aromas">Aromas</option>
+          <option value="sabores">Sabores</option>
+          <option value="envases">Envases</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Stock</th>
+            <th>Presentaciones</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-productos-body">
+          <tr><td colspan="5" style="text-align: center; color: #888;">Cargando inventario...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
   </main>
 
   <div id="toast-container"></div>

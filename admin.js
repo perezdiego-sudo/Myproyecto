@@ -42,6 +42,10 @@ const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion
 const btnCancelarEdit = document.getElementById('btn-cancelar-edit');
 const tablaBody = document.getElementById('tabla-productos-body');
 
+// Filtros de búsqueda
+const filtroBuscar = document.getElementById('filtro-buscar');
+const filtroCategoria = document.getElementById('filtro-categoria');
+
 // Grupos que se muestran/ocultan según la categoría
 const grupoPresentaciones = document.getElementById('grupo-presentaciones');
 const grupoPrecioGranel = document.getElementById('grupo-precio-granel');
@@ -53,7 +57,6 @@ const inputPrecio250 = document.getElementById('precio-250');
 const inputPrecio125 = document.getElementById('precio-125');
 
 let todosLosProductos = [];
-
 const STOCK_MINIMO_POR_DEFECTO = 5;
 
 
@@ -63,7 +66,6 @@ const STOCK_MINIMO_POR_DEFECTO = 5;
 
 function esCategoriaGranel(categoria) {
   const cat = (categoria || '').trim().toLowerCase();
-  // Retorna false si la categoría es envases o envase
   return cat !== 'envases' && cat !== 'envase';
 }
 
@@ -116,11 +118,9 @@ function actualizarVisibilidadPorCategoria() {
     if (grupoPrecioGranel) grupoPrecioGranel.classList.remove('hidden');
     if (grupoPresentaciones) grupoPresentaciones.classList.add('hidden');
   } else {
-    // Es categoría ENVASE / ENVASES
     if (grupoPrecioGranel) grupoPrecioGranel.classList.add('hidden');
     if (grupoPresentaciones) grupoPresentaciones.classList.remove('hidden');
 
-    // Si no hay filas de precio, crea una por defecto con 'Unidad'
     if (listaPresentaciones && listaPresentaciones.children.length === 0) {
       crearFilaPresentacion('Unidad', '', '1');
     }
@@ -141,11 +141,7 @@ if (prodCategoriaInput) {
 // PRESENTACIONES DINÁMICAS (SOLO ENVASES)
 // ==========================================================
 
-function crearFilaPresentacion(
-  nombre = '',
-  precio = '',
-  equivalencia = '1'
-) {
+function crearFilaPresentacion(nombre = '', precio = '', equivalencia = '1') {
   if (!listaPresentaciones) return;
 
   const fila = document.createElement('div');
@@ -185,19 +181,13 @@ function crearFilaPresentacion(
     </button>
   `;
 
-  fila
-    .querySelector('.btn-quitar-presentacion')
-    .addEventListener('click', () => {
-      fila.remove();
-    });
+  fila.querySelector('.btn-quitar-presentacion').addEventListener('click', () => {
+    fila.remove();
+  });
 
   listaPresentaciones.appendChild(fila);
 }
 
-
-// ==========================================================
-// AGREGAR PRESENTACIÓN
-// ==========================================================
 
 if (btnAgregarPresentacion) {
   btnAgregarPresentacion.addEventListener('click', () => {
@@ -209,10 +199,6 @@ if (btnAgregarPresentacion) {
   });
 }
 
-
-// ==========================================================
-// OBTENER PRESENTACIONES DEL FORMULARIO (SOLO ENVASES)
-// ==========================================================
 
 function obtenerPresentacionesDelFormulario() {
   if (!listaPresentaciones) return [];
@@ -227,11 +213,7 @@ function obtenerPresentacionesDelFormulario() {
     const equivalencia = equivaliaValor === '' ? 1 : parseFloat(equivaliaValor);
 
     if (nombre) {
-      presentaciones.push({
-        nombre,
-        precio,
-        equivalencia
-      });
+      presentaciones.push({ nombre, precio, equivalencia });
     }
   });
 
@@ -291,10 +273,6 @@ onAuthStateChanged(auth, (user) => {
 });
 
 
-// ==========================================================
-// LOGIN
-// ==========================================================
-
 if (formLogin) {
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -312,10 +290,6 @@ if (formLogin) {
 }
 
 
-// ==========================================================
-// CERRAR SESIÓN
-// ==========================================================
-
 if (btnLogout) {
   btnLogout.addEventListener('click', () => {
     signOut(auth);
@@ -325,7 +299,7 @@ if (btnLogout) {
 
 
 // ==========================================================
-// CARGAR PRODUCTOS DESDE FIRESTORE
+// CARGAR Y FILTRAR PRODUCTOS DESDE FIRESTORE
 // ==========================================================
 
 function cargarProductos() {
@@ -340,25 +314,41 @@ function cargarProductos() {
 }
 
 
-// ==========================================================
-// RENDERIZAR TABLA
-// ==========================================================
-
 function renderizarTabla(productos) {
   if (!tablaBody) return;
 
-  if (productos.length === 0) {
+  const textoBusqueda = filtroBuscar ? filtroBuscar.value.toLowerCase().trim() : '';
+  const categoriaSeleccionada = filtroCategoria ? filtroCategoria.value.trim().toLowerCase() : '';
+
+  // 1. Filtrar por búsqueda y categoría
+  let productosFiltrados = productos.filter(p => {
+    const coincideNombre = (p.nombre || '').toLowerCase().includes(textoBusqueda);
+    const coincideCategoria = !categoriaSeleccionada || (p.categoria || '').toLowerCase() === categoriaSeleccionada;
+    return coincideNombre && coincideCategoria;
+  });
+
+  // 2. Ordenar por categoría y luego alfabéticamente por nombre
+  productosFiltrados.sort((a, b) => {
+    const catA = (a.categoria || '').toLowerCase();
+    const catB = (b.categoria || '').toLowerCase();
+    if (catA === catB) {
+      return (a.nombre || '').localeCompare(b.nombre || '');
+    }
+    return catA.localeCompare(catB);
+  });
+
+  if (productosFiltrados.length === 0) {
     tablaBody.innerHTML = `
       <tr>
         <td colspan="5" style="text-align:center; padding:16px; color:#888;">
-          No hay productos registrados
+          No se encontraron productos registrados
         </td>
       </tr>
     `;
     return;
   }
 
-  tablaBody.innerHTML = productos.map(p => {
+  tablaBody.innerHTML = productosFiltrados.map(p => {
     const presentaciones = p.presentaciones || [];
     const resumenPresentaciones = presentaciones
       .map(pr => `${pr.nombre}: $${(Number(pr.precio) || 0).toLocaleString('es-CO')}`)
@@ -382,10 +372,13 @@ function renderizarTabla(productos) {
       }
     }
 
+    // Convertimos la categoría a minúsculas y sin espacios para que coincida con la clase CSS
+    const catClase = (p.categoria || '').toLowerCase().trim();
+
     return `
       <tr class="${claseFila}">
         <td><strong>${p.nombre || ''}</strong></td>
-        <td><span class="badge-cat cat-${p.categoria}">${p.categoria || ''}</span></td>
+        <td><span class="badge-cat cat-${catClase}">${p.categoria || ''}</span></td>
         <td><span style="color:${stockColor}; font-weight:600;">${stockTexto}</span></td>
         <td>${resumenPresentaciones || '—'}</td>
         <td>
@@ -416,6 +409,16 @@ function renderizarTabla(productos) {
   tablaBody.querySelectorAll('.btn-stock').forEach(btn => {
     btn.addEventListener('click', () => ajustarStockRapido(btn.dataset.id, btn.dataset.stock));
   });
+}
+
+
+// LISTENERS PARA FILTROS EN TIEMPO REAL
+if (filtroBuscar) {
+  filtroBuscar.addEventListener('input', () => renderizarTabla(todosLosProductos));
+}
+
+if (filtroCategoria) {
+  filtroCategoria.addEventListener('change', () => renderizarTabla(todosLosProductos));
 }
 
 
@@ -586,18 +589,10 @@ async function eliminarProducto(id) {
 }
 
 
-// ==========================================================
-// CANCELAR EDICIÓN
-// ==========================================================
-
 if (btnCancelarEdit) {
   btnCancelarEdit.addEventListener('click', limpiarFormulario);
 }
 
-
-// ==========================================================
-// LIMPIAR FORMULARIO
-// ==========================================================
 
 function limpiarFormulario() {
   if (formProducto) formProducto.reset();
@@ -625,15 +620,11 @@ function limpiarFormulario() {
 }
 
 
-// ==========================================================
-// INICIAR ESTADO DEL FORMULARIO
-// ==========================================================
-
 actualizarVisibilidadPorCategoria();
 
 
 // ==========================================================
-// IMPORTACIÓN MASIVA CSV
+// IMPORTACIÓN MASIVA Y PLANTILLA CSV
 // ==========================================================
 
 const inputCSV = document.getElementById('input-csv');
@@ -686,14 +677,14 @@ function parsearCSV(texto) {
 
 if (btnImportarCSV) {
   btnImportarCSV.addEventListener('click', async () => {
-    const archivo = inputCSV.files[0];
+    const archivo = inputCSV ? inputCSV.files[0] : null;
 
     if (!archivo) {
       mostrarToast('Selecciona un archivo CSV primero', 'error');
       return;
     }
 
-    progresoImportacion.textContent = 'Leyendo archivo...';
+    if (progresoImportacion) progresoImportacion.textContent = 'Leyendo archivo...';
 
     try {
       const texto = await archivo.text();
@@ -729,7 +720,7 @@ if (btnImportarCSV) {
 
       if (listaProductos.length === 0) {
         mostrarToast('No se encontraron productos válidos en el archivo', 'error');
-        progresoImportacion.textContent = '';
+        if (progresoImportacion) progresoImportacion.textContent = '';
         return;
       }
 
@@ -738,7 +729,9 @@ if (btnImportarCSV) {
 
       for (let i = 0; i < listaProductos.length; i++) {
         const producto = listaProductos[i];
-        progresoImportacion.textContent = `Importando ${i + 1} de ${listaProductos.length}: ${producto.nombre}...`;
+        if (progresoImportacion) {
+          progresoImportacion.textContent = `Importando ${i + 1} de ${listaProductos.length}: ${producto.nombre}...`;
+        }
 
         try {
           await addDoc(collection(db, 'productos'), producto);
@@ -749,13 +742,15 @@ if (btnImportarCSV) {
         }
       }
 
-      progresoImportacion.textContent = `Importación terminada: ${exitosos} productos agregados, ${fallidos} fallidos.`;
+      if (progresoImportacion) {
+        progresoImportacion.textContent = `Importación terminada: ${exitosos} productos agregados, ${fallidos} fallidos.`;
+      }
       mostrarToast(`${exitosos} productos importados correctamente`, 'exito');
-      inputCSV.value = '';
+      if (inputCSV) inputCSV.value = '';
 
     } catch (error) {
       mostrarToast('Error leyendo el archivo: ' + error.message, 'error');
-      progresoImportacion.textContent = '';
+      if (progresoImportacion) progresoImportacion.textContent = '';
     }
   });
 }
