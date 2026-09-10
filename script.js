@@ -1,6 +1,6 @@
 import { db } from "./firebase_config.js";
 import {
-  collection, getDocs, doc, getDoc, runTransaction
+  collection, onSnapshot, doc, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // ==========================================================
@@ -28,14 +28,12 @@ const NUMERO_WHATSAPP = "573136375152";
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
 // ==========================================================
-// CARGA DE PRODUCTOS DESDE FIREBASE
+// ESCUCHADOR EN TIEMPO REAL (FIREBASE ONSNAPSHOT)
 // ==========================================================
-
-async function cargarProductos() {
+function escucharProductosEnTiempoReal() {
   if (!contenedor) return;
 
-  try {
-    const snapshot = await getDocs(collection(db, "productos"));
+  onSnapshot(collection(db, "productos"), (snapshot) => {
     contenedor.innerHTML = '';
 
     if (snapshot.empty) {
@@ -250,17 +248,15 @@ async function cargarProductos() {
 
     inicializarEventosProductos();
     filtrarProductos();
-
-  } catch (error) {
-    contenedor.innerHTML = `<p style="color:red; text-align:center;">Error cargando productos: ${error.message}</p>`;
-    console.error("Error al obtener los productos desde Firebase:", error);
-  }
+  }, (error) => {
+    contenedor.innerHTML = `<p style="color:red; text-align:center;">Error conectando con la base de datos: ${error.message}</p>`;
+    console.error("Error en tiempo real de Firebase:", error);
+  });
 }
 
 // ==========================================================
-// FILTROS Y BÚSQUEDA DE PRODUCTOS
+// FILTROS Y BÚSQUEDA
 // ==========================================================
-
 function filtrarProductos() {
   const categoriaActiva = document.querySelector('.btn-filtro.activo')?.dataset.categoria || 'todos';
   const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : '';
@@ -269,7 +265,6 @@ function filtrarProductos() {
 
   productos.forEach(producto => {
     const coincideCategoria = (categoriaActiva === 'todos' || producto.dataset.categoria === categoriaActiva);
-    
     const nombreProducto = producto.dataset.nombre 
       ? producto.dataset.nombre.toLowerCase() 
       : producto.querySelector('h3')?.textContent.toLowerCase() || '';
@@ -284,12 +279,10 @@ function filtrarProductos() {
   });
 }
 
-// Evento para el campo de búsqueda
 if (inputBusqueda) {
   inputBusqueda.addEventListener('input', filtrarProductos);
 }
 
-// Evento para los botones de categorías
 const botonesFiltro = document.querySelectorAll('.btn-filtro');
 botonesFiltro.forEach(boton => {
   boton.addEventListener('click', () => {
@@ -300,9 +293,8 @@ botonesFiltro.forEach(boton => {
 });
 
 // ==========================================================
-// CONTROL DEL MODAL Y ELEMENTOS DEL CARRITO
+// MODAL Y CONTROLES DEL CARRITO
 // ==========================================================
-
 if (btnAbrirCarrito) {
   btnAbrirCarrito.addEventListener('click', () => modalCarrito.classList.remove('oculto-modal'));
 }
@@ -338,9 +330,8 @@ radiosEnvio.forEach(radio => {
 });
 
 // ==========================================================
-// LÍMITE DE CANTIDAD Y ACTUALIZACIÓN DINÁMICA
+// RECALCULAR CANTIDAD Y VALORES DINÁMICOS EN TARJETAS
 // ==========================================================
-
 function actualizarMaxCantidad(productoDiv) {
   const inputCantidad = productoDiv.querySelector('.cantidad');
   if (!inputCantidad) return;
@@ -401,9 +392,8 @@ function recalcularSubtotalTarjeta(productoDiv) {
 }
 
 // ==========================================================
-// EVENTOS DE BOTONES Y CAMPO DE TEXTO
+// EVENTOS DE PRODUCTOS Y VALIDACIÓN AL AGREGAR
 // ==========================================================
-
 function inicializarEventosProductos() {
   document.querySelectorAll('.producto').forEach(productoDiv => {
     actualizarMaxCantidad(productoDiv);
@@ -504,7 +494,32 @@ function inicializarEventosProductos() {
       }
 
       const productoId = productoDiv.dataset.id;
+      const stockTotalTxt = productoDiv.dataset.stock;
       const productoExistente = carrito.find(item => item.nombre === nombre);
+
+      // Verificación preventiva de stock antes de agregar al carrito
+      if (stockTotalTxt !== '' && stockTotalTxt !== undefined) {
+        const stockTotal = Number(stockTotalTxt);
+        let equivalencia = 1;
+
+        if (tipoVenta !== 'granel' && tipoVenta !== 'unidad') {
+          const selectPresentacion = productoDiv.querySelector('.presentacion');
+          if (selectPresentacion) {
+            equivalencia = Number(selectPresentacion.options[selectPresentacion.selectedIndex]?.dataset.equivalencia) || 1;
+          } else {
+            equivalencia = Number(productoDiv.dataset.equivalencia) || 1;
+          }
+        }
+
+        const cantidadEnCarrito = productoExistente ? productoExistente.cantidad : 0;
+        const totalSolicitado = (cantidadEnCarrito + cantidad) * equivalencia;
+
+        if (totalSolicitado > stockTotal) {
+          const disponibleRestante = Math.floor((stockTotal - (cantidadEnCarrito * equivalencia)) / equivalencia);
+          alert(`No puedes agregar esa cantidad. Solo quedan ${Math.max(0, disponibleRestante)} ${unidadMedida} disponibles de "${nombre}".`);
+          return;
+        }
+      }
 
       if (productoExistente) {
         productoExistente.cantidad += cantidad;
@@ -527,9 +542,8 @@ function inicializarEventosProductos() {
 }
 
 // ==========================================================
-// ACTUALIZAR CARRITO
+// ACTUALIZAR ESTADO DEL CARRITO (CON LÍMITE EN EL BOTÓN +)
 // ==========================================================
-
 function actualizarCarrito() {
   if (!listaCarrito) return;
 
@@ -561,6 +575,31 @@ function actualizarCarrito() {
     });
 
     li.querySelector('.btn-sumar').addEventListener('click', () => {
+      // Validar si al presionar + se supera el stock disponible en la tienda
+      const tarjetaProducto = document.querySelector(`.producto[data-id="${item.productoId}"]`);
+      if (tarjetaProducto && tarjetaProducto.dataset.stock !== '') {
+        const stockDisponible = Number(tarjetaProducto.dataset.stock);
+        let equivalencia = 1;
+
+        if (item.tipoVenta !== 'granel' && item.tipoVenta !== 'unidad') {
+          const select = tarjetaProducto.querySelector('.presentacion');
+          if (select) {
+            const opcion = select.options[select.selectedIndex];
+            equivalencia = Number(opcion?.dataset.equivalencia) || 1;
+          } else {
+            equivalencia = Number(tarjetaProducto.dataset.equivalencia) || 1;
+          }
+        }
+
+        const nuevaCantidadRequerida = (item.cantidad + 1) * equivalencia;
+
+        if (nuevaCantidadRequerida > stockDisponible) {
+          const maximoItems = Math.floor(stockDisponible / equivalencia);
+          alert(`Solo puedes agregar hasta ${maximoItems} ${unidadVisual} (Stock disponible: ${stockDisponible}).`);
+          return;
+        }
+      }
+
       carrito[index].cantidad += 1;
       actualizarCarrito();
     });
@@ -594,52 +633,52 @@ function actualizarCarrito() {
 }
 
 // ==========================================================
-// VERIFICAR Y DESCONTAR STOCK
+// DESCUENTO ATÓMICO CON TRANSACCIONES (EVITA SOBREVENTAS)
 // ==========================================================
-
-async function verificarYDescontarStock(itemsCarrito) {
-  for (const item of itemsCarrito) {
-    if (!item.productoId) continue;
-    const snap = await getDoc(doc(db, 'productos', item.productoId));
-    if (!snap.exists()) continue;
-
-    const data = snap.data();
-    if (data.stock === null || data.stock === undefined) continue;
-
-    let cantidadARestar = (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad')
-      ? item.cantidad
-      : item.cantidad * ((data.presentaciones || []).find(p => p.nombre === item.presentacionNombre)?.equivalencia || 1);
-
-    if (Number(data.stock) < cantidadARestar) {
-      throw new Error(`No hay suficiente stock de "${item.nombre}". Ajusta la cantidad.`);
+async function descontarStockAtomico(itemsCarrito) {
+  await runTransaction(db, async (transaction) => {
+    // 1. Fase de Lectura previa
+    const lecturas = [];
+    for (const item of itemsCarrito) {
+      if (!item.productoId) continue;
+      const ref = doc(db, 'productos', item.productoId);
+      lecturas.push({ ref, item, snap: await transaction.get(ref) });
     }
-  }
 
-  for (const item of itemsCarrito) {
-    if (!item.productoId) continue;
-    const refProducto = doc(db, 'productos', item.productoId);
-
-    await runTransaction(db, async (transaction) => {
-      const snap = await transaction.get(refProducto);
-      if (!snap.exists()) return;
-
+    // 2. Validación de Stock
+    for (const { snap, item } of lecturas) {
+      if (!snap.exists()) continue;
       const data = snap.data();
-      if (data.stock === null || data.stock === undefined) return;
+      if (data.stock === null || data.stock === undefined) continue;
 
-      let cantidadARestar = (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad')
+      let cantidadRequerida = (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad')
         ? item.cantidad
         : item.cantidad * ((data.presentaciones || []).find(p => p.nombre === item.presentacionNombre)?.equivalencia || 1);
 
-      const nuevoStock = Math.max(0, Number(data.stock) - cantidadARestar);
-      transaction.update(refProducto, { stock: nuevoStock });
-    });
-  }
+      if (Number(data.stock) < cantidadRequerida) {
+        throw new Error(`¡Ups! Un producto acaba de agotarse o no tiene suficiente stock: "${item.nombre}". Disponible: ${data.stock}`);
+      }
+    }
+
+    // 3. Aplicar descuento de Stock
+    for (const { ref, snap, item } of lecturas) {
+      if (!snap.exists()) continue;
+      const data = snap.data();
+      if (data.stock === null || data.stock === undefined) continue;
+
+      let cantidadRequerida = (item.tipoVenta === 'granel' || item.tipoVenta === 'unidad')
+        ? item.cantidad
+        : item.cantidad * ((data.presentaciones || []).find(p => p.nombre === item.presentacionNombre)?.equivalencia || 1);
+
+      const nuevoStock = Math.max(0, Number(data.stock) - cantidadRequerida);
+      transaction.update(ref, { stock: nuevoStock });
+    }
+  });
 }
 
 // ==========================================================
-// ENVIAR A WHATSAPP (CORREGIDO)
+// ENVIAR A WHATSAPP
 // ==========================================================
-
 if (btnEnviarPedido) {
   btnEnviarPedido.addEventListener('click', async () => {
     if (carrito.length === 0) {
@@ -655,15 +694,15 @@ if (btnEnviarPedido) {
       return;
     }
 
-    // 1. Verificación y descuento de stock
+    // 1. Ejecutar descuento seguro en transacción atómica
     try {
-      await verificarYDescontarStock(carrito);
+      await descontarStockAtomico(carrito);
     } catch (error) {
       alert(error.message);
       return;
     }
 
-    // 2. Construcción del mensaje con saltos de línea estándar
+    // 2. Formatear mensaje de WhatsApp
     const fecha = new Date().toLocaleDateString('es-CO');
     const hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
@@ -693,25 +732,22 @@ if (btnEnviarPedido) {
     textoMensaje += `==============================\n`;
     textoMensaje += `_(El valor final con domicilio será confirmado por el vendedor)_`;
 
-    // 3. Formateo seguro de la URL para WhatsApp
     const urlWhatsApp = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP}&text=${encodeURIComponent(textoMensaje)}`;
 
-    // 4. Vaciar carrito y recargar interfaz
+    // 3. Vaciar el carrito y redirigir
     carrito = [];
     actualizarCarrito();
-    cargarProductos();
 
-    // 5. Redirección directa para evitar bloqueos del navegador
     window.location.href = urlWhatsApp;
   });
 }
-// ==========================================================
-// ZOOM Y CARGA INICIAL
-// ==========================================================
 
+// ==========================================================
+// MODAL DE ZOOM Y CARGA INICIAL EN TIEMPO REAL
+// ==========================================================
 if (modalZoom) {
   modalZoom.addEventListener('click', () => modalZoom.classList.add('oculto-modal'));
 }
 
-cargarProductos();
+escucharProductosEnTiempoReal();
 actualizarCarrito();
