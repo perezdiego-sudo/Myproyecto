@@ -2,14 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Panel de Administración - Quimiaseo y Perfumería del Caribe</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      /* PALETA DE COLORES EXACTA DEL CATÁLOGO */
+      /* PALETA DE COLORES */
       --brand-blue: #0038a8;
       --brand-blue-hover: #002c86;
       --brand-title: #002d80;
@@ -28,91 +28,135 @@
       --radius-sm: 8px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    body {
+    html, body {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
       background-color: var(--bg-page);
       color: var(--text-main);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* HEADER OFICIAL */
     header {
       background-color: var(--brand-blue);
       color: #ffffff;
-      padding: 16px 32px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      font-size: 1.1rem;
+      gap: 10px;
       text-decoration: none;
       color: white;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      min-width: 0;
+      flex: 1;
     }
 
     .brand-logo {
       background-color: #ffffff;
       color: var(--brand-blue);
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       flex-shrink: 0;
     }
 
-    .user-info { display: flex; align-items: center; gap: 14px; }
+    .brand span {
+      font-weight: 800;
+      font-size: clamp(0.75rem, 3.2vw, 1.05rem);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      line-height: 1.2;
+      white-space: normal;
+      word-break: break-word;
+    }
 
-    #user-email { font-weight: 600; color: #ffffff; font-size: 0.9rem; }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    #user-email {
+      font-weight: 600;
+      color: #ffffff;
+      font-size: 0.82rem;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     .btn-logout {
-      background-color: rgba(255, 255, 255, 0.15);
+      background-color: rgba(255, 255, 255, 0.18);
       color: white;
       border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: var(--radius-pill);
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.78rem;
+      white-space: nowrap;
       transition: all 0.2s ease;
     }
-    .btn-logout:hover {
+    .btn-logout:hover, .btn-logout:active {
       background-color: var(--badge-red);
       border-color: var(--badge-red);
     }
 
-    main { flex: 1; max-width: 1200px; width: 100%; margin: 32px auto; padding: 0 20px; }
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 0 14px;
+    }
 
     /* TITULAR SECCIÓN */
     .page-title {
       text-align: center;
       color: var(--brand-title);
-      font-size: 2rem;
+      font-size: clamp(1.35rem, 5vw, 1.9rem);
       font-weight: 800;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
+      word-break: break-word;
     }
 
     /* CONTENEDOR LOGIN */
     .login-container {
-      max-width: 400px;
-      margin: 40px auto;
+      width: 100%;
+      max-width: 390px;
+      margin: 30px auto;
       background: var(--card-bg);
       border-radius: var(--radius-card);
-      padding: 36px 30px;
+      padding: 24px 18px;
       box-shadow: var(--shadow-md);
       border: 1px solid var(--border-color);
     }
@@ -120,63 +164,85 @@
     .login-title {
       text-align: center;
       color: var(--brand-title);
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 800;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     /* TARJETAS DENTRO DEL PANEL */
-    .dashboard-grid { display: flex; flex-direction: column; gap: 24px; }
+    .dashboard-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: 100%;
+    }
 
     .card {
       background: var(--card-bg);
       border-radius: var(--radius-card);
-      padding: 28px;
+      padding: 18px 14px;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--border-color);
+      width: 100%;
+      overflow: hidden;
     }
 
     .card-title {
-      font-size: 1.25rem;
+      font-size: clamp(1.05rem, 3.5vw, 1.25rem);
       font-weight: 800;
       color: var(--brand-title);
-      margin-bottom: 20px;
-      padding-bottom: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
       border-bottom: 2px solid var(--card-inner-bg);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      word-break: break-word;
     }
 
     /* FORMULARIOS E INPUTS */
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
 
-    .form-group { margin-bottom: 18px; }
+    .form-group {
+      margin-bottom: 14px;
+      width: 100%;
+    }
 
     .form-group label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--brand-title);
     }
 
     .form-group input, .form-group select, .form-group textarea {
       width: 100%;
-      padding: 12px 18px;
-      border: 1px solid var(--border-color);
+      max-width: 100%;
+      min-height: 44px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border-color);
       border-radius: var(--radius-pill);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       background-color: #ffffff;
       color: var(--text-main);
       transition: all 0.2s ease;
     }
 
-    .form-group textarea { border-radius: 12px; }
+    .form-group textarea {
+      min-height: 70px;
+      border-radius: 12px;
+      resize: vertical;
+    }
 
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
       outline: none;
@@ -184,15 +250,16 @@
       box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
     }
 
-    /* BOTONES ESTILO CATÁLOGO */
+    /* BOTONES */
     .btn-primary {
       width: 100%;
+      min-height: 44px;
       background-color: var(--brand-blue);
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: var(--radius-pill);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
@@ -201,83 +268,331 @@
       gap: 8px;
       transition: all 0.2s ease;
     }
-    .btn-primary:hover {
+    .btn-primary:hover, .btn-primary:active {
       background-color: var(--brand-blue-hover);
-      transform: translateY(-1px);
     }
 
     .btn-secondary {
       background-color: #ffffff;
       color: var(--text-muted);
-      border: 1px solid var(--border-color);
+      border: 1.5px solid var(--border-color);
     }
-    .btn-secondary:hover {
+    .btn-secondary:hover, .btn-secondary:active {
       background-color: var(--card-inner-bg);
       color: var(--brand-title);
     }
 
+    /* CARGA MASIVA CSV */
+    .csv-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .csv-box input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 0.85rem;
+      border: 1.5px dashed var(--border-color);
+      border-radius: 10px;
+      background-color: var(--bg-page);
+    }
+
+    .csv-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    /* PRECIOS GRANEL */
+    .granel-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .granel-grid label {
+      font-size: 0.78rem;
+      margin-bottom: 3px;
+    }
+
+    .granel-grid input {
+      min-height: 40px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
     /* PRESENTACIONES DINÁMICAS */
-    #lista-presentaciones { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+    #lista-presentaciones {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
 
     .fila-presentacion {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr auto;
-      gap: 10px;
-      align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       background: var(--card-inner-bg);
-      padding: 10px 14px;
+      padding: 12px;
       border-radius: 12px;
+      width: 100%;
+    }
+
+    .fila-presentacion input {
+      min-height: 40px;
+      background-color: #ffffff;
     }
 
     .btn-quitar-presentacion {
       background: #ffffff;
       color: var(--badge-red);
-      border: 1px solid var(--border-color);
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      min-height: 38px;
+      width: 100%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: 700;
+      font-size: 0.82rem;
+      gap: 6px;
       transition: all 0.2s ease;
     }
-    .btn-quitar-presentacion:hover {
-      background: var(--badge-red);
-      color: white;
+
+    /* ESTILO DE BUSCADORES Y FILTROS (REDONDEADOS COMO EN LA FOTO 2) */
+    .filtros-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+      width: 100%;
     }
 
-    /* TABLA E INVENTARIO */
+    .filtros-box input,
+    .filtros-box select {
+      width: 100%;
+      height: 48px;
+      padding: 0 22px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      background-color: #ffffff;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0, 56, 168, 0.04);
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .filtros-box input:focus,
+    .filtros-box select:focus {
+      border-color: var(--brand-blue);
+      box-shadow: 0 0 0 4px rgba(0, 56, 168, 0.12);
+    }
+
     .table-responsive {
-      overflow-x: auto;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
+      width: 100%;
     }
 
-    table { width: 100%; border-collapse: collapse; text-align: left; }
+    /* ESTILOS DE TABLA EN MÓVILES (< 768px) */
+    @media (max-width: 768px) {
+      .table-responsive {
+        overflow-x: hidden;
+      }
 
-    th, td { padding: 14px 18px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-    th {
-      background-color: var(--card-inner-bg);
-      color: var(--brand-title);
-      font-weight: 800;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      thead {
+        display: none;
+      }
+
+      tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+
+      tr {
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        border: 1.5px solid var(--border-color);
+        border-radius: 14px;
+        padding: 12px 14px;
+        gap: 8px;
+        width: 100%;
+        box-shadow: var(--shadow-sm);
+      }
+
+      tr.fila-agotado {
+        border-left: 5px solid var(--badge-red);
+        background-color: #fff8f8;
+      }
+
+      tr.fila-stock-bajo {
+        border-left: 5px solid #f59e0b;
+        background-color: #fffdf5;
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 4px 0;
+        font-size: 0.85rem;
+        word-break: break-word;
+      }
+
+      td:first-child {
+        font-size: 0.98rem;
+        font-weight: 800;
+        color: var(--brand-title);
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--card-inner-bg);
+      }
+
+      td:last-child {
+        margin-top: 4px;
+        padding-top: 8px;
+        border-top: 1px solid var(--card-inner-bg);
+      }
+
+      .action-btns {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        width: 100%;
+      }
+
+      .btn-sm {
+        min-height: 38px;
+        padding: 0;
+        justify-content: center;
+        font-size: 0.78rem;
+        width: 100%;
+      }
     }
 
-    tr:hover { background-color: #fafbfc; }
+    /* ESTILOS DE TABLA EN ESCRITORIO (> 768px) */
+    @media (min-width: 769px) {
+      header { padding: 16px 32px; }
+      main { margin: 30px auto; padding: 0 20px; }
+      .card { padding: 26px; }
 
-    tr.fila-agotado { background-color: #fef2f2; }
-    tr.fila-stock-bajo { background-color: #fffbeb; }
+      .form-row { flex-direction: row; gap: 16px; }
+      .form-row .form-group { flex: 1; }
 
-    /* BADGES CATEGORÍA E ESTADO (ESTILO CATÁLOGO) */
+      .csv-box { flex-direction: row; align-items: center; }
+      .csv-btns { flex-direction: row; width: auto; }
+      .csv-btns button { width: auto; }
+
+      .granel-grid { grid-template-columns: repeat(4, 1fr); }
+
+      .filtros-box {
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+      }
+      .filtros-box input { flex: 1; }
+      .filtros-box select { width: auto; min-width: 220px; }
+
+      .fila-presentacion {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr auto;
+        align-items: center;
+      }
+
+      .btn-quitar-presentacion {
+        width: 36px;
+        height: 36px;
+        min-height: 36px;
+        border-radius: 50%;
+      }
+
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: auto;
+      }
+
+      thead {
+        display: table-header-group;
+      }
+
+      tbody {
+        display: table-row-group;
+      }
+
+      tr {
+        display: table-row !important;
+      }
+
+      th, td {
+        display: table-cell !important;
+        padding: 12px 14px;
+        vertical-align: middle;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.88rem;
+      }
+
+      th {
+        background-color: var(--card-inner-bg);
+        color: var(--brand-title);
+        font-weight: 800;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+
+      th:nth-child(1), td:nth-child(1) { width: 22%; }
+      th:nth-child(2), td:nth-child(2) { width: 14%; }
+      th:nth-child(3), td:nth-child(3) { width: 12%; }
+      th:nth-child(4), td:nth-child(4) { width: 34%; }
+      th:nth-child(5), td:nth-child(5) { width: 18%; }
+
+      tr:hover { background-color: #fafbfc; }
+      tr.fila-agotado { background-color: #fef2f2; }
+      tr.fila-stock-bajo { background-color: #fffbeb; }
+
+      .action-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+      }
+
+      .btn-sm {
+        min-width: 90px;
+        justify-content: center;
+      }
+    }
+
+    /* BADGES Y BOTONES DE ACCIÓN */
     .badge-cat {
       display: inline-block;
       padding: 4px 12px;
       border-radius: var(--radius-pill);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       background-color: var(--badge-blue);
       color: #ffffff;
@@ -287,13 +602,11 @@
       display: inline-block;
       padding: 4px 12px;
       border-radius: var(--radius-pill);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       background-color: var(--badge-red);
       color: #ffffff;
     }
-
-    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 
     .btn-sm {
       padding: 6px 14px;
@@ -308,42 +621,48 @@
       transition: all 0.2s ease;
     }
     .btn-edit { background: var(--card-inner-bg); color: var(--brand-title); }
-    .btn-edit:hover { background: #dbe4f0; }
-    .btn-stock { background: #e0f2fe; color: #0369a1; }
-    .btn-stock:hover { background: #bae6fd; }
-    .btn-delete { background: #fee2e2; color: var(--badge-red); }
-    .btn-delete:hover { background: var(--badge-red); color: white; }
+    .btn-edit:hover, .btn-edit:active { background: #dbe4f0; }
 
-    /* NOTIFICACIONES TOAST */
-    #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; }
+    .btn-stock { background: #e0f2fe; color: #0369a1; }
+    .btn-stock:hover, .btn-stock:active { background: #bae6fd; }
+
+    .btn-delete { background: #fee2e2; color: var(--badge-red); }
+    .btn-delete:hover, .btn-delete:active { background: var(--badge-red); color: white; }
+
+    /* TOAST NOTIFICACIÓN */
+    #toast-container {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 9999;
+      pointer-events: none;
+    }
 
     .toast {
       background-color: var(--brand-title);
       color: white;
-      padding: 14px 22px;
+      padding: 12px 18px;
       border-radius: var(--radius-pill);
       box-shadow: var(--shadow-md);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
       animation: fadeIn 0.3s ease-out;
+      pointer-events: auto;
     }
     .toast.error { background-color: var(--badge-red); }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .hidden { display: none !important; }
-
-    @media (max-width: 600px) {
-      header { padding: 12px 16px; }
-      .brand { font-size: 0.95rem; }
-      main { margin: 16px auto; padding: 0 12px; }
-      .card { padding: 18px; }
-      .action-btns { flex-direction: column; }
-      .btn-sm { width: 100%; justify-content: center; }
-    }
   </style>
 </head>
 <body>
@@ -382,21 +701,62 @@
     <section id="panel-section" class="dashboard-grid hidden">
 
       <h1 class="page-title">Panel Administrador</h1>
+      
 
       <!-- CARGA CSV -->
       <div class="card">
         <h2 class="card-title"><i class="fa-solid fa-file-csv"></i> Carga Masiva de Productos (CSV)</h2>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px;">
-          <input type="file" id="input-csv" accept=".csv" style="flex: 1; min-width: 200px;">
-          <button type="button" class="btn-primary" id="btn-importar-csv" style="width: auto;">
-            <i class="fa-solid fa-upload"></i> Importar CSV
-          </button>
-          <button type="button" class="btn-primary btn-secondary" id="btn-descargar-plantilla" style="width: auto;">
-            <i class="fa-solid fa-download"></i> Plantilla
-          </button>
+        <div class="csv-box">
+          <input type="file" id="input-csv" accept=".csv">
+          <div class="csv-btns">
+            <button type="button" class="btn-primary" id="btn-importar-csv">
+              <i class="fa-solid fa-upload"></i> Importar CSV
+            </button>
+            <button type="button" class="btn-primary btn-secondary" id="btn-descargar-plantilla">
+              <i class="fa-solid fa-download"></i> Plantilla
+            </button>
+          </div>
         </div>
-        <p id="progreso-importacion" style="margin-top: 10px; font-size: 0.88rem; font-weight: 700; color: var(--brand-blue);"></p>
+        <p id="progreso-importacion" style="margin-top: 10px; font-size: 0.88rem; font-weight: 700; color: var(--brand-blue); text-align: center;"></p>
       </div>
+
+      <div class="kpi-wrapper">
+  <!-- Botón para mostrar / ocultar -->
+  <button type="button" id="btn-toggle-kpis" class="btn-primary btn-secondary" style="width: auto; margin: 0 auto; display: flex;">
+    <i class="fa-solid fa-chart-line"></i> <span id="txt-btn-kpi">Ver Indicadores</span>
+  </button>
+
+  <div id="kpi-container">
+  <div class="kpi-card">
+    <div class="kpi-icon total">
+      <i class="fa-solid fa-boxes-stacked"></i>
+    </div>
+    <div class="kpi-info">
+      <h3 id="kpi-total">0</h3>
+      <p>Total Productos</p>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-icon agotados">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <div class="kpi-info">
+      <h3 id="kpi-agotados">0</h3>
+      <p>Productos Agotados</p>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-icon bajo">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+    </div>
+    <div class="kpi-info">
+      <h3 id="kpi-bajo-stock">0</h3>
+      <p>Stock Bajo</p>
+    </div>
+  </div>
+</div>
 
       <!-- REGISTRO / EDICIÓN -->
       <div class="card">
@@ -440,7 +800,7 @@
           <!-- PRECIOS GRANEL -->
           <div id="grupo-precio-granel" class="form-group">
             <label><strong>Precios por Fracción:</strong></label>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;">
+            <div class="granel-grid">
               <div>
                 <label for="precio-1000">1000 <span class="unidad-granel-txt">g</span>:</label>
                 <input type="number" id="precio-1000" placeholder="Precio ($)">
@@ -464,7 +824,7 @@
           <div id="grupo-presentaciones" class="form-group hidden">
             <label><strong>Presentaciones y Precios:</strong></label>
             <div id="lista-presentaciones"></div>
-            <button type="button" id="btn-agregar-presentacion" class="btn-sm btn-edit" style="width: 100%; justify-content: center; margin-top: 8px;">
+            <button type="button" id="btn-agregar-presentacion" class="btn-sm btn-edit" style="width: 100%; justify-content: center; margin-top: 8px; min-height: 40px;">
               <i class="fa-solid fa-plus"></i> Agregar opción
             </button>
           </div>
@@ -481,7 +841,7 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
             <button type="submit" class="btn-primary" id="btn-guardar-prod">
               Guardar Producto
             </button>
@@ -493,25 +853,21 @@
         </form>
       </div>
 
-      <!-- TABLA DE INVENTARIO -->
+      <!-- TABLA DE INVENTARIO Y FILTROS -->
       <div class="card">
         <h2 class="card-title"><i class="fa-solid fa-boxes-stacked"></i> Productos en Inventario</h2>
         
-        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 220px;">
-            <input type="text" id="filtro-buscar" placeholder="🔍 Buscar producto por nombre...">
-          </div>
-          <div>
-            <select id="filtro-categoria" style="width: auto;">
-              <option value="">Todas las categorías</option>
-              <option value="polvos">Polvos</option>
-              <option value="liquidos">Líquidos</option>
-              <option value="perfumeria">Perfumería</option>
-              <option value="aromas">Aromas</option>
-              <option value="sabores">Sabores</option>
-              <option value="envases">Envases Plásticos</option>
-            </select>
-          </div>
+        <div class="filtros-box">
+          <input type="text" id="filtro-buscar" placeholder="🔍 Buscar producto por nombre...">
+          <select id="filtro-categoria">
+            <option value="">Todas las categorías</option>
+            <option value="polvos">Polvos</option>
+            <option value="liquidos">Líquidos</option>
+            <option value="perfumeria">Perfumería</option>
+            <option value="aromas">Aromas</option>
+            <option value="sabores">Sabores</option>
+            <option value="envases">Envases Plásticos</option>
+          </select>
         </div>
 
         <div class="table-responsive">

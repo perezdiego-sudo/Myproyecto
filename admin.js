@@ -256,6 +256,7 @@ function cargarProductos() {
     }));
 
     renderizarTabla(todosLosProductos);
+    actualizarKPIs(todosLosProductos);
   });
 }
 
@@ -288,6 +289,7 @@ function renderizarTabla(productos) {
         </td>
       </tr>
     `;
+    actualizarKPIs(todosLosProductos);
     return;
   }
 
@@ -353,6 +355,8 @@ function renderizarTabla(productos) {
   tablaBody.querySelectorAll('.btn-stock').forEach(btn => {
     btn.addEventListener('click', () => ajustarStockRapido(btn.dataset.id, btn.dataset.stock));
   });
+
+  actualizarKPIs(todosLosProductos);
 }
 
 if (filtroBuscar) filtroBuscar.addEventListener('input', () => renderizarTabla(todosLosProductos));
@@ -673,6 +677,48 @@ if (btnDescargarPlantilla) {
 
     URL.revokeObjectURL(url);
   });
+}
+
+// ==========================================================
+// INDICADORES (KPIs) Y DESPLEGABLE
+// ==========================================================
+const btnToggleKpis = document.getElementById('btn-toggle-kpis');
+const kpiContainer = document.getElementById('kpi-container');
+const txtBtnKpi = document.getElementById('txt-btn-kpi');
+
+if (btnToggleKpis && kpiContainer && txtBtnKpi) {
+  btnToggleKpis.addEventListener('click', () => {
+    kpiContainer.classList.toggle('hidden');
+    const estaOculto = kpiContainer.classList.contains('hidden');
+    txtBtnKpi.textContent = estaOculto ? 'Ver Indicadores' : 'Ocultar Indicadores';
+  });
+}
+
+export function actualizarKPIs(listaProductos) {
+  if (!Array.isArray(listaProductos)) return;
+
+  const total = listaProductos.length;
+
+  const agotados = listaProductos.filter(p => {
+    if (p.stock === null || p.stock === undefined || p.stock === '') return false;
+    return Number(p.stock) <= 0;
+  }).length;
+
+  const stockBajo = listaProductos.filter(p => {
+    if (p.stock === null || p.stock === undefined || p.stock === '' || Number(p.stock) <= 0) return false;
+    const min = (p.stockMinimo === null || p.stockMinimo === undefined || p.stockMinimo === '') 
+      ? STOCK_MINIMO_POR_DEFECTO 
+      : Number(p.stockMinimo);
+    return Number(p.stock) <= min;
+  }).length;
+
+  const elemTotal = document.getElementById('kpi-total');
+  const elemAgotados = document.getElementById('kpi-agotados');
+  const elemStockBajo = document.getElementById('kpi-bajo-stock');
+
+  if (elemTotal) elemTotal.textContent = total;
+  if (elemAgotados) elemAgotados.textContent = agotados;
+  if (elemStockBajo) elemStockBajo.textContent = stockBajo;
 }
 
 // ==========================================================
