@@ -3,242 +3,346 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Administración - Quimiaseo Caribe</title>
+  <title>Panel de Administración - Quimiaseo y Perfumería del Caribe</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --primary-color: #0d47a1;
-      --primary-dark: #002171;
-      --bg-color: #f4f6f9;
+      /* PALETA DE COLORES EXACTA DEL CATÁLOGO */
+      --brand-blue: #0038a8;
+      --brand-blue-hover: #002c86;
+      --brand-title: #002d80;
+      --bg-page: #f4f6f9;
       --card-bg: #ffffff;
-      --text-color: #333333;
-      --border-color: #e0e0e0;
-      --success-color: #2e7d32;
-      --danger-color: #c62828;
+      --card-inner-bg: #ebf0f7;
+      --badge-blue: #3b71d8;
+      --badge-red: #f05252;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 4px 14px rgba(0, 56, 168, 0.05);
+      --shadow-md: 0 8px 24px rgba(0, 56, 168, 0.08);
+      --radius-pill: 50px;
+      --radius-card: 16px;
+      --radius-sm: 8px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-    html, body { overflow-x: hidden; }
-
-    body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; flex-direction: column; }
-
-    header {
-      background-color: var(--primary-color);
-      color: #ffffff;
-      padding: 15px 30px;
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      flex-direction: column;
     }
 
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.25rem; text-decoration: none; color: white; min-width: 0; }
+    /* HEADER OFICIAL */
+    header {
+      background-color: var(--brand-blue);
+      color: #ffffff;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-    .brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-decoration: none;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
     .brand-logo {
       background-color: #ffffff;
-      color: var(--primary-color);
-      width: 38px; height: 38px;
+      color: var(--brand-blue);
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
       flex-shrink: 0;
     }
 
-    .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .user-info { display: flex; align-items: center; gap: 14px; }
 
-    #user-email { max-width: 45vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #user-email { font-weight: 600; color: #ffffff; font-size: 0.9rem; }
 
     .btn-logout {
-      background-color: rgba(255,255,255,0.15);
+      background-color: rgba(255, 255, 255, 0.15);
       color: white;
-      border: 1px solid rgba(255,255,255,0.3);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       padding: 6px 14px;
-      border-radius: 6px;
+      border-radius: var(--radius-pill);
       cursor: pointer;
-      transition: background-color 0.2s;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
     }
-    .btn-logout:hover { background-color: rgba(255,255,255,0.3); }
+    .btn-logout:hover {
+      background-color: var(--badge-red);
+      border-color: var(--badge-red);
+    }
 
-    main { flex: 1; max-width: 1200px; width: 100%; margin: 30px auto; padding: 0 20px; }
+    main { flex: 1; max-width: 1200px; width: 100%; margin: 32px auto; padding: 0 20px; }
 
+    /* TITULAR SECCIÓN */
+    .page-title {
+      text-align: center;
+      color: var(--brand-title);
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 28px;
+    }
+
+    /* CONTENEDOR LOGIN */
     .login-container {
-      max-width: 420px; margin: 40px auto;
-      background: var(--card-bg); border-radius: 12px;
-      padding: 35px 30px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      max-width: 400px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 36px 30px;
+      box-shadow: var(--shadow-md);
       border: 1px solid var(--border-color);
     }
 
     .login-title {
-      text-align: center; color: var(--primary-color);
-      font-size: 1.4rem; margin-bottom: 25px;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
+      text-align: center;
+      color: var(--brand-title);
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
-    .form-group { margin-bottom: 18px; }
-
-    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; color: #444; }
-
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 11px 14px;
-      border: 1px solid var(--border-color); border-radius: 6px;
-      font-size: 0.95rem; background-color: #f9fbfd;
-      transition: border-color 0.2s;
-    }
-
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      outline: none; border-color: var(--primary-color); background-color: #ffffff;
-    }
-
-    .btn-primary {
-      width: 100%; background-color: var(--primary-color); color: white;
-      border: none; padding: 12px; border-radius: 6px;
-      font-size: 1rem; font-weight: 600; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: background-color 0.2s;
-    }
-    .btn-primary:hover { background-color: var(--primary-dark); }
-
-    .dashboard-grid { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 25px; 
-}
+    /* TARJETAS DENTRO DEL PANEL */
+    .dashboard-grid { display: flex; flex-direction: column; gap: 24px; }
 
     .card {
-      background: var(--card-bg); border-radius: 10px; padding: 22px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
-      min-width: 0;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
     }
 
     .card-title {
-      font-size: 1.15rem; color: var(--primary-color); margin-bottom: 18px;
-      padding-bottom: 10px; border-bottom: 2px solid #eef2f7;
-      display: flex; align-items: center; gap: 8px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--brand-title);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--card-inner-bg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
+    /* FORMULARIOS E INPUTS */
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+
+    .form-group { margin-bottom: 18px; }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--brand-title);
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 12px 18px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      font-size: 0.92rem;
+      background-color: #ffffff;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .form-group textarea { border-radius: 12px; }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--brand-blue);
+      box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.12);
+    }
+
+    /* BOTONES ESTILO CATÁLOGO */
+    .btn-primary {
+      width: 100%;
+      background-color: var(--brand-blue);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: var(--radius-pill);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      background-color: var(--brand-blue-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover {
+      background-color: var(--card-inner-bg);
+      color: var(--brand-title);
+    }
+
+    /* PRESENTACIONES DINÁMICAS */
     #lista-presentaciones { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 
     .fila-presentacion {
       display: grid;
       grid-template-columns: 1.2fr 1fr 1fr auto;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
-    }
-
-    .fila-presentacion input {
-      padding: 9px 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      font-size: 0.85rem;
+      background: var(--card-inner-bg);
+      padding: 10px 14px;
+      border-radius: 12px;
     }
 
     .btn-quitar-presentacion {
-      background: #ffebee; color: var(--danger-color);
-      border: none; border-radius: 6px;
-      width: 34px; height: 34px; cursor: pointer;
+      background: #ffffff;
+      color: var(--badge-red);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .btn-quitar-presentacion:hover {
+      background: var(--badge-red);
+      color: white;
     }
 
-    .btn-agregar-presentacion {
-      background: #e3f2fd; color: var(--primary-color);
-      border: 1px dashed var(--primary-color);
-      border-radius: 6px; padding: 8px; width: 100%;
-      cursor: pointer; font-weight: 600; margin-bottom: 18px;
+    /* TABLA E INVENTARIO */
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
     }
-    .btn-agregar-presentacion:hover { background: #bbdefb; }
-
-    .table-responsive { overflow-x: auto; }
 
     table { width: 100%; border-collapse: collapse; text-align: left; }
 
-    th, td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.92rem; }
+    th, td { padding: 14px 18px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
 
-    th { background-color: #f8fafc; color: #555; font-weight: 600; }
-
-    tr:hover { background-color: #f1f5f9; }
-
-    tr.fila-agotado { background-color: #ffebee; }
-    tr.fila-agotado:hover { background-color: #ffcdd2; }
-    tr.fila-stock-bajo { background-color: #fff8e1; }
-    tr.fila-stock-bajo:hover { background-color: #ffecb3; }
-
-    .badge-cat {
-      display: inline-block; padding: 3px 8px; border-radius: 12px;
-      font-size: 0.78rem; font-weight: 600; text-transform: capitalize;
+    th {
+      background-color: var(--card-inner-bg);
+      color: var(--brand-title);
+      font-weight: 800;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-.cat-polvos { background: #fff7ed; color: #c2410c; }
-.cat-liquidos { background: #eff6ff; color: #1d4ed8; }
-.cat-perfumeria { background: #f5f3ff; color: #6d28d9; }
-.cat-aromas { background: #fefce8; color: #a16207; }
-.cat-sabores { background: #fff1f2; color: #be123c; }
-.cat-envases { background: #f0fdf4; color: #15803d; }
+
+    tr:hover { background-color: #fafbfc; }
+
+    tr.fila-agotado { background-color: #fef2f2; }
+    tr.fila-stock-bajo { background-color: #fffbeb; }
+
+    /* BADGES CATEGORÍA E ESTADO (ESTILO CATÁLOGO) */
+    .badge-cat {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      font-weight: 700;
+      background-color: var(--badge-blue);
+      color: #ffffff;
+    }
+
+    .badge-agotado {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      font-weight: 700;
+      background-color: var(--badge-red);
+      color: #ffffff;
+    }
 
     .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 
     .btn-sm {
-      padding: 5px 10px; font-size: 0.8rem; border-radius: 4px;
-      border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      border-radius: var(--radius-pill);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+      transition: all 0.2s ease;
     }
-    .btn-edit { background: #eceff1; color: #37474f; }
-    .btn-edit:hover { background: #cfd8dc; }
-    .btn-stock { background: #e8f5e9; color: #2e7d32; }
-    .btn-stock:hover { background: #c8e6c9; }
-    .btn-delete { background: #ffebee; color: #c62828; }
-    .btn-delete:hover { background: #ffcdd2; }
+    .btn-edit { background: var(--card-inner-bg); color: var(--brand-title); }
+    .btn-edit:hover { background: #dbe4f0; }
+    .btn-stock { background: #e0f2fe; color: #0369a1; }
+    .btn-stock:hover { background: #bae6fd; }
+    .btn-delete { background: #fee2e2; color: var(--badge-red); }
+    .btn-delete:hover { background: var(--badge-red); color: white; }
 
-    #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; }
+    /* NOTIFICACIONES TOAST */
+    #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; }
 
     .toast {
-      background-color: #212121; color: white; padding: 12px 24px; border-radius: 8px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3); font-size: 0.9rem;
-      display: flex; align-items: center; gap: 10px; animation: fadeIn 0.3s ease-out;
+      background-color: var(--brand-title);
+      color: white;
+      padding: 14px 22px;
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: fadeIn 0.3s ease-out;
     }
-    .toast.error { background-color: var(--danger-color); }
-    .toast.exito { background-color: var(--success-color); }
+    .toast.error { background-color: var(--badge-red); }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .hidden { display: none !important; }
 
-    /* ============ RESPONSIVE: CELULAR ============ */
     @media (max-width: 600px) {
       header { padding: 12px 16px; }
-      .brand { font-size: 1.05rem; max-width: 60vw; }
-      .brand span { display: none; }
-
+      .brand { font-size: 0.95rem; }
       main { margin: 16px auto; padding: 0 12px; }
-
-      .card { padding: 16px; }
-
-      .login-container { margin: 20px auto; padding: 24px 18px; }
-
-      .fila-presentacion {
-        grid-template-columns: 1fr 1fr;
-        grid-template-areas:
-          "nombre nombre"
-          "precio equivalencia"
-          "quitar quitar";
-      }
-      .fila-presentacion .presentacion-nombre { grid-area: nombre; }
-      .fila-presentacion .presentacion-precio { grid-area: precio; }
-      .fila-presentacion .presentacion-equivalencia { grid-area: equivalencia; }
-      .fila-presentacion .btn-quitar-presentacion { grid-area: quitar; width: 100%; height: 36px; }
-
-      table { font-size: 0.82rem; }
-      th, td { padding: 8px 8px; }
+      .card { padding: 18px; }
       .action-btns { flex-direction: column; }
       .btn-sm { width: 100%; justify-content: center; }
-
-      #input-csv { max-width: 100%; }
-      .card > div[style*="display: flex"] { flex-direction: column; align-items: stretch !important; }
-      .card > div[style*="display: flex"] button { width: 100% !important; }
     }
   </style>
 </head>
@@ -247,207 +351,192 @@
   <header>
     <a href="catalogo.html" class="brand">
       <div class="brand-logo">Qpc</div>
-      <span>Panel de Administración</span>
+      <span>Quimiaseo y Perfumería del Caribe</span>
     </a>
     <div class="user-info hidden" id="user-info">
-      <span id="user-email" style="font-size: 0.88rem; opacity: 0.9;"></span>
+      <span id="user-email"></span>
       <button class="btn-logout" id="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
     </div>
   </header>
 
   <main>
-    <!-- SECCIÓN LOGIN -->
+    <!-- LOGIN -->
     <section id="login-section" class="login-container">
-      <div class="login-title"><i class="fa-solid fa-user-shield"></i> Acceso Proveedor</div>
+      <div class="login-title"><i class="fa-solid fa-lock"></i> Acceso Administrador</div>
       <form id="form-login">
         <div class="form-group">
-          <label for="login-email"><i class="fa-solid fa-envelope"></i> Correo Electrónico:</label>
-          <input type="email" id="login-email" placeholder="ejemplo@correo.com" required>
+          <label for="login-email">Correo Electrónico:</label>
+          <input type="email" id="login-email" placeholder="correo@ejemplo.com" required>
         </div>
         <div class="form-group">
-          <label for="login-password"><i class="fa-solid fa-key"></i> Contraseña:</label>
+          <label for="login-password">Contraseña:</label>
           <input type="password" id="login-password" placeholder="••••••••" required>
         </div>
         <button type="submit" class="btn-primary" id="btn-login-submit">
-          <i class="fa-solid fa-right-to-bracket"></i> Ingresar al Panel
+          Ingresar al Panel
         </button>
       </form>
     </section>
 
-   <!-- SECCIÓN PANEL DE ADMINISTRACIÓN -->
-<section id="panel-section" class="dashboard-grid hidden">
+    <!-- PANEL DE CONTROL -->
+    <section id="panel-section" class="dashboard-grid hidden">
 
-  <!-- 1. IMPORTAR CSV -->
-  <div class="card">
-    <h2 class="card-title"><i class="fa-solid fa-file-csv"></i> Importar productos desde CSV</h2>
-    <p style="margin-bottom: 14px; color: #666; font-size: 0.9rem;">
-      Sube un archivo CSV con varios productos a la vez. Cada presentación va en su propia fila, agrupada por el mismo número de producto.
-    </p>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-      <input type="file" id="input-csv" accept=".csv">
-      <button type="button" class="btn-primary" id="btn-importar-csv" style="width: auto; padding: 10px 20px;">
-        <i class="fa-solid fa-upload"></i> Importar
-      </button>
-      <button type="button" class="btn-primary" id="btn-descargar-plantilla" style="width: auto; padding: 10px 20px; background-color: #78909c;">
-        <i class="fa-solid fa-download"></i> Descargar plantilla
-      </button>
-    </div>
-    <p id="progreso-importacion" style="margin-top: 12px; font-size: 0.88rem; color: #444;"></p>
-  </div>
+      <h1 class="page-title">Panel Administrador</h1>
 
-  <!-- 2. REGISTRAR PRODUCTO -->
-  <div class="card">
-    <h2 class="card-title" id="form-title">
-      <i class="fa-solid fa-square-plus"></i> Registrar Producto
-    </h2>
-    <form id="form-producto">
-      <input type="hidden" id="prod-id">
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prod-nombre">Nombre del Producto:</label>
-          <input type="text" id="prod-nombre" placeholder="Ej: Alcohol al 96%" required>
+      <!-- CARGA CSV -->
+      <div class="card">
+        <h2 class="card-title"><i class="fa-solid fa-file-csv"></i> Carga Masiva de Productos (CSV)</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px;">
+          <input type="file" id="input-csv" accept=".csv" style="flex: 1; min-width: 200px;">
+          <button type="button" class="btn-primary" id="btn-importar-csv" style="width: auto;">
+            <i class="fa-solid fa-upload"></i> Importar CSV
+          </button>
+          <button type="button" class="btn-primary btn-secondary" id="btn-descargar-plantilla" style="width: auto;">
+            <i class="fa-solid fa-download"></i> Plantilla
+          </button>
         </div>
-
-        <div class="form-group">
-          <label for="prod-categoria">Categoría:</label>
-          <select id="prod-categoria" required>
-            <option value="polvos">Polvos</option>
-            <option value="liquidos">Líquidos</option>
-            <option value="perfumeria">Perfumería</option>
-            <option value="aromas">Aromas</option>
-            <option value="sabores">Sabores</option>
-            <option value="envases">Envases</option>
-          </select>
-        </div>
+        <p id="progreso-importacion" style="margin-top: 10px; font-size: 0.88rem; font-weight: 700; color: var(--brand-blue);"></p>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prod-descripcion">Descripción:</label>
-          <textarea id="prod-descripcion" rows="2" placeholder="Ej: Alcohol de alta pureza..." required></textarea>
-        </div>
+      <!-- REGISTRO / EDICIÓN -->
+      <div class="card">
+        <h2 class="card-title" id="form-title">
+          <i class="fa-solid fa-square-plus"></i> Registrar Nuevo Producto
+        </h2>
+        <form id="form-producto">
+          <input type="hidden" id="prod-id">
 
-        <div class="form-group">
-          <label for="prod-imagen">Link de la imagen (URL):</label>
-          <input type="text" id="prod-imagen" placeholder="imagenes/producto.jpg o link de internet">
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="prod-nombre">Nombre del Producto:</label>
+              <input type="text" id="prod-nombre" placeholder="Ej: Alcohol al 96%" required>
+            </div>
+
+            <div class="form-group">
+              <label for="prod-categoria">Categoría:</label>
+              <select id="prod-categoria" required>
+                <option value="polvos">Polvos</option>
+                <option value="liquidos">Líquidos</option>
+                <option value="perfumeria">Perfumería</option>
+                <option value="aromas">Aromas</option>
+                <option value="sabores">Sabores</option>
+                <option value="envases">Envases Plásticos</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="prod-descripcion">Descripción:</label>
+              <textarea id="prod-descripcion" rows="2" placeholder="Descripción corta del producto..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="prod-imagen">Ruta de Imagen:</label>
+              <input type="text" id="prod-imagen" placeholder="imagenes/producto.jpg">
+            </div>
+          </div>
+
+          <!-- PRECIOS GRANEL -->
+          <div id="grupo-precio-granel" class="form-group">
+            <label><strong>Precios por Fracción:</strong></label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;">
+              <div>
+                <label for="precio-1000">1000 <span class="unidad-granel-txt">g</span>:</label>
+                <input type="number" id="precio-1000" placeholder="Precio ($)">
+              </div>
+              <div>
+                <label for="precio-500">500 <span class="unidad-granel-txt">g</span>:</label>
+                <input type="number" id="precio-500" placeholder="Precio ($)">
+              </div>
+              <div>
+                <label for="precio-250">250 <span class="unidad-granel-txt">g</span>:</label>
+                <input type="number" id="precio-250" placeholder="Precio ($)">
+              </div>
+              <div>
+                <label for="precio-125">125 <span class="unidad-granel-txt">g</span>:</label>
+                <input type="number" id="precio-125" placeholder="Precio ($)">
+              </div>
+            </div>
+          </div>
+
+          <!-- PRESENTACIONES MANUALES -->
+          <div id="grupo-presentaciones" class="form-group hidden">
+            <label><strong>Presentaciones y Precios:</strong></label>
+            <div id="lista-presentaciones"></div>
+            <button type="button" id="btn-agregar-presentacion" class="btn-sm btn-edit" style="width: 100%; justify-content: center; margin-top: 8px;">
+              <i class="fa-solid fa-plus"></i> Agregar opción
+            </button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="prod-stock">Stock total (<span id="unidad-stock-txt">unid.</span>) — Vacío = ilimitado:</label>
+              <input type="number" id="prod-stock" step="0.01" min="0" placeholder="Ej: 50">
+            </div>
+
+            <div class="form-group">
+              <label for="prod-stock-minimo">Stock mínimo (<span id="unidad-stock-minimo-txt">unid.</span>):</label>
+              <input type="number" id="prod-stock-minimo" step="0.01" min="0" placeholder="Ej: 5">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button type="submit" class="btn-primary" id="btn-guardar-prod">
+              Guardar Producto
+            </button>
+
+            <button type="button" class="btn-primary btn-secondary hidden" id="btn-cancelar-edit">
+              Cancelar
+            </button>
+          </div>
+        </form>
       </div>
 
-      <!-- PRECIOS A GRANEL -->
-      <div id="grupo-precio-granel" class="form-group">
-        <label><strong>Precios por cantidad (Gramos / Mililitros):</strong></label>
+      <!-- TABLA DE INVENTARIO -->
+      <div class="card">
+        <h2 class="card-title"><i class="fa-solid fa-boxes-stacked"></i> Productos en Inventario</h2>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;">
-          <div>
-            <label for="precio-1000">1000 <span class="unidad-granel-txt">g</span>:</label>
-            <input type="number" id="precio-1000" placeholder="Ej: 68000">
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 220px;">
+            <input type="text" id="filtro-buscar" placeholder="🔍 Buscar producto por nombre...">
           </div>
-
           <div>
-            <label for="precio-500">500 <span class="unidad-granel-txt">g</span>:</label>
-            <input type="number" id="precio-500" placeholder="Ej: 34000">
-          </div>
-
-          <div>
-            <label for="precio-250">250 <span class="unidad-granel-txt">g</span>:</label>
-            <input type="number" id="precio-250" placeholder="Ej: 17000">
-          </div>
-
-          <div>
-            <label for="precio-125">125 <span class="unidad-granel-txt">g</span>:</label>
-            <input type="number" id="precio-125" placeholder="Ej: 8500">
+            <select id="filtro-categoria" style="width: auto;">
+              <option value="">Todas las categorías</option>
+              <option value="polvos">Polvos</option>
+              <option value="liquidos">Líquidos</option>
+              <option value="perfumeria">Perfumería</option>
+              <option value="aromas">Aromas</option>
+              <option value="sabores">Sabores</option>
+              <option value="envases">Envases Plásticos</option>
+            </select>
           </div>
         </div>
 
-        <small style="display: block; margin-top: 8px; color: #666;">
-          Al digitar el precio de 1000 <span class="unidad-granel-txt">g</span> los demás se calcularán automáticamente, pero puedes ajustar cada valor manualmente si lo deseas.
-        </small>
-      </div>
-
-      <!-- PRECIO UNITARIO / ENVASES -->
-      <div id="grupo-presentaciones" class="form-group hidden">
-        <label><strong>Precio Unitario / Presentaciones:</strong></label>
-        <div id="lista-presentaciones"></div>
-        <button type="button" id="btn-agregar-presentacion" class="btn-sm">
-          + Agregar otra presentación
-        </button>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prod-stock">
-            <i class="fa-solid fa-cubes"></i> Stock total (<span id="unidad-stock-txt">unid.</span>) — vacío = ilimitado:
-          </label>
-          <input type="number" id="prod-stock" step="0.01" min="0" placeholder="Ej: 50">
-        </div>
-
-        <div class="form-group">
-          <label for="prod-stock-minimo">
-            <i class="fa-solid fa-triangle-exclamation"></i> Stock mínimo de alerta (<span id="unidad-stock-minimo-txt">unid.</span>) — opcional:
-          </label>
-          <input type="number" id="prod-stock-minimo" step="0.01" min="0" placeholder="Ej: 5 (si no lo llenas, se usa 5 por defecto)">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Stock</th>
+                <th>Presentaciones / Precios</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-productos-body">
+              <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Cargando productos...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button type="submit" class="btn-primary" id="btn-guardar-prod">
-          <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
-        </button>
-
-        <button type="button" class="btn-primary hidden" id="btn-cancelar-edit" style="background-color: #78909c;">
-          <i class="fa-solid fa-xmark"></i> Cancelar Edición
-        </button>
-      </div>
-    </form>
-  </div>
-
-<!-- 3. INVENTARIO DE PRODUCTOS -->
-  <div class="card">
-    <h2 class="card-title"><i class="fa-solid fa-boxes-stacked"></i> Inventario de Productos</h2>
-    
-    <!-- NUEVO: Controles de Filtro y Búsqueda -->
-    <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 220px;">
-        <input type="text" id="filtro-buscar" placeholder="🔍 Buscar producto por nombre..." style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem;">
-      </div>
-      <div>
-        <select id="filtro-categoria" style="padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; background-color: #f9fbfd; font-size: 0.9rem;">
-          <option value="">Todas las categorías</option>
-          <option value="polvos">Polvos</option>
-          <option value="liquidos">Líquidos</option>
-          <option value="perfumeria">Perfumería</option>
-          <option value="aromas">Aromas</option>
-          <option value="sabores">Sabores</option>
-          <option value="envases">Envases</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Categoría</th>
-            <th>Stock</th>
-            <th>Presentaciones</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-productos-body">
-          <tr><td colspan="5" style="text-align: center; color: #888;">Cargando inventario...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</section>
+    </section>
   </main>
 
   <div id="toast-container"></div>
 
   <script type="module" src="admin.js"></script>
-
 </body>
 </html>

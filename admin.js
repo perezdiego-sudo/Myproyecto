@@ -14,11 +14,9 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-
 // ==========================================================
 // ELEMENTOS DEL DOM
 // ==========================================================
-
 const loginSection = document.getElementById('login-section');
 const panelSection = document.getElementById('panel-section');
 const userInfo = document.getElementById('user-info');
@@ -42,28 +40,32 @@ const btnAgregarPresentacion = document.getElementById('btn-agregar-presentacion
 const btnCancelarEdit = document.getElementById('btn-cancelar-edit');
 const tablaBody = document.getElementById('tabla-productos-body');
 
-// Filtros de búsqueda
+// Filtros
 const filtroBuscar = document.getElementById('filtro-buscar');
 const filtroCategoria = document.getElementById('filtro-categoria');
 
-// Grupos que se muestran/ocultan según la categoría
+// Secciones dinámicas según categoría
 const grupoPresentaciones = document.getElementById('grupo-presentaciones');
 const grupoPrecioGranel = document.getElementById('grupo-precio-granel');
 
-// CAMPOS DE PRECIO A GRANEL (1000, 500, 250, 125)
+// Precios a granel
 const inputPrecio1000 = document.getElementById('precio-1000');
 const inputPrecio500 = document.getElementById('precio-500');
 const inputPrecio250 = document.getElementById('precio-250');
 const inputPrecio125 = document.getElementById('precio-125');
 
+// Importación CSV
+const inputCSV = document.getElementById('input-csv');
+const btnImportarCSV = document.getElementById('btn-importar-csv');
+const btnDescargarPlantilla = document.getElementById('btn-descargar-plantilla');
+const progresoImportacion = document.getElementById('progreso-importacion');
+
 let todosLosProductos = [];
 const STOCK_MINIMO_POR_DEFECTO = 5;
 
-
 // ==========================================================
-// UNIDAD BASE Y VERIFICACIÓN DE CATEGORÍA
+// UNIDADES Y CATEGORÍAS
 // ==========================================================
-
 function esCategoriaGranel(categoria) {
   const cat = (categoria || '').trim().toLowerCase();
   return cat !== 'envases' && cat !== 'envase';
@@ -80,15 +82,10 @@ function obtenerUnidadStock(categoria) {
     envases: 'unid.',
     envase: 'unid.'
   };
-
   return unidades[catLower] || 'unid.';
 }
 
-
-// ==========================================================
-// CÁLCULO AUTOMÁTICO EN EL PANEL AL ESCRIBIR EN 1000g/ml
-// ==========================================================
-
+// Cálculo automático de fracciones a partir del precio de 1000g/ml
 if (inputPrecio1000) {
   inputPrecio1000.addEventListener('input', () => {
     const p1000 = parseFloat(inputPrecio1000.value) || 0;
@@ -97,11 +94,6 @@ if (inputPrecio1000) {
     if (inputPrecio125) inputPrecio125.value = p1000 ? Math.round(p1000 * 0.125) : '';
   });
 }
-
-
-// ==========================================================
-// MOSTRAR EL BLOQUE CORRECTO SEGÚN LA CATEGORÍA
-// ==========================================================
 
 function actualizarVisibilidadPorCategoria() {
   const categoria = prodCategoriaInput ? prodCategoriaInput.value : 'polvos';
@@ -127,38 +119,13 @@ function actualizarVisibilidadPorCategoria() {
   }
 }
 
-
-// ==========================================================
-// ACTUALIZAR AL CAMBIAR CATEGORÍA
-// ==========================================================
-
 if (prodCategoriaInput) {
   prodCategoriaInput.addEventListener('change', actualizarVisibilidadPorCategoria);
 }
 
-
 // ==========================================================
-// BOTONES RÁPIDOS DE UNIDADES PRESELECCIONADAS (PRESETS)
+// PRESENTACIONES DINÁMICAS (ENVASES Y MANUALES)
 // ==========================================================
-
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('btn-preset')) {
-    const valorPreset = e.target.getAttribute('data-value');
-    const inputNombre = document.getElementById('pres-nombre-input');
-    const inputPrecio = document.getElementById('pres-precio-input');
-    
-    if (inputNombre) {
-      inputNombre.value = valorPreset;
-      if (inputPrecio) inputPrecio.focus();
-    }
-  }
-});
-
-
-// ==========================================================
-// PRESENTACIONES DINÁMICAS (SOLO ENVASES / MANUAL)
-// ==========================================================
-
 function crearFilaPresentacion(nombre = '', precio = '', equivalencia = '1') {
   if (!listaPresentaciones) return;
 
@@ -166,35 +133,10 @@ function crearFilaPresentacion(nombre = '', precio = '', equivalencia = '1') {
   fila.classList.add('fila-presentacion');
 
   fila.innerHTML = `
-    <input
-      type="text"
-      class="presentacion-nombre"
-      placeholder="Ej: Unidad, Caja x 10, Paquete"
-      value="${nombre}"
-    >
-
-    <input
-      type="number"
-      class="presentacion-precio"
-      placeholder="Precio ($)"
-      min="0"
-      value="${precio}"
-    >
-
-    <input
-      type="number"
-      step="0.001"
-      class="presentacion-equivalencia"
-      placeholder="Equivale a (unid)"
-      min="0"
-      value="${equivalencia}"
-    >
-
-    <button
-      type="button"
-      class="btn-quitar-presentacion"
-      title="Eliminar opción"
-    >
+    <input type="text" class="presentacion-nombre" placeholder="Ej: Unidad, Caja x 10" value="${nombre}">
+    <input type="number" class="presentacion-precio" placeholder="Precio ($)" min="0" value="${precio}">
+    <input type="number" step="0.001" class="presentacion-equivalencia" placeholder="Equivale a (unid)" min="0" value="${equivalencia}">
+    <button type="button" class="btn-quitar-presentacion" title="Eliminar opción">
       <i class="fa-solid fa-trash"></i>
     </button>
   `;
@@ -206,7 +148,6 @@ function crearFilaPresentacion(nombre = '', precio = '', equivalencia = '1') {
   listaPresentaciones.appendChild(fila);
 }
 
-
 if (btnAgregarPresentacion) {
   btnAgregarPresentacion.addEventListener('click', () => {
     if (prodCategoriaInput && esCategoriaGranel(prodCategoriaInput.value)) {
@@ -217,7 +158,6 @@ if (btnAgregarPresentacion) {
   });
 }
 
-
 function obtenerPresentacionesDelFormulario() {
   if (!listaPresentaciones) return [];
 
@@ -227,8 +167,8 @@ function obtenerPresentacionesDelFormulario() {
   filas.forEach(fila => {
     const nombre = fila.querySelector('.presentacion-nombre').value.trim();
     const precio = parseFloat(fila.querySelector('.presentacion-precio').value) || 0;
-    const equivaliaValor = fila.querySelector('.presentacion-equivalencia').value;
-    const equivalencia = equivaliaValor === '' ? 1 : parseFloat(equivaliaValor);
+    const equivVal = fila.querySelector('.presentacion-equivalencia').value;
+    const equivalencia = equivVal === '' ? 1 : parseFloat(equivVal);
 
     if (nombre) {
       presentaciones.push({ nombre, precio, equivalencia });
@@ -237,11 +177,6 @@ function obtenerPresentacionesDelFormulario() {
 
   return presentaciones;
 }
-
-
-// ==========================================================
-// CONSTRUIR Y CARGAR PRESENTACIONES A GRANEL
-// ==========================================================
 
 function construirPresentacionGranel(categoria) {
   const unidad = obtenerUnidadStock(categoria);
@@ -270,11 +205,9 @@ function cargarPreciosGranelEdicion(presentaciones) {
   if (inputPrecio125) inputPrecio125.value = buscarPrecio(125);
 }
 
-
 // ==========================================================
-// AUTENTICACIÓN
+// AUTENTICACIÓN FIRESTORE
 // ==========================================================
-
 onAuthStateChanged(auth, (user) => {
   if (user) {
     if (loginSection) loginSection.classList.add('hidden');
@@ -290,11 +223,9 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-
 if (formLogin) {
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
@@ -307,7 +238,6 @@ if (formLogin) {
   });
 }
 
-
 if (btnLogout) {
   btnLogout.addEventListener('click', () => {
     signOut(auth);
@@ -315,11 +245,9 @@ if (btnLogout) {
   });
 }
 
-
 // ==========================================================
-// CARGAR Y FILTRAR PRODUCTOS DESDE FIRESTORE
+// GESTIÓN DE INVENTARIO Y FIRESTORE
 // ==========================================================
-
 function cargarProductos() {
   onSnapshot(collection(db, 'productos'), (snapshot) => {
     todosLosProductos = snapshot.docs.map(doc => ({
@@ -331,27 +259,18 @@ function cargarProductos() {
   });
 }
 
-
 function renderizarTabla(productos) {
   if (!tablaBody) return;
 
   const textoBusqueda = filtroBuscar ? filtroBuscar.value.toLowerCase().trim() : '';
   const categoriaSeleccionada = filtroCategoria ? filtroCategoria.value.trim().toLowerCase() : '';
 
-  // 1. Filtrar por búsqueda y categoría
   let productosFiltrados = productos.filter(p => {
     const coincideNombre = (p.nombre || '').toLowerCase().includes(textoBusqueda);
     const coincideCategoria = !categoriaSeleccionada || (p.categoria || '').toLowerCase() === categoriaSeleccionada;
     return coincideNombre && coincideCategoria;
   });
 
-  // 2. Actualizar el contador dinámico en el título
-  const totalSpan = document.getElementById('total-productos');
-  if (totalSpan) {
-    totalSpan.textContent = `(${productosFiltrados.length})`;
-  }
-
-  // 3. Ordenar por categoría y luego alfabéticamente por nombre
   productosFiltrados.sort((a, b) => {
     const catA = (a.categoria || '').toLowerCase();
     const catB = (b.categoria || '').toLowerCase();
@@ -364,8 +283,8 @@ function renderizarTabla(productos) {
   if (productosFiltrados.length === 0) {
     tablaBody.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align:center; padding:16px; color:#888;">
-          No se encontraron productos registrados
+        <td colspan="5" style="text-align:center; padding: 20px; color: #64748b;">
+          No se encontraron productos registrados.
         </td>
       </tr>
     `;
@@ -375,15 +294,13 @@ function renderizarTabla(productos) {
   tablaBody.innerHTML = productosFiltrados.map((p, index) => {
     const presentaciones = p.presentaciones || [];
     
-    // Generación de chips con estilos en línea directos para garantizar legibilidad
     const resumenPresentaciones = presentaciones
-      .map(pr => `<span style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 3px 8px; margin: 2px 4px 2px 0; border-radius: 6px; font-size: 0.82rem; white-space: nowrap; color: #334155;"><b style="color: #0f172a;">${pr.nombre}:</b> $${(Number(pr.precio) || 0).toLocaleString('es-CO')}</span>`)
+      .map(pr => `<span style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 2px 8px; margin: 2px; border-radius: 6px; font-size: 0.8rem; white-space: nowrap; color: #334155;"><b style="color: #002147;">${pr.nombre}:</b> $${(Number(pr.precio) || 0).toLocaleString('es-CO')}</span>`)
       .join(' ');
 
     const tieneStock = p.stock !== null && p.stock !== undefined && p.stock !== '';
     const unidad = obtenerUnidadStock(p.categoria);
     const stockTexto = tieneStock ? `${p.stock} ${unidad}` : 'Ilimitado';
-    const stockColor = tieneStock && Number(p.stock) <= 0 ? '#c62828' : '#333';
     const catLower = (p.categoria || '').toLowerCase();
 
     let claseFila = '';
@@ -402,12 +319,12 @@ function renderizarTabla(productos) {
     return `
       <tr class="${claseFila}">
         <td>
-          <span class="num-producto" style="color: #888; font-weight: 600; margin-right: 4px;">${index + 1}.</span> 
+          <span style="color: #94a3b8; font-weight: 600; margin-right: 4px;">${index + 1}.</span> 
           <strong>${p.nombre || ''}</strong>
         </td>
         <td><span class="badge-cat cat-${catLower}">${p.categoria || ''}</span></td>
-        <td><span style="color:${stockColor}; font-weight:600;">${stockTexto}</span></td>
-        <td><div class="presentaciones-list" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">${resumenPresentaciones || '—'}</div></td>
+        <td><span style="font-weight: 700;">${stockTexto}</span></td>
+        <td><div style="display: flex; flex-wrap: wrap; gap: 4px;">${resumenPresentaciones || '—'}</div></td>
         <td>
           <div class="action-btns">
             <button class="btn-sm btn-edit" data-id="${p.id}">
@@ -438,27 +355,16 @@ function renderizarTabla(productos) {
   });
 }
 
+if (filtroBuscar) filtroBuscar.addEventListener('input', () => renderizarTabla(todosLosProductos));
+if (filtroCategoria) filtroCategoria.addEventListener('change', () => renderizarTabla(todosLosProductos));
 
-// LISTENERS PARA FILTROS EN TIEMPO REAL
-if (filtroBuscar) {
-  filtroBuscar.addEventListener('input', () => renderizarTabla(todosLosProductos));
-}
-
-if (filtroCategoria) {
-  filtroCategoria.addEventListener('change', () => renderizarTabla(todosLosProductos));
-}
-
-
-// ==========================================================
-// AJUSTE RÁPIDO DE STOCK
-// ==========================================================
-
+// Ajuste express de stock
 async function ajustarStockRapido(id, stockActual) {
   const producto = todosLosProductos.find(p => p.id === id);
   const unidad = producto ? obtenerUnidadStock(producto.categoria) : 'unid.';
 
   const nuevoValor = prompt(
-    `Nuevo stock total en ${unidad} (deja vacío para ilimitado):`,
+    `Nuevo stock total en ${unidad} (deja vacío para stock ilimitado):`,
     stockActual || ''
   );
 
@@ -468,23 +374,19 @@ async function ajustarStockRapido(id, stockActual) {
   const stockNumerico = texto === '' ? null : parseFloat(texto);
 
   if (stockNumerico !== null && (isNaN(stockNumerico) || stockNumerico < 0)) {
-    mostrarToast('Escribe un número válido (0 o mayor), o deja vacío para ilimitado', 'error');
+    mostrarToast('Ingresa un número válido o deja vacío para ilimitado', 'error');
     return;
   }
 
   try {
     await updateDoc(doc(db, 'productos', id), { stock: stockNumerico });
-    mostrarToast(`Stock actualizado en ${unidad}`, 'exito');
+    mostrarToast(`Stock actualizado correctamente`, 'exito');
   } catch (err) {
     mostrarToast('Error al actualizar stock: ' + err.message, 'error');
   }
 }
 
-
-// ==========================================================
-// GUARDAR / ACTUALIZAR PRODUCTO
-// ==========================================================
-
+// Guardar / Actualizar
 if (formProducto) {
   formProducto.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -496,17 +398,16 @@ if (formProducto) {
       const precio1000 = parseFloat(inputPrecio1000 ? inputPrecio1000.value : 0) || 0;
 
       if (precio1000 <= 0) {
-        mostrarToast(`Escribe al menos el precio para 1000 ${obtenerUnidadStock(categoria)}`, 'error');
+        mostrarToast(`Ingresa el precio base para 1000 ${obtenerUnidadStock(categoria)}`, 'error');
         return;
       }
 
       presentaciones = construirPresentacionGranel(categoria);
-
     } else {
       presentaciones = obtenerPresentacionesDelFormulario();
 
       if (presentaciones.length === 0) {
-        mostrarToast('Agrega al menos un precio para el envase', 'error');
+        mostrarToast('Agrega al menos una opción de precio', 'error');
         return;
       }
     }
@@ -532,24 +433,18 @@ if (formProducto) {
     try {
       if (id) {
         await updateDoc(doc(db, 'productos', id), dataProducto);
-        mostrarToast('Producto actualizado', 'exito');
+        mostrarToast('Producto actualizado exitosamente', 'exito');
       } else {
         await addDoc(collection(db, 'productos'), dataProducto);
-        mostrarToast('Producto registrado', 'exito');
+        mostrarToast('Producto registrado exitosamente', 'exito');
       }
 
       limpiarFormulario();
-
     } catch (err) {
-      mostrarToast('Error al guardar: ' + err.message, 'error');
+      mostrarToast('Error al guardar el producto: ' + err.message, 'error');
     }
   });
 }
-
-
-// ==========================================================
-// EDITAR PRODUCTO
-// ==========================================================
 
 function editarProducto(id) {
   const prod = todosLosProductos.find(p => p.id === id);
@@ -599,13 +494,8 @@ function editarProducto(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-
-// ==========================================================
-// ELIMINAR PRODUCTO
-// ==========================================================
-
 async function eliminarProducto(id) {
-  if (confirm('¿Eliminar este producto permanentemente?')) {
+  if (confirm('¿Confirmas que deseas eliminar este producto permanentemente?')) {
     try {
       await deleteDoc(doc(db, 'productos', id));
       mostrarToast('Producto eliminado', 'exito');
@@ -615,11 +505,9 @@ async function eliminarProducto(id) {
   }
 }
 
-
 if (btnCancelarEdit) {
   btnCancelarEdit.addEventListener('click', limpiarFormulario);
 }
-
 
 function limpiarFormulario() {
   if (formProducto) formProducto.reset();
@@ -646,20 +534,11 @@ function limpiarFormulario() {
   }
 }
 
-
 actualizarVisibilidadPorCategoria();
 
-
 // ==========================================================
-// IMPORTACIÓN MASIVA Y PLANTILLA CSV
+// IMPORTACIÓN Y PLANTILLA CSV
 // ==========================================================
-
-const inputCSV = document.getElementById('input-csv');
-const btnImportarCSV = document.getElementById('btn-importar-csv');
-const btnDescargarPlantilla = document.getElementById('btn-descargar-plantilla');
-const progresoImportacion = document.getElementById('progreso-importacion');
-
-
 function dividirLineaCSV(linea) {
   const resultado = [];
   let actual = '';
@@ -667,7 +546,6 @@ function dividirLineaCSV(linea) {
 
   for (let i = 0; i < linea.length; i++) {
     const car = linea[i];
-
     if (car === '"') {
       dentroDeComillas = !dentroDeComillas;
     } else if (car === ',' && !dentroDeComillas) {
@@ -677,11 +555,9 @@ function dividirLineaCSV(linea) {
       actual += car;
     }
   }
-
   resultado.push(actual);
   return resultado;
 }
-
 
 function parsearCSV(texto) {
   const lineas = texto.split(/\r?\n/).filter(l => l.trim() !== '');
@@ -692,15 +568,12 @@ function parsearCSV(texto) {
   return lineas.slice(1).map(linea => {
     const valores = dividirLineaCSV(linea);
     const fila = {};
-
     encabezados.forEach((encabezado, i) => {
       fila[encabezado] = (valores[i] || '').trim();
     });
-
     return fila;
   });
 }
-
 
 if (btnImportarCSV) {
   btnImportarCSV.addEventListener('click', async () => {
@@ -711,7 +584,7 @@ if (btnImportarCSV) {
       return;
     }
 
-    if (progresoImportacion) progresoImportacion.textContent = 'Leyendo archivo...';
+    if (progresoImportacion) progresoImportacion.textContent = 'Procesando archivo...';
 
     try {
       const texto = await archivo.text();
@@ -746,7 +619,7 @@ if (btnImportarCSV) {
       const listaProductos = Object.values(productosPorId);
 
       if (listaProductos.length === 0) {
-        mostrarToast('No se encontraron productos válidos en el archivo', 'error');
+        mostrarToast('No se hallaron datos válidos en el CSV', 'error');
         if (progresoImportacion) progresoImportacion.textContent = '';
         return;
       }
@@ -757,31 +630,30 @@ if (btnImportarCSV) {
       for (let i = 0; i < listaProductos.length; i++) {
         const producto = listaProductos[i];
         if (progresoImportacion) {
-          progresoImportacion.textContent = `Importando ${i + 1} de ${listaProductos.length}: ${producto.nombre}...`;
+          progresoImportacion.textContent = `Cargando ${i + 1} de ${listaProductos.length}: ${producto.nombre}...`;
         }
 
         try {
           await addDoc(collection(db, 'productos'), producto);
           exitosos++;
         } catch (err) {
-          console.error(`Error con ${producto.nombre}:`, err);
+          console.error(`Error procesando ${producto.nombre}:`, err);
           fallidos++;
         }
       }
 
       if (progresoImportacion) {
-        progresoImportacion.textContent = `Importación terminada: ${exitosos} productos agregados, ${fallidos} fallidos.`;
+        progresoImportacion.textContent = `Proceso finalizado: ${exitosos} agregados, ${fallidos} errores.`;
       }
       mostrarToast(`${exitosos} productos importados correctamente`, 'exito');
       if (inputCSV) inputCSV.value = '';
 
     } catch (error) {
-      mostrarToast('Error leyendo el archivo: ' + error.message, 'error');
+      mostrarToast('Error al leer el archivo: ' + error.message, 'error');
       if (progresoImportacion) progresoImportacion.textContent = '';
     }
   });
 }
-
 
 if (btnDescargarPlantilla) {
   btnDescargarPlantilla.addEventListener('click', () => {
@@ -803,11 +675,9 @@ if (btnDescargarPlantilla) {
   });
 }
 
-
 // ==========================================================
-// NOTIFICACIONES TOAST
+// NOTIFICACIONES
 // ==========================================================
-
 function mostrarToast(msj, tipo) {
   const toastContainer = document.getElementById('toast-container');
   if (!toastContainer) return;
@@ -820,6 +690,5 @@ function mostrarToast(msj, tipo) {
   `;
 
   toastContainer.appendChild(toast);
-
   setTimeout(() => toast.remove(), 3000);
 }
