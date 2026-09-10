@@ -737,4 +737,4 @@ function mostrarToast(msj, tipo) {
 
   toastContainer.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
-}
+} 
