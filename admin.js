@@ -63,6 +63,11 @@ const progresoImportacion = document.getElementById('progreso-importacion');
 let todosLosProductos = [];
 const STOCK_MINIMO_POR_DEFECTO = 5;
 
+// ---- PAGINACIÓN ----
+let paginaActual = 1;
+const PRODUCTOS_POR_PAGINA = 20;
+// ---------------------
+
 // ==========================================================
 // UNIDADES Y CATEGORÍAS
 // ==========================================================
@@ -256,7 +261,6 @@ function cargarProductos() {
     }));
 
     renderizarTabla(todosLosProductos);
-    actualizarKPIs(todosLosProductos);
   });
 }
 
@@ -281,6 +285,15 @@ function renderizarTabla(productos) {
     return catA.localeCompare(catB);
   });
 
+  // ---- PAGINACIÓN ----
+  const totalPaginas = Math.max(1, Math.ceil(productosFiltrados.length / PRODUCTOS_POR_PAGINA));
+  if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+  if (paginaActual < 1) paginaActual = 1;
+
+  const inicio = (paginaActual - 1) * PRODUCTOS_POR_PAGINA;
+  const productosPagina = productosFiltrados.slice(inicio, inicio + PRODUCTOS_POR_PAGINA);
+  // ---------------------
+
   if (productosFiltrados.length === 0) {
     tablaBody.innerHTML = `
       <tr>
@@ -289,11 +302,11 @@ function renderizarTabla(productos) {
         </td>
       </tr>
     `;
-    actualizarKPIs(todosLosProductos);
+    renderizarControlesPaginacion(0);
     return;
   }
 
-  tablaBody.innerHTML = productosFiltrados.map((p, index) => {
+  tablaBody.innerHTML = productosPagina.map((p, index) => {
     const presentaciones = p.presentaciones || [];
     
     const resumenPresentaciones = presentaciones
@@ -321,7 +334,7 @@ function renderizarTabla(productos) {
     return `
       <tr class="${claseFila}">
         <td>
-          <span style="color: #94a3b8; font-weight: 600; margin-right: 4px;">${index + 1}.</span> 
+          <span style="color: #94a3b8; font-weight: 600; margin-right: 4px;">${inicio + index + 1}.</span> 
           <strong>${p.nombre || ''}</strong>
         </td>
         <td><span class="badge-cat cat-${catLower}">${p.categoria || ''}</span></td>
@@ -356,11 +369,40 @@ function renderizarTabla(productos) {
     btn.addEventListener('click', () => ajustarStockRapido(btn.dataset.id, btn.dataset.stock));
   });
 
-  actualizarKPIs(todosLosProductos);
+  renderizarControlesPaginacion(totalPaginas);
 }
 
-if (filtroBuscar) filtroBuscar.addEventListener('input', () => renderizarTabla(todosLosProductos));
-if (filtroCategoria) filtroCategoria.addEventListener('change', () => renderizarTabla(todosLosProductos));
+// ---- PAGINACIÓN: controles ----
+function renderizarControlesPaginacion(totalPaginas) {
+  const contenedor = document.getElementById('paginacion');
+  if (!contenedor) return;
+
+  if (totalPaginas <= 1) {
+    contenedor.innerHTML = '';
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <button class="btn-sm" id="btn-pag-anterior" ${paginaActual === 1 ? 'disabled' : ''}>« Anterior</button>
+    <span style="margin: 0 12px;">Página ${paginaActual} de ${totalPaginas}</span>
+    <button class="btn-sm" id="btn-pag-siguiente" ${paginaActual === totalPaginas ? 'disabled' : ''}>Siguiente »</button>
+  `;
+
+  const btnAnterior = document.getElementById('btn-pag-anterior');
+  const btnSiguiente = document.getElementById('btn-pag-siguiente');
+
+  if (btnAnterior) btnAnterior.addEventListener('click', () => irAPagina(paginaActual - 1));
+  if (btnSiguiente) btnSiguiente.addEventListener('click', () => irAPagina(paginaActual + 1));
+}
+
+function irAPagina(numero) {
+  paginaActual = numero;
+  renderizarTabla(todosLosProductos);
+}
+// ---------------------
+
+if (filtroBuscar) filtroBuscar.addEventListener('input', () => { paginaActual = 1; renderizarTabla(todosLosProductos); });
+if (filtroCategoria) filtroCategoria.addEventListener('change', () => { paginaActual = 1; renderizarTabla(todosLosProductos); });
 
 // Ajuste express de stock
 async function ajustarStockRapido(id, stockActual) {
@@ -679,47 +721,7 @@ if (btnDescargarPlantilla) {
   });
 }
 
-// ==========================================================
-// INDICADORES (KPIs) Y DESPLEGABLE
-// ==========================================================
-const btnToggleKpis = document.getElementById('btn-toggle-kpis');
-const kpiContainer = document.getElementById('kpi-container');
-const txtBtnKpi = document.getElementById('txt-btn-kpi');
 
-if (btnToggleKpis && kpiContainer && txtBtnKpi) {
-  btnToggleKpis.addEventListener('click', () => {
-    kpiContainer.classList.toggle('hidden');
-    const estaOculto = kpiContainer.classList.contains('hidden');
-    txtBtnKpi.textContent = estaOculto ? 'Ver Indicadores' : 'Ocultar Indicadores';
-  });
-}
-
-export function actualizarKPIs(listaProductos) {
-  if (!Array.isArray(listaProductos)) return;
-
-  const total = listaProductos.length;
-
-  const agotados = listaProductos.filter(p => {
-    if (p.stock === null || p.stock === undefined || p.stock === '') return false;
-    return Number(p.stock) <= 0;
-  }).length;
-
-  const stockBajo = listaProductos.filter(p => {
-    if (p.stock === null || p.stock === undefined || p.stock === '' || Number(p.stock) <= 0) return false;
-    const min = (p.stockMinimo === null || p.stockMinimo === undefined || p.stockMinimo === '') 
-      ? STOCK_MINIMO_POR_DEFECTO 
-      : Number(p.stockMinimo);
-    return Number(p.stock) <= min;
-  }).length;
-
-  const elemTotal = document.getElementById('kpi-total');
-  const elemAgotados = document.getElementById('kpi-agotados');
-  const elemStockBajo = document.getElementById('kpi-bajo-stock');
-
-  if (elemTotal) elemTotal.textContent = total;
-  if (elemAgotados) elemAgotados.textContent = agotados;
-  if (elemStockBajo) elemStockBajo.textContent = stockBajo;
-}
 
 // ==========================================================
 // NOTIFICACIONES
@@ -737,4 +739,4 @@ function mostrarToast(msj, tipo) {
 
   toastContainer.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
-} 
+}

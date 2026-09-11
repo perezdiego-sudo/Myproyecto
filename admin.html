@@ -720,43 +720,6 @@
         <p id="progreso-importacion" style="margin-top: 10px; font-size: 0.88rem; font-weight: 700; color: var(--brand-blue); text-align: center;"></p>
       </div>
 
-      <div class="kpi-wrapper">
-  <!-- Botón para mostrar / ocultar -->
-  <button type="button" id="btn-toggle-kpis" class="btn-primary btn-secondary" style="width: auto; margin: 0 auto; display: flex;">
-    <i class="fa-solid fa-chart-line"></i> <span id="txt-btn-kpi">Ver Indicadores</span>
-  </button>
-
-  <div id="kpi-container">
-  <div class="kpi-card">
-    <div class="kpi-icon total">
-      <i class="fa-solid fa-boxes-stacked"></i>
-    </div>
-    <div class="kpi-info">
-      <h3 id="kpi-total">0</h3>
-      <p>Total Productos</p>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-icon agotados">
-      <i class="fa-solid fa-triangle-exclamation"></i>
-    </div>
-    <div class="kpi-info">
-      <h3 id="kpi-agotados">0</h3>
-      <p>Productos Agotados</p>
-    </div>
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-icon bajo">
-      <i class="fa-solid fa-clock-rotate-left"></i>
-    </div>
-    <div class="kpi-info">
-      <h3 id="kpi-bajo-stock">0</h3>
-      <p>Stock Bajo</p>
-    </div>
-  </div>
-</div>
 
       <!-- REGISTRO / EDICIÓN -->
       <div class="card">
@@ -885,6 +848,7 @@
               <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Cargando productos...</td></tr>
             </tbody>
           </table>
+          <div id="paginacion" style="display:flex; justify-content:center; align-items:center; margin-top:15px;"></div>
         </div>
       </div>
 
