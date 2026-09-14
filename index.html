@@ -1,80 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QUIMIASEO Y PERFUMERIA DEL CARIBE</title>
-  
-  <!-- Tipografía Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Archivo de Estilos CSS -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quimiaseo y Perfumería del Caribe</title>
+    <!-- Tipografía moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Iconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="body-inicio">
+<body class="clean-layout-body">
 
-  <!-- Encabezado con Logo Qpc -->
-  <header class="header">
-    <a href="index.html" class="logo">
-      <div class="logo-circulo-header">Qpc</div>
-      <span>QUIMIASEO Y PERFUMERIA DEL CARIBE</span>
-    </a>
-  </header>
-
-  <!-- Sección Principal -->
-  <main class="hero-inicio">
-    <div class="hero-card">
-      
-      <!-- Logo Principal de la Marca -->
-      <div class="logo-hero">Qpc</div>
-      <!-- NOTA: Si usas una imagen en archivo (ej. logo.png), reemplaza la línea de arriba por: -->
-      <!-- <img src="logo.png" alt="Logo QPC" class="logo-hero-img"> -->
-      
-      <h1>QUIMIASEO Y PERFUMERIA DEL CARIBE</h1>
-      
-      <p class="hero-descripcion">
-        Venta de Materias primas, Aromas, Saborizantes, Perfumes, Aceites, Jabón Líquido, Desinfectantes y Plásticos en General.
-      </p>
-
-      <a href="catalogo.html" class="btn-catalogo">Ver Catálogo</a>
-
-      <!-- Tarjetas Informativas -->
-      <div class="grid-info-inicio">
-        <div class="card-info">
-          <span class="card-info-titulo">👤 Administrador</span>
-          <span class="card-info-valor">Jarold Bolaño</span>
-        </div>
+    <!-- Contenedor Principal Completo -->
+    <main class="clean-main-container">
         
-        <div class="card-info">
-          <span class="card-info-titulo">📍 Ubicación</span>
-          <span class="card-info-valor">Calle 21 No. 23 - 72 Centro, Sincelejo - Sucre</span>
-        </div>
-      </div>
-    </div>
-  </main>
+        <!-- Header superior corporativo con Ubicación y Estado -->
+        <header class="content-header">
+            <div class="mobile-brand-tag">
+                <div class="mini-logo-box">Qpc</div>
+                <span>QPC CARIBE</span>
+            </div>
+            <div class="header-location">
+                <i class="fa-solid fa-location-dot text-danger"></i>
+                <span>Sincelejo - Sucre</span>
+            </div>
+            <div class="header-badge-status">
+                <span class="status-dot"></span> Operativo
+            </div>
+        </header>
 
-  <!-- Pie de Página -->
-  <footer class="footer">
-    <div class="footer-contenido">
-      <div>
-        <div class="footer-logo">
-          <div class="logo-circulo-header">Qpc</div>
-          <span>QUIMIASEO</span>
-        </div>
-        <p class="footer-texto">Tu aliado en materias primas y productos de aseo.</p>
-      </div>
-      <div class="footer-columna">
-        <h4>Contacto</h4>
-        <p>👤 Jarold Bolaño</p>
-        <p>📍 Calle 21 No. 23 - 72 Centro, Sincelejo - Sucre</p>
-      </div>
-    </div>
-    <div class="footer-derechos">
-      <p>&copy; QUIMIASEO Y PERFUMERIA DEL CARIBE. Todos los derechos reservados.</p>
-    </div>
-  </footer>
+        <!-- Bloque Hero Inmersivo -->
+        <section class="content-hero">
+            <div class="hero-text-block">
+                <div class="hero-tag">
+                    <i class="fa-solid fa-flask"></i> Distribución Mayorista y Detal
+                </div>
+                <h1 class="hero-heading">
+                    QUIMIASEO Y PERFUMERIA <br><span class="text-gradient-cyan">DEL CARIBE</span>
+                </h1>
+                <p class="hero-desc">
+                    Venta de Materias primas, Aromas, Saborizantes, Perfumes, Aceites, Jabón Líquido, Desinfectantes y Plásticos en General.
+                </p>
+                <div class="hero-actions">
+                    <a href="catalogo.html" class="btn-action-primary">
+                        <span>Explorar Catálogo Online</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Panel visual lateral con Info y Director -->
+            <div class="hero-visual-card">
+                <div class="visual-card-glow"></div>
+                <div class="chemical-icon-box">
+                    <i class="fa-solid fa-vials"></i>
+                </div>
+                <h3>Esencias & Materias Primas</h3>
+                <p>Estándares estrictos de pureza y calidad garantizada para todos nuestros compuestos y productos de aseo.</p>
+
+                <!-- Tarjeta integrada del Administrador / Director -->
+                <div class="admin-profile-box">
+                    <div class="admin-mini-badge">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="admin-mini-info">
+                        <span class="mini-label">Director Encargado</span>
+                        <span class="mini-name">Jarold Bolaño</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer integrado con ubicación detallada -->
+        <footer class="content-footer">
+            <div class="footer-info-row">
+                <span><i class="fa-solid fa-location-dot"></i> Sincelejo, Sucre, Colombia</span>
+                <span><i class="fa-solid fa-user-tie"></i> Dirección: Jarold Bolaño</span>
+            </div>
+            <p>&copy; 2026 Quimiaseo y Perfumería del Caribe. Todos los derechos reservados.</p>
+        </footer>
+    </main>
 
 </body>
 </html>
