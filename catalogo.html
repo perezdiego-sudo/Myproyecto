@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quimiaseo y Perfumería del Caribe - Inicio</title>
+  <title>Quimiaseo y Perfumería del Caribe - Catálogo</title>
   
   <!-- Tipografía Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,89 +18,129 @@
 </head>
 <body class="clean-layout-body">
 
-  <div class="clean-main-container">
+  <main class="clean-main-container">
 
-    <!-- ENCABEZADO SUPERIOR -->
+    <!-- ENCABEZADO CORPORATIVO -->
     <header class="content-header">
-      <div class="header-brand-group">
+      <a href="index.html" class="header-brand-group" style="text-decoration: none;">
         <div class="mini-logo-box">Qpc</div>
         <div class="brand-text-wrapper">
-          <span class="brand-main-name">QUIMIASEO & PERFUMERÍA</span>
-          <span class="brand-sub-name">DEL CARIBE</span>
+          <span class="brand-main-name">QUIMIASEO Y PERFUMERIA DEL CARIBE</span>
+          <span class="brand-sub-name">CATÁLOGO ONLINE</span>
         </div>
-      </div>
-      <div class="header-badge">
-        <i class="fa-solid fa-certificate"></i>
-        <span>Calidad Garantizada</span>
-      </div>
+      </a>
+      <a href="index.html" class="btn-back-home">
+        <i class="fa-solid fa-house"></i>
+        <span>Inicio</span>
+      </a>
     </header>
 
-    <!-- SECCIÓN HERO / BANNER PRINCIPAL -->
-    <section class="hero-section">
-      <div class="hero-badge-tag">
-        <i class="fa-solid fa-flask"></i> Distribución Mayorista y Detal
-      </div>
-      
-      <h1 class="hero-title">QUIMIASEO Y PERFUMERIA<br>DEL CARIBE</h1>
-      
-      <p class="hero-description">
-        Venta de Materias primas, Aromas, Saborizantes, Perfumes, Aceites, Jabón Líquido, Desinfectantes y Plásticos en General.
-      </p>
+    <!-- SECCIÓN CATÁLOGO -->
+    <section id="catalogo" class="catalogo">
+      <h2 class="catalogo-titulo">Nuestro Catálogo</h2>
 
-      <div class="hero-actions">
-        <a href="catalogo.html" class="btn-primary-cta">
-          <span>Explorar Catálogo Online</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </a>
+      <!-- Buscador de productos -->
+      <div class="contenedor-buscador">
+        <input 
+          type="text" 
+          id="input-busqueda" 
+          placeholder="🔍 Buscar producto por nombre..." 
+          autocomplete="off"
+        >
       </div>
+
+      <!-- Filtros por categoría -->
+      <div class="filtros">
+        <button class="btn-filtro activo" data-categoria="todos">Todos</button>
+        <button class="btn-filtro" data-categoria="envases">Envases Plásticos</button>
+        <button class="btn-filtro" data-categoria="liquidos">Líquidos</button>
+        <button class="btn-filtro" data-categoria="perfumeria">Perfumería</button>
+        <button class="btn-filtro" data-categoria="aromas">Aromas</button>
+        <button class="btn-filtro" data-categoria="sabores">Sabores</button>
+        <button class="btn-filtro" data-categoria="polvos">Polvos</button>
+      </div>
+
+      <!-- Contenedor dinámico de productos (Renderizado por script.js) -->
+      <div class="productos" id="productos-container">
+        <p style="color:#94a3b8; text-align:center; grid-column: 1/-1; padding: 2rem;">Cargando productos...</p>
+      </div>
+
+      <!-- Botón flotante del carrito para celular -->
+      <button id="btn-abrir-carrito" class="btn-carrito-flotante" aria-label="Abrir carrito">
+        🛒 <span id="contador-carrito">0</span>
+      </button>
     </section>
 
-    <!-- REJILLA DE TARJETAS INFORMATIVAS -->
-    <section class="features-grid">
-      
-      <!-- Card 1: Calidad -->
-      <div class="feature-card">
-        <div class="feature-icon-box">
-          <i class="fa-solid fa-vials"></i>
-        </div>
-        <div class="feature-content">
-          <h3>Esencias & Materias Primas</h3>
-          <p>Estándares estrictos de pureza y calidad garantizada para todos nuestros compuestos y productos de aseo.</p>
-        </div>
-      </div>
+    <!-- MODAL DEL CARRITO -->
+    <div id="modal-carrito" class="modal-carrito oculto-modal">
+      <div class="modal-contenido">
 
-      <!-- Card 2: Dirección Encargada -->
-      <div class="feature-card">
-        <div class="feature-icon-box">
-          <i class="fa-solid fa-user-shield"></i>
+        <div class="modal-header">
+          <h2>Tu Carrito</h2>
+          <div class="modal-header-acciones">
+            <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
+            <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
+          </div>
         </div>
-        <div class="feature-content">
-          <h3>Director Encargado</h3>
-          <p>Jarold Bolaño</p>
-        </div>
-      </div>
 
-      <!-- Card 3: Ubicación -->
-      <div class="feature-card">
-        <div class="feature-icon-box">
-          <i class="fa-solid fa-location-dot"></i>
-        </div>
-        <div class="feature-content">
-          <h3>Ubicación</h3>
-          <p>Calle 21 No. 23 – 78 Centro, Sincelejo – Sucre</p>
-        </div>
-      </div>
+        <div class="modal-body">
+          <ul id="lista-carrito"></ul>
 
-    </section>
+          <!-- Opciones de envío/domicilio -->
+          <div class="opcion-domicilio">
+            <p class="titulo-domicilio">¿Requiere domicilio?</p>
+
+            <div class="radio-group">
+              <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
+              <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+            </div>
+
+            <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa (Ej: Calle 20 #15-30)">
+          </div>
+
+          <!-- Resumen del total -->
+          <div class="resumen-precios">
+            <p id="subtotal-carrito">Subtotal: $0</p>
+            <p id="total-carrito" class="total-resaltado">Total: $0</p>
+          </div>
+
+          <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MODAL ZOOM DE IMAGEN -->
+    <div id="modal-zoom" class="modal-zoom oculto-modal">
+      <img id="zoom-imagen-actual" src="" alt="Imagen ampliada">
+    </div>
 
     <!-- PIE DE PÁGINA -->
     <footer class="footer">
+      <div class="footer-contenido">
+        <div class="footer-columna">
+          <div class="footer-logo">
+            <div class="mini-logo-box">Qpc</div>
+            <span>QUIMIASEO Y PERFUMERIA DEL CARIBE</span>
+          </div>
+          <p class="footer-texto">Venta de Materias primas, Aromas, Saborizantes, Perfumes, Aceites, Jabón Líquido, Desinfectantes y Plásticos en General.</p>
+        </div>
+
+        <div class="footer-columna">
+          <h4>Contacto</h4>
+          <p>📍 Calle 21 No. 23 - 72 Centro, Sincelejo - Sucre</p>
+          <p>🕒 Lunes a Sábado, 8am - 6pm</p>
+        </div>
+      </div>
+
       <div class="footer-derechos">
-        <p>&copy; 2026 Quimiaseo y Perfumería del Caribe. Todos los derechos reservados.</p>
+        <p>&copy; 2026 QUIMIASEO Y PERFUMERIA DEL CARIBE. Todos los derechos reservados.</p>
       </div>
     </footer>
 
-  </div>
+  </main>
 
+  <!-- Script principal JS -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>

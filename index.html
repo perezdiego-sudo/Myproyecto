@@ -1,95 +1,125 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quimiaseo y Perfumería del Caribe</title>
-    <!-- Tipografía moderna -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Iconos FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quimiaseo y Perfumería del Caribe - Inicio</title>
+  
+  <!-- Tipografía Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Iconos FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Hoja de estilos -->
+  <link rel="stylesheet" href="style.css">
 </head>
+<body class="clean-layout-body">
 
-        <nav class="sidebar-nav">
-            <a href="#" class="nav-item active">
-                <i class="fa-solid fa-house-chimney"></i>
-                <span>Inicio</span>
-            </a>
-            <a href="catalogo.html" class="nav-item">
-                <i class="fa-solid fa-box-open"></i>
-                <span>Catálogo</span>
-            </a>
-            <a href="admin.html" class="nav-item">
-                <i class="fa-solid fa-user-gear"></i>
-                <span>Administración</span>
-            </a>
-        </nav>
+  <div class="clean-main-container">
 
-        <div class="sidebar-footer-card">
-            <div class="admin-mini-badge">
-                <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <div class="admin-mini-info">
-                <span class="mini-label">Director</span>
-                <span class="mini-name">Jarold Bolaño</span>
-            </div>
+    <!-- ENCABEZADO SUPERIOR -->
+    <header class="content-header">
+      <div class="header-brand-group">
+        <div class="mini-logo-box">Qpc</div>
+        <div class="brand-text-wrapper">
+          <span class="brand-main-name">QUIMIASEO & PERFUMERÍA</span>
+          <span class="brand-sub-name">DEL CARIBE</span>
         </div>
-    </aside>
+      </div>
+      <div class="header-badge">
+        <i class="fa-solid fa-certificate"></i>
+        <span>Calidad Garantizada</span>
+      </div>
+    </header>
 
-    <!-- Contenido Principal -->
-    <main class="app-main-content">
-        
-        <!-- Header superior corporativo (ubicación y estado) -->
-        <header class="content-header">
-            <div class="mobile-brand-tag">
-                <div class="mini-logo-box">Qpc</div>
-                <span>QPC CARIBE</span>
-            </div>
-            <div class="header-location">
-                <i class="fa-solid fa-location-dot"></i>
-                <span>Sincelejo - Sucre</span>
-            </div>
-            <div class="header-badge-status">
-                <span class="status-dot"></span> Operativo
-            </div>
-        </header>
+    <!-- SECCIÓN HERO / BANNER PRINCIPAL -->
+    <section class="hero-section">
+      <div class="hero-badge-tag">
+        <i class="fa-solid fa-flask"></i> Distribución Mayorista y Detal
+      </div>
+      
+      <h1 class="hero-title">QUIMIASEO Y PERFUMERIA<br>DEL CARIBE</h1>
+      
+      <p class="hero-description">
+        Venta de Materias primas, Aromas, Saborizantes, Perfumes, Aceites, Jabón Líquido, Desinfectantes y Plásticos en General.
+      </p>
 
-        <!-- Bloque Hero Inmersivo -->
-        <section class="content-hero">
-            <div class="hero-text-block">
-                <div class="hero-tag">
-                    <i class="fa-solid fa-flask"></i> Distribución Mayorista y Detal
-                </div>
-                <h1 class="hero-heading">
-                    QUIMIASEO Y PERFUMERIA <br><span class="text-gradient-cyan">DEL CARIBE</span>
-                </h1>
-                <p class="hero-desc">
-                    Venta de Materias primas, Aromas, Saborizantes, Perfumes, Aceites, Jabón Líquido, Desinfectantes y Plásticos en General.
-                </p>
-                <div class="hero-actions">
-                    <a href="catalogo.html" class="btn-action-primary">
-                        <span>Explorar Catálogo Online</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
+      <div class="hero-actions">
+        <!-- El enlace apunta al ID #seccion-catalogo -->
+        <a href="catalogo.html" class="btn-primary-cta">
+          <span>Explorar Catálogo Online</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </section>
 
-            <!-- Panel visual lateral -->
-            <div class="hero-visual-card">
-                <div class="visual-card-glow"></div>
-                <div class="chemical-icon-box">
-                    <i class="fa-solid fa-vials"></i>
-                </div>
-                <h3>Esencias & Materias Primas</h3>
-                <p>Estándares estrictos de pureza y calidad garantizada para todos nuestros compuestos y productos de aseo.</p>
-            </div>
-        </section>
+    <!-- REJILLA DE TARJETAS INFORMATIVAS -->
+    <section class="features-grid">
+      
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i class="fa-solid fa-vials"></i>
+        </div>
+        <div class="feature-content">
+          <h3>Esencias & Materias Primas</h3>
+          <p>Estándares estrictos de pureza y calidad garantizada para todos nuestros compuestos y productos de aseo.</p>
+        </div>
+      </div>
 
-        <!-- Footer integrado -->
-        <footer class="content-footer">
-            <p>&copy; 2026 Quimiaseo y Perfumería del Caribe. Todos los derechos reservados.</p>
-        </footer>
-<script src="script.js"></script>
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="feature-content">
+          <h3>Director Encargado</h3>
+          <p>Jarold Bolaño</p>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div class="feature-content">
+          <h3>Ubicación</h3>
+          <p>Calle 21 No. 23 – 78 Centro, Sincelejo – Sucre</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SECCIÓN CATÁLOGO (AQUÍ BAJARÁ EL BOTÓN) -->
+    <section class="catalogo" id="seccion-catalogo">
+      <h2 class="catalogo-titulo">Catálogo de Productos</h2>
+      
+      <!-- Buscador -->
+      <div class="contenedor-buscador">
+        <input type="text" id="input-busqueda" placeholder="Buscar producto, aroma o materia prima...">
+      </div>
+
+      <!-- Filtros -->
+      <div class="filtros">
+        <button class="btn-filtro activo" data-categoria="todos">Todos</button>
+        <button class="btn-filtro" data-categoria="esencias">Esencias</button>
+        <button class="btn-filtro" data-categoria="aseo">Aseo</button>
+        <button class="btn-filtro" data-categoria="materias-primas">Materias Primas</button>
+      </div>
+
+      <!-- Grid de Productos (Rellenado dinámicamente por script.js) -->
+      <div class="productos" id="contenedor-productos">
+      </div>
+    </section>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="footer">
+      <div class="footer-derechos">
+        <p>&copy; 2026 Quimiaseo y Perfumería del Caribe. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+
+  </div>
 </body>
 </html>
