@@ -31,71 +31,7 @@ html, body {
 }
 
 /* ==========================================================
-   ENCABEZADO GLOBAL
-   ========================================================== */
-.header {
-  background-color: var(--color-primary);
-  padding: 1rem 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  width: 100%;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.logo-circulo-header {
-  width: 44px;
-  height: 44px;
-  background-color: #ffffff;
-  color: var(--color-primary); /* Azul principal #003399 */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-main);
-  font-weight: 800; /* Extra negrita */
-  font-size: 1.05rem;
-  letter-spacing: -0.5px; /* Ajuste entre letras similar a la imagen */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  flex-shrink: 0;
-}
-
-/* Logo Central Destacado de Inicio */
-.logo-hero {
-  width: 90px;
-  height: 90px;
-  background-color: #ffffff;
-  color: var(--color-primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 2.2rem;
-  letter-spacing: -1px;
-  box-shadow: 0 6px 20px rgba(0, 51, 153, 0.15);
-  margin-bottom: 1.5rem;
-  border: 3px solid var(--color-primary);
-}
-
-.logo-hero-img {
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
-  margin-bottom: 1.5rem;
-}
-/* ==========================================================
-   ESTILOS DE DISEÑO LIMPIO Y CORPORATIVO
+   ESTILOS DE DISEÑO LIMPIO (AZUL Y BLANCO CORPORATIVO)
    ========================================================== */
 
 * {
@@ -106,16 +42,16 @@ html, body {
 
 body.clean-layout-body {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #030712;
-    color: #f3f4f6;
+    background-color: #0b132b;
+    color: #f8fafc;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     overflow-x: hidden;
-    background: radial-gradient(circle at top right, rgba(14, 116, 144, 0.12), transparent 40%),
-                radial-gradient(circle at bottom left, rgba(30, 58, 138, 0.12), transparent 40%),
-                #030712;
+    background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.15), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(30, 64, 175, 0.15), transparent 40%),
+                #0b132b;
 }
 
 /* Contenedor Principal Centrado y Fluido */
@@ -137,12 +73,12 @@ body.clean-layout-body {
     align-items: center;
     margin-bottom: 3rem;
     font-size: 0.85rem;
-    color: #94a3b8;
+    color: #cbd5e1;
     gap: 1rem;
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(15, 23, 42, 0.8);
     padding: 12px 20px;
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
 }
 
@@ -159,7 +95,7 @@ body.clean-layout-body {
 .mini-logo-box {
     width: 35px;
     height: 35px;
-    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    background: #2563eb;
     color: white;
     border-radius: 10px;
     display: flex;
@@ -173,27 +109,27 @@ body.clean-layout-body {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
     padding: 8px 16px;
     border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .header-location i {
-    color: #ef4444;
+    color: #f87171;
 }
 
 .header-badge-status {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(34, 197, 94, 0.1);
+    background: rgba(34, 197, 94, 0.15);
     color: #4ade80;
     padding: 6px 14px;
     border-radius: 50px;
     font-size: 0.75rem;
     font-weight: 600;
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .status-dot {
@@ -218,14 +154,14 @@ body.clean-layout-body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(6, 182, 212, 0.1);
-    color: #22d3ee;
+    background: rgba(37, 99, 235, 0.15);
+    color: #93c5fd;
     padding: 6px 16px;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
     margin-bottom: 1.5rem;
-    border: 1px solid rgba(6, 182, 212, 0.2);
+    border: 1px solid rgba(37, 99, 235, 0.3);
 }
 
 .hero-heading {
@@ -245,7 +181,7 @@ body.clean-layout-body {
 
 .hero-desc {
     font-size: 1.05rem;
-    color: #94a3b8;
+    color: #cbd5e1;
     line-height: 1.6;
     margin-bottom: 2.5rem;
     max-width: 600px;
@@ -255,41 +191,42 @@ body.clean-layout-body {
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    background: #2563eb;
     color: white;
     padding: 16px 36px;
     border-radius: 14px;
     font-size: 1.05rem;
     font-weight: 700;
     text-decoration: none;
-    box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.4);
+    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-action-primary:hover {
+    background: #1d4ed8;
     transform: translateY(-3px);
-    box-shadow: 0 15px 30px -5px rgba(6, 182, 212, 0.6);
+    box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.7);
 }
 
 /* Tarjeta Visual Secundaria (Derecha) */
 .hero-visual-card {
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
     padding: 2.5rem 2rem;
     text-align: center;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 .chemical-icon-box {
     width: 70px;
     height: 70px;
-    background: rgba(37, 99, 235, 0.15);
+    background: rgba(37, 99, 235, 0.2);
     color: #60a5fa;
     border-radius: 20px;
     display: flex;
@@ -297,7 +234,7 @@ body.clean-layout-body {
     justify-content: center;
     font-size: 1.8rem;
     margin: 0 auto 1.5rem auto;
-    border: 1px solid rgba(37, 99, 235, 0.3);
+    border: 1px solid rgba(37, 99, 235, 0.4);
 }
 
 .hero-visual-card h3 {
@@ -309,15 +246,15 @@ body.clean-layout-body {
 
 .hero-visual-card p {
     font-size: 0.9rem;
-    color: #94a3b8;
+    color: #cbd5e1;
     line-height: 1.5;
     margin-bottom: 1.5rem;
 }
 
-/* Estilos de la Tarjeta del Administrador dentro del Hero */
+/* Estilos de la Tarjeta del Administrador */
 .admin-profile-box {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 12px 16px;
     border-radius: 14px;
     display: flex;
@@ -330,8 +267,8 @@ body.clean-layout-body {
 .admin-mini-badge {
     width: 40px;
     height: 40px;
-    background: rgba(245, 158, 11, 0.15);
-    color: #fbbf24;
+    background: rgba(37, 99, 235, 0.2);
+    color: #93c5fd;
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -347,7 +284,7 @@ body.clean-layout-body {
 
 .mini-label {
     font-size: 0.7rem;
-    color: #64748b;
+    color: #94a3b8;
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -356,15 +293,15 @@ body.clean-layout-body {
 .mini-name {
     font-size: 0.9rem;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #ffffff;
 }
 
 /* Footer */
 .content-footer {
     margin-top: 3rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 1.5rem;
-    color: #64748b;
+    color: #94a3b8;
     font-size: 0.85rem;
     text-align: center;
 }
@@ -375,7 +312,7 @@ body.clean-layout-body {
     gap: 2rem;
     margin-bottom: 0.8rem;
     flex-wrap: wrap;
-    color: #94a3b8;
+    color: #cbd5e1;
 }
 
 .footer-info-row span {
@@ -385,7 +322,7 @@ body.clean-layout-body {
 }
 
 .footer-info-row i {
-    color: #38bdf8;
+    color: #60a5fa;
 }
 
 /* Adaptación para Dispositivos Móviles */
