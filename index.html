@@ -10,22 +10,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="clean-layout-body">
 
-    <!-- Contenedor Principal Completo -->
-    <main class="clean-main-container">
-        
-        <!-- Header superior corporativo formal -->
-        <header class="content-header">
-            <div class="header-brand-group">
-                <div class="mini-logo-box">Qpc</div>
-                <div class="brand-text-wrapper">
-                    <span class="brand-main-name">QUIMIASEO & PERFUMERÍA</span>
-                    <span class="brand-sub-name">DEL CARIBE</span>
-                </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active">
+                <i class="fa-solid fa-house-chimney"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="catalogo.html" class="nav-item">
+                <i class="fa-solid fa-box-open"></i>
+                <span>Catálogo</span>
+            </a>
+            <a href="admin.html" class="nav-item">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Administración</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer-card">
+            <div class="admin-mini-badge">
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <div class="header-badge-corp">
-                <i class="fa-solid fa-certificate"></i> Calidad Garantizada
+            <div class="admin-mini-info">
+                <span class="mini-label">Director</span>
+                <span class="mini-name">Jarold Bolaño</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="app-main-content">
+        
+        <!-- Header superior corporativo (ubicación y estado) -->
+        <header class="content-header">
+            <div class="mobile-brand-tag">
+                <div class="mini-logo-box">Qpc</div>
+                <span>QPC CARIBE</span>
+            </div>
+            <div class="header-location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Sincelejo - Sucre</span>
+            </div>
+            <div class="header-badge-status">
+                <span class="status-dot"></span> Operativo
             </div>
         </header>
 
@@ -49,7 +75,7 @@
                 </div>
             </div>
 
-            <!-- Panel visual lateral con Info, Director y Ubicación -->
+            <!-- Panel visual lateral -->
             <div class="hero-visual-card">
                 <div class="visual-card-glow"></div>
                 <div class="chemical-icon-box">
@@ -57,28 +83,6 @@
                 </div>
                 <h3>Esencias & Materias Primas</h3>
                 <p>Estándares estrictos de pureza y calidad garantizada para todos nuestros compuestos y productos de aseo.</p>
-
-                <!-- Tarjeta del Administrador / Director -->
-                <div class="admin-profile-box">
-                    <div class="admin-mini-badge">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <div class="admin-mini-info">
-                        <span class="mini-label">Director Encargado</span>
-                        <span class="mini-name">Jarold Bolaño</span>
-                    </div>
-                </div>
-
-                <!-- Tarjeta de Ubicación (Justo debajo de Jarold) -->
-                <div class="location-profile-box">
-                    <div class="location-mini-badge">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-                    <div class="location-mini-info">
-                        <span class="mini-label">Ubicación</span>
-                        <span class="mini-address">Calle 21 No. 23 – 78 Centro, Sincelejo – Sucre</span>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -86,7 +90,6 @@
         <footer class="content-footer">
             <p>&copy; 2026 Quimiaseo y Perfumería del Caribe. Todos los derechos reservados.</p>
         </footer>
-    </main>
-
+<script src="script.js"></script>
 </body>
 </html>
