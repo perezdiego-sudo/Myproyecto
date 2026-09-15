@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">">
   <title>Quimiaseo y Perfumería del Caribe - Catálogo</title>
   
   <!-- Tipografía Google Fonts -->
@@ -72,43 +72,72 @@
     </section>
 
     <!-- MODAL DEL CARRITO -->
-    <div id="modal-carrito" class="modal-carrito oculto-modal">
-      <div class="modal-contenido">
+<div id="modal-carrito" class="modal-carrito oculto-modal">
+  <div class="modal-contenido">
 
-        <div class="modal-header">
-          <h2>Tu Carrito</h2>
-          <div class="modal-header-acciones">
-            <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
-            <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
-          </div>
+    <div class="modal-header">
+      <h2>Tu Carrito <span id="contador-titulo-modal">(0 productos)</span></h2>
+      <div class="modal-header-acciones">
+        <button id="btn-vaciar-carrito" class="btn-vaciar">Vaciar todo</button>
+        <button id="btn-cerrar-carrito" class="btn-cerrar">✕</button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <ul id="lista-carrito"></ul>
+
+      <!-- Opciones de envío/domicilio y datos del cliente -->
+      <div class="opcion-domicilio">
+
+        <!-- Nombre del cliente -->
+        <div class="campo-grupo">
+          <p class="titulo-domicilio">Nombre completo *</p>
+          <input type="text" id="input-nombre" class="input-direccion" placeholder="Ej: Maria Perez" autocomplete="name">
         </div>
 
-        <div class="modal-body">
-          <ul id="lista-carrito"></ul>
+        <!-- Opción de domicilio -->
+        <p class="titulo-domicilio" style="margin-top: 12px;">¿Requiere domicilio?</p>
+        <div class="radio-group">
+          <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
+          <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
+        </div>
 
-          <!-- Opciones de envío/domicilio -->
-          <div class="opcion-domicilio">
-            <p class="titulo-domicilio">¿Requiere domicilio?</p>
+        <!-- Dirección de entrega -->
+        <div id="contenedor-direccion">
+          <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa (Ej: Calle 20 #15-30)">
+          <small class="nota-domicilio" style="display: block; font-size: 11px; opacity: 0.8; margin-top: 4px;">* El valor del domicilio dependerá de la zona y se confirmará por WhatsApp.</small>
+        </div>
 
-            <div class="radio-group">
-              <label><input type="radio" name="tipoEnvio" value="Sí" checked> Sí, requiere domicilio</label>
-              <label><input type="radio" name="tipoEnvio" value="No"> No, recojo en local</label>
-            </div>
+        <!-- Método de pago -->
+        <div class="campo-grupo" style="margin-top: 12px;">
+          <p class="titulo-domicilio">Método de pago preferido</p>
+          <select id="select-pago" class="input-direccion">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Nequi">Nequi</option>
+            <option value="Daviplata">Daviplata</option>
+            <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+          </select>
+        </div>
 
-            <input type="text" id="input-direccion" class="input-direccion" placeholder="Escribe tu dirección completa (Ej: Calle 20 #15-30)">
-          </div>
-
-          <!-- Resumen del total -->
-          <div class="resumen-precios">
-            <p id="subtotal-carrito">Subtotal: $0</p>
-            <p id="total-carrito" class="total-resaltado">Total: $0</p>
-          </div>
-
-          <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
+        <!-- Notas adicionales -->
+        <div class="campo-grupo" style="margin-top: 12px;">
+          <p class="titulo-domicilio">Notas / Observaciones (Opcional)</p>
+          <input type="text" id="input-notas" class="input-direccion" placeholder="Ej: Traer cambio de $50.000 / Entregar por la tarde">
         </div>
 
       </div>
+
+      <!-- Resumen del total -->
+      <div class="resumen-precios">
+        <p id="subtotal-carrito">Subtotal: $0</p>
+        <p id="total-carrito" class="total-resaltado">Total: $0</p>
+      </div>
+
+      <button id="btn-enviar-pedido">Enviar pedido por WhatsApp</button>
     </div>
+
+  </div>
+</div>
 
     <!-- MODAL ZOOM DE IMAGEN -->
     <div id="modal-zoom" class="modal-zoom oculto-modal">

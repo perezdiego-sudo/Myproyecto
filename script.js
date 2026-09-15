@@ -13,8 +13,16 @@ const btnAbrirCarrito = document.getElementById('btn-abrir-carrito');
 const btnCerrarCarrito = document.getElementById('btn-cerrar-carrito');
 const btnVaciarCarrito = document.getElementById('btn-vaciar-carrito');
 const contadorCarrito = document.getElementById('contador-carrito');
+const contadorTituloModal = document.getElementById('contador-titulo-modal');
+
+// Nuevos campos del carrito
+const inputNombre = document.getElementById('input-nombre');
 const inputDireccion = document.getElementById('input-direccion');
+const contenedorDireccion = document.getElementById('contenedor-direccion');
+const selectPago = document.getElementById('select-pago');
+const inputNotas = document.getElementById('input-notas');
 const radiosEnvio = document.querySelectorAll('input[name="tipoEnvio"]');
+
 const listaCarrito = document.getElementById('lista-carrito');
 const subtotalCarrito = document.getElementById('subtotal-carrito');
 const totalCarrito = document.getElementById('total-carrito');
@@ -319,12 +327,16 @@ if (modalCarrito) {
   });
 }
 
+// Ocultar/Mostrar contenedor de dirección
 radiosEnvio.forEach(radio => {
   radio.addEventListener('change', () => {
-    if (radio.value === 'Sí' && radio.checked) {
-      inputDireccion.classList.remove('oculto');
-    } else if (radio.value === 'No' && radio.checked) {
-      inputDireccion.classList.add('oculto');
+    const targetElement = contenedorDireccion || inputDireccion;
+    if (targetElement) {
+      if (radio.value === 'Sí' && radio.checked) {
+        targetElement.classList.remove('oculto');
+      } else if (radio.value === 'No' && radio.checked) {
+        targetElement.classList.add('oculto');
+      }
     }
   });
 });
@@ -497,7 +509,7 @@ function inicializarEventosProductos() {
       const stockTotalTxt = productoDiv.dataset.stock;
       const productoExistente = carrito.find(item => item.nombre === nombre);
 
-      // Verificación preventiva de stock antes de agregar al carrito
+      // Verificación preventiva de stock
       if (stockTotalTxt !== '' && stockTotalTxt !== undefined) {
         const stockTotal = Number(stockTotalTxt);
         let equivalencia = 1;
@@ -542,7 +554,7 @@ function inicializarEventosProductos() {
 }
 
 // ==========================================================
-// ACTUALIZAR ESTADO DEL CARRITO (CON LÍMITE EN EL BOTÓN +)
+// ACTUALIZAR ESTADO DEL CARRITO
 // ==========================================================
 function actualizarCarrito() {
   if (!listaCarrito) return;
@@ -575,7 +587,6 @@ function actualizarCarrito() {
     });
 
     li.querySelector('.btn-sumar').addEventListener('click', () => {
-      // Validar si al presionar + se supera el stock disponible en la tienda
       const tarjetaProducto = document.querySelector(`.producto[data-id="${item.productoId}"]`);
       if (tarjetaProducto && tarjetaProducto.dataset.stock !== '') {
         const stockDisponible = Number(tarjetaProducto.dataset.stock);
@@ -624,20 +635,24 @@ function actualizarCarrito() {
     totalCarrito.textContent = `Total: $${Math.round(total).toLocaleString('es-CO')}`;
   }
 
+  // Contador flotante del botón abrir carrito
   if (contadorCarrito) {
-    const totalUnidades = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-    contadorCarrito.textContent = totalUnidades;
+    contadorCarrito.textContent = carrito.length;
+  }
+
+  // Contador en el título del modal
+  if (contadorTituloModal) {
+    contadorTituloModal.textContent = `(${carrito.length} ${carrito.length === 1 ? 'producto' : 'productos'})`;
   }
 
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
 // ==========================================================
-// DESCUENTO ATÓMICO CON TRANSACCIONES (EVITA SOBREVENTAS)
+// DESCUENTO ATÓMICO CON TRANSACCIONES
 // ==========================================================
 async function descontarStockAtomico(itemsCarrito) {
   await runTransaction(db, async (transaction) => {
-    // 1. Fase de Lectura previa
     const lecturas = [];
     for (const item of itemsCarrito) {
       if (!item.productoId) continue;
@@ -645,7 +660,6 @@ async function descontarStockAtomico(itemsCarrito) {
       lecturas.push({ ref, item, snap: await transaction.get(ref) });
     }
 
-    // 2. Validación de Stock
     for (const { snap, item } of lecturas) {
       if (!snap.exists()) continue;
       const data = snap.data();
@@ -660,7 +674,6 @@ async function descontarStockAtomico(itemsCarrito) {
       }
     }
 
-    // 3. Aplicar descuento de Stock
     for (const { ref, snap, item } of lecturas) {
       if (!snap.exists()) continue;
       const data = snap.data();
@@ -677,7 +690,7 @@ async function descontarStockAtomico(itemsCarrito) {
 }
 
 // ==========================================================
-// ENVIAR A WHATSAPP
+// ENVIAR PEDIDO A WHATSAPP
 // ==========================================================
 if (btnEnviarPedido) {
   btnEnviarPedido.addEventListener('click', async () => {
@@ -686,15 +699,29 @@ if (btnEnviarPedido) {
       return;
     }
 
-    const radioSeleccionado = document.querySelector('input[name="tipoEnvio"]:checked');
-    const requiereDomicilio = radioSeleccionado ? radioSeleccionado.value : 'No';
-
-    if (requiereDomicilio === 'Sí' && inputDireccion.value.trim() === '') {
-      alert('Por favor escribe la dirección para el domicilio.');
+    // Validación de Nombre
+    const nombreCliente = inputNombre ? inputNombre.value.trim() : '';
+    if (!nombreCliente) {
+      alert('Por favor escribe tu nombre completo.');
+      if (inputNombre) inputNombre.focus();
       return;
     }
 
-    // 1. Ejecutar descuento seguro en transacción atómica
+    // Validación de Domicilio
+    const radioSeleccionado = document.querySelector('input[name="tipoEnvio"]:checked');
+    const requiereDomicilio = radioSeleccionado ? radioSeleccionado.value : 'No';
+    const direccionTexto = inputDireccion ? inputDireccion.value.trim() : '';
+
+    if (requiereDomicilio === 'Sí' && !direccionTexto) {
+      alert('Por favor escribe la dirección completa para el domicilio.');
+      if (inputDireccion) inputDireccion.focus();
+      return;
+    }
+
+    const metodoPago = selectPago ? selectPago.value : 'Efectivo';
+    const notasTexto = inputNotas ? inputNotas.value.trim() : '';
+
+    // 1. Ejecutar descuento seguro en Firestore
     try {
       await descontarStockAtomico(carrito);
     } catch (error) {
@@ -702,7 +729,7 @@ if (btnEnviarPedido) {
       return;
     }
 
-    // 2. Formatear mensaje de WhatsApp
+    // 2. Formatear mensaje para WhatsApp
     const fecha = new Date().toLocaleDateString('es-CO');
     const hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
@@ -711,7 +738,9 @@ if (btnEnviarPedido) {
     textoMensaje += `COMPROBANTE DE PEDIDO\n`;
     textoMensaje += `Fecha: ${fecha} | ${hora}\n`;
     textoMensaje += `==============================\n\n`;
-    textoMensaje += `Hola, quiero realizar el siguiente pedido:\n\n`;
+    textoMensaje += `*CLIENTE:* ${nombreCliente}\n`;
+    textoMensaje += `*MÉTODO DE PAGO:* ${metodoPago}\n\n`;
+    textoMensaje += `*DETALLE DEL PEDIDO:*\n`;
 
     carrito.forEach(item => {
       const subtotal = Math.round(item.precio * item.cantidad);
@@ -725,7 +754,11 @@ if (btnEnviarPedido) {
     textoMensaje += `*¿Requiere domicilio?:* ${requiereDomicilio}\n`;
 
     if (requiereDomicilio === 'Sí') {
-      textoMensaje += `*Dirección:* ${inputDireccion.value.trim()}\n`;
+      textoMensaje += `*Dirección:* ${direccionTexto}\n`;
+    }
+
+    if (notasTexto) {
+      textoMensaje += `*Notas:* ${notasTexto}\n`;
     }
 
     textoMensaje += `*TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}\n`;
@@ -734,16 +767,20 @@ if (btnEnviarPedido) {
 
     const urlWhatsApp = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP}&text=${encodeURIComponent(textoMensaje)}`;
 
-    // 3. Vaciar el carrito y redirigir
+    // 3. Vaciar carrito e inputs
     carrito = [];
     actualizarCarrito();
+
+    if (inputNombre) inputNombre.value = '';
+    if (inputDireccion) inputDireccion.value = '';
+    if (inputNotas) inputNotas.value = '';
 
     window.location.href = urlWhatsApp;
   });
 }
 
 // ==========================================================
-// MODAL DE ZOOM Y CARGA INICIAL EN TIEMPO REAL
+// MODAL DE ZOOM Y CARGA INICIAL
 // ==========================================================
 if (modalZoom) {
   modalZoom.addEventListener('click', () => modalZoom.classList.add('oculto-modal'));

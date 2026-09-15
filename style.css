@@ -971,6 +971,12 @@ body.clean-layout-body {
 /* ==========================================================
    ADAPTACIONES MÓVILES (PREVENIR ZOOM EN INPUTS Y AJUSTES)
    ========================================================== */
+
+/* Previene el ajuste automático de texto en navegadores basados en WebKit (iOS) */
+html, body {
+  -webkit-text-size-adjust: 100%;
+}
+
 @media (max-width: 768px) {
   .clean-main-container {
     padding: 1.2rem 0.8rem;
@@ -1003,13 +1009,15 @@ body.clean-layout-body {
     justify-content: flex-start;
   }
 
+  /* REGLA GENERAL PARA TODOS LOS CAMPOS DE TEXTO Y DESPLEGABLES */
+  input,
+  select,
+  textarea,
   .input-cantidad-group input,
   .input-direccion,
   .select-estilizado,
-  #input-busqueda,
-  input[type="number"],
-  input[type="text"] {
-    font-size: 16px !important; /* Previene el auto-zoom en dispositivos móviles */
+  #input-busqueda {
+    font-size: 16px !important; /* Fuerza 16px en TODOS los inputs para evitar auto-zoom */
   }
 
   .btn-carrito-flotante {
