@@ -524,8 +524,51 @@
       .header-container {
         width: calc(100% - 20px);
         margin: 10px auto 0 auto;
-        padding: 10px 14px;
+        padding: 12px 14px;
         border-radius: 16px;
+        flex-direction: column !important; /* Pasa el logo/título arriba y botones abajo */
+        align-items: center !important;
+        text-align: center !important;
+        gap: 10px !important;
+      }
+
+      .brand {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 6px !important;
+        width: 100% !important;
+      }
+
+      .brand-text {
+        align-items: center !important;
+        text-align: center !important;
+        width: 100% !important;
+      }
+
+      .brand-title {
+        white-space: normal !important; /* Permite que el título pase a 2 líneas en vez de solaparse */
+        word-break: break-word !important;
+        font-size: 0.85rem !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+      }
+
+      .brand-subtitle {
+        text-align: center !important;
+        font-size: 0.65rem !important;
+      }
+
+      .header-actions {
+        width: 100% !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+
+      .btn-inicio, .btn-logout {
+        padding: 6px 14px !important;
+        font-size: 0.78rem !important;
       }
 
       #user-email {
