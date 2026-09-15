@@ -1017,99 +1017,74 @@ body.clean-layout-body {
 }
 
 /* ==========================================================
-   ADAPTACIONES MÓVILES Y PREVENCIÓN DE SOLAPAMIENTO / ZOOM
+   CORRECCIÓN DEFINITIVA DE SOLAPAMIENTO EN HEADER MÓVIL
    ========================================================== */
-
-/* Previene el ajuste automático de texto en iOS */
-html, body {
-  -webkit-text-size-adjust: 100%;
-}
-
-@media (max-width: 768px) {
-  .clean-main-container {
-    padding: 1rem 0.6rem;
-  }
-
-  /* RESTRUCTURACIÓN COMPLETA DEL HEADER EN MÓVILES */
-  .content-header {
+@media screen and (max-width: 768px) {
+  /* 1. Convertir la cabecera en un contenedor vertical que auto-crece */
+  .clean-main-container .content-header {
+    display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
+    height: auto !important;
+    min-height: auto !important;
+    padding: 16px 10px !important;
     gap: 12px !important;
-    padding: 12px 10px !important;
-    text-align: center !important;
   }
 
-  .header-brand-group {
+  /* 2. Anular cualquier posición absoluta o flotante de los elementos internos */
+  .clean-main-container .content-header *,
+  .clean-main-container .content-header *::before,
+  .clean-main-container .content-header *::after {
+    position: static !important;
+    transform: none !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+  }
+
+  /* 3. Agrupar Logo y Nombre centrados verticalmente */
+  .clean-main-container .header-brand-group {
+    display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 8px !important;
-    width: 100% !important;
-  }
-
-  .brand-text-wrapper {
-    align-items: center !important;
     text-align: center !important;
     width: 100% !important;
+    gap: 6px !important;
   }
 
-  .brand-main-name {
-    font-size: 0.8rem !important;
+  .clean-main-container .brand-text-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .clean-main-container .brand-main-name {
+    font-size: 0.85rem !important;
     white-space: normal !important;
     word-break: break-word !important;
-    line-height: 1.2 !important;
+    line-height: 1.3 !important;
   }
 
-  .brand-sub-name {
-    font-size: 0.65rem !important;
-  }
-
-  /* BOTONES DE NAVEGACIÓN (INICIO, SALIR, VOLVER) */
-  .content-header a,
-  .content-header button,
-  .btn-back-home {
-    font-size: 0.78rem !important;
+  /* 4. Enviar los botones (Inicio, Salir) a una fila propia debajo del texto */
+  .clean-main-container .content-header a,
+  .clean-main-container .content-header button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 4px !important;
+    font-size: 0.8rem !important;
     padding: 6px 14px !important;
-    white-space: nowrap !important;
   }
 
-  /* BANNER Y HERO */
-  .hero-section {
-    padding: 1.5rem 1rem;
-  }
-
-  .hero-title {
-    font-size: 1.5rem;
-  }
-
-  .hero-description {
-    font-size: 0.9rem;
-  }
-
-  .btn-primary-cta {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .filtros {
-    justify-content: flex-start;
-  }
-
-  /* PREVENCIÓN DE AUTO-ZOOM EN TODOS LOS CAMPOS */
-  input,
-  select,
-  textarea,
+  /* 5. Mantener la prevención de zoom en campos de texto */
+  input, select, textarea,
   .input-cantidad-group input,
   .input-direccion,
   .select-estilizado,
   #input-busqueda {
     font-size: 16px !important;
-  }
-
-  .btn-carrito-flotante {
-    bottom: 16px;
-    right: 16px;
-    width: 50px;
-    height: 50px;
   }
 }
