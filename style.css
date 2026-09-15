@@ -972,32 +972,118 @@ body.clean-layout-body {
    ADAPTACIONES MÓVILES (PREVENIR ZOOM EN INPUTS Y AJUSTES)
    ========================================================== */
 
-/* Previene el ajuste automático de texto en navegadores basados en WebKit (iOS) */
+/* Ajuste responsivo para el encabezado en pantallas pequeñas */
+@media (max-width: 768px) {
+  /* Contenedor principal de la cabecera */
+  .header, 
+  .navbar, 
+  .admin-header, 
+  .header-container {
+    flex-direction: column !important;
+    height: auto !important;
+    padding: 12px 8px !important;
+    gap: 10px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  /* Título y subtítulo del panel */
+  .header-title, 
+  .brand-info, 
+  .titulo-header {
+    font-size: 0.85rem !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: break-word;
+  }
+
+  /* Botones de navegación (Inicio, Salir) */
+  .header-acciones, 
+  .nav-buttons, 
+  .user-actions {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-top: 4px;
+  }
+
+  .header-acciones button,
+  .header-acciones a,
+  .nav-buttons a {
+    font-size: 0.8rem !important;
+    padding: 6px 12px !important;
+  }
+}
+
+/* ==========================================================
+   ADAPTACIONES MÓVILES Y PREVENCIÓN DE SOLAPAMIENTO / ZOOM
+   ========================================================== */
+
+/* Previene el ajuste automático de texto en iOS */
 html, body {
   -webkit-text-size-adjust: 100%;
 }
 
 @media (max-width: 768px) {
   .clean-main-container {
-    padding: 1.2rem 0.8rem;
+    padding: 1rem 0.6rem;
   }
 
+  /* RESTRUCTURACIÓN COMPLETA DEL HEADER EN MÓVILES */
   .content-header {
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    padding: 12px 10px !important;
+    text-align: center !important;
   }
 
+  .header-brand-group {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .brand-text-wrapper {
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  .brand-main-name {
+    font-size: 0.8rem !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    line-height: 1.2 !important;
+  }
+
+  .brand-sub-name {
+    font-size: 0.65rem !important;
+  }
+
+  /* BOTONES DE NAVEGACIÓN (INICIO, SALIR, VOLVER) */
+  .content-header a,
+  .content-header button,
+  .btn-back-home {
+    font-size: 0.78rem !important;
+    padding: 6px 14px !important;
+    white-space: nowrap !important;
+  }
+
+  /* BANNER Y HERO */
   .hero-section {
-    padding: 1.8rem 1.2rem;
+    padding: 1.5rem 1rem;
   }
 
   .hero-title {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 
   .hero-description {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .btn-primary-cta {
@@ -1009,7 +1095,7 @@ html, body {
     justify-content: flex-start;
   }
 
-  /* REGLA GENERAL PARA TODOS LOS CAMPOS DE TEXTO Y DESPLEGABLES */
+  /* PREVENCIÓN DE AUTO-ZOOM EN TODOS LOS CAMPOS */
   input,
   select,
   textarea,
@@ -1017,13 +1103,13 @@ html, body {
   .input-direccion,
   .select-estilizado,
   #input-busqueda {
-    font-size: 16px !important; /* Fuerza 16px en TODOS los inputs para evitar auto-zoom */
+    font-size: 16px !important;
   }
 
   .btn-carrito-flotante {
     bottom: 16px;
     right: 16px;
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
   }
 }
